@@ -1,0 +1,15 @@
+.DS_Store
+.git
+coverage
+node_modules
+__tests__
+
+.dockerignore
+.env
+.gitignore
+banner.png
+Dockerfile
+jest.config.js
+nconf.json
+yarn-error.log
+yarn.lock
