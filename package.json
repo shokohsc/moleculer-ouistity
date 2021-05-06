@@ -13,6 +13,7 @@
     "moleculer": "0.14.13",
     "moleculer-repl": "0.6.4",
     "moleculer-web": "0.10.0-beta2",
+    "nats": "1.4.12",
     "nconf": "0.11.2",
     "uuid": "8.3.2"
   },
