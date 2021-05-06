@@ -15,9 +15,14 @@ if (nconf.get('APP_MOLECULER_METRICS_PORT')) { APP_MOLECULER_METRICS_PORT = pars
 if (nconf.get('APP_NATS_PORT')) { APP_NATS_PORT = parseInt(nconf.get('APP_NATS_PORT')) }
 // ************************************
 
+const APP_GLOBAL_GATEWAY_URL = nconf.get('APP_GLOBAL_GATEWAY_URL') || 'http://localhost:5000'
+
 const APP_NATS_HOSTNAME = nconf.get('APP_NATS_HOSTNAME') || 'localhost'
 
 module.exports = {
+  global: {
+    gatewayUrl: APP_GLOBAL_GATEWAY_URL
+  },
   moleculer: {
     port: APP_MOLECULER_API_GATEWAY_PORT,
     metrics: {

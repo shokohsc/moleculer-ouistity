@@ -10,13 +10,21 @@
     "start:dev": "moleculer-runner --repl --hot --config moleculer.config.js services"
   },
   "dependencies": {
+    "adm-zip": "0.5.5",
+    "archive-type": "4.0.0",
     "axios": "0.21.1",
+    "fs-extra": "10.0.0",
+    "glob": "7.1.6",
+    "glob-promise": "4.1.0",
+    "lodash": "4.17.21",
     "moleculer": "0.14.13",
     "moleculer-repl": "0.6.4",
     "moleculer-web": "0.10.0-beta2",
     "nats": "1.4.12",
     "nconf": "0.11.2",
-    "uuid": "8.3.2"
+    "read-chunk": "3.2.0",
+    "uuid": "8.3.2",
+    "yamljs": "0.3.0"
   },
   "devDependencies": {
     "jest": "26.6.3",
