@@ -3,8 +3,6 @@ const { snakeCase } = require('lodash')
 const archiveType = require('archive-type')
 const readChunk = require('read-chunk')
 const glob = require('glob-promise')
-const YAML = require('yamljs')
-const fse = require('fs-extra')
 
 const { global: { gatewayUrl } } = require('../../../application.config')
 const types = ['zip', 'rar']
@@ -32,8 +30,9 @@ const handler = async function (ctx) {
         // reading content of zip
         data.content = await this.broker.call('ArchivesDomain.GetAllEntriesQuery', { archive, type: type.ext })
         // write the data
-        await fse.ensureDirSync(`${sourcePath}/content`)
-        await fse.outputFileSync(`${sourcePath}/content/${urn}.yaml`, YAML.stringify(data, 8, 2))
+        await this.broker.call('BooksDomain.create', data)
+        const result = await this.broker.call('BooksDomain.find')
+        console.log(result)
       }
     } while (files.length > 0)
     return { success: true }

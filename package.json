@@ -18,6 +18,8 @@
     "glob-promise": "4.1.0",
     "lodash": "4.17.21",
     "moleculer": "0.14.13",
+    "moleculer-db": "0.8.13",
+    "moleculer-db-adapter-mongo": "0.4.11",
     "moleculer-repl": "0.6.4",
     "moleculer-web": "0.10.0-beta2",
     "nats": "1.4.12",

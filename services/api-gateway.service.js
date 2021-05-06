@@ -32,7 +32,8 @@ module.exports = {
         'GET status/readiness' (req, res) {
           res.setHeader('Content-Type', 'application/json; charset=utf-8')
           res.end(JSON.stringify({ ready: true }))
-        }
+        },
+        'GET api/v1/books': 'BooksDomain.list'
       }
     }]
   }
