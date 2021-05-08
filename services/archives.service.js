@@ -1,7 +1,7 @@
 module.exports = {
   name: 'ArchivesDomain',
   actions: {
-    GetDataFromFilepathQuery: require('./actions/archives/GetDataFromFilepathQuery'),
-    GenerateCatalogCommand: require('./actions/archives/GenerateCatalogCommand')
+    GenerateBooksCatalogCommand: require('./actions/archives/GenerateBooksCatalogCommand'),
+    GeneratePagesCatalogCommand: require('./actions/archives/GeneratePagesCatalogCommand')
   }
 }

@@ -13,6 +13,9 @@ const handler = async function (ctx) {
     const { source = '../../../assets/data' } = ctx.params
     const sourcePath = path.resolve(__dirname, source)
     const files = glob.sync(`${sourcePath}/archives/**/*.*`)
+    const books = {}
+    // STEP 1: generate books
+    this.logger.info(ctx.action.name, 'STEP 1: generate books')
     do {
       const archive = files.shift()
       // prepare the data
@@ -27,8 +30,6 @@ const handler = async function (ctx) {
           archive,
           type
         }
-        // reading content of zip
-        data.content = await this.broker.call('ArchivesDomain.GetDataFromFilepathQuery', { archive, type: type.ext, book: urn })
         // remove old entries with this book urn
         const items = await this.broker.call('BooksDomain.find', { query: { urn } })
         if (items.length > 0) {
@@ -37,10 +38,23 @@ const handler = async function (ctx) {
             await this.broker.call('BooksDomain.remove', { id: item._id })
           } while (items.length > 0)
         }
-        // insert new value
-        await this.broker.call('BooksDomain.create', data)
+        // insert new book
+        const result = await this.broker.call('BooksDomain.create', data)
+        books[result.urn] = result._id
       }
     } while (files.length > 0)
+    // STEP 2: generate pages for books
+    this.logger.info(ctx.action.name, 'STEP 2: generate pages for books')
+    const keys = Object.keys(books)
+    const ids = []
+    keys.map(key => {
+      ids.push(books[key])
+      return true
+    })
+    do {
+      const id = ids.shift()
+      await this.broker.call('ArchivesDomain.GeneratePagesCatalogCommand', { id })
+    } while (ids.length > 0)
     return { success: true }
   } catch (e) {
     this.logger.error(e.message)

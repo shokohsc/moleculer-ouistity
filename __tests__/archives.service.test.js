@@ -20,7 +20,7 @@ afterAll(async () => {
 
 describe('service books', () => {
   test('should generate catalog from archives', async () => {
-    const { success } = await broker.call('ArchivesDomain.GenerateCatalogCommand')
+    const { success } = await broker.call('ArchivesDomain.GenerateBooksCatalogCommand')
     expect(success).toEqual(true)
   })
 })

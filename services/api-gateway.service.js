@@ -33,7 +33,8 @@ module.exports = {
           res.setHeader('Content-Type', 'application/json; charset=utf-8')
           res.end(JSON.stringify({ ready: true }))
         },
-        'GET api/v1/books': 'BooksDomain.list'
+        'GET api/v1/books': 'BooksDomain.list',
+        'GET api/v1/pages': 'PagesDomain.list'
       }
     }]
   }
