@@ -28,11 +28,17 @@ const handler = async function (ctx) {
           type
         }
         // reading content of zip
-        data.content = await this.broker.call('ArchivesDomain.GetAllEntriesQuery', { archive, type: type.ext })
-        // write the data
+        data.content = await this.broker.call('ArchivesDomain.GetDataFromFilepathQuery', { archive, type: type.ext, book: urn })
+        // remove old entries with this book urn
+        const items = await this.broker.call('BooksDomain.find', { query: { urn } })
+        if (items.length > 0) {
+          do {
+            const item = items.shift()
+            await this.broker.call('BooksDomain.remove', { id: item._id })
+          } while (items.length > 0)
+        }
+        // insert new value
         await this.broker.call('BooksDomain.create', data)
-        const result = await this.broker.call('BooksDomain.find')
-        console.log(result)
       }
     } while (files.length > 0)
     return { success: true }
