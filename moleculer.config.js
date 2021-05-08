@@ -6,7 +6,7 @@ const { moleculer: { metrics }, nats } = require('./application.config')
 module.exports = {
   nodeID: `node-${name}-${version}-${uuidv4()}`,
   logger: true,
-  cacher: 'Memory',
+  cacher: false,
   transporter: {
     type: 'NATS',
     options: {

@@ -13,7 +13,7 @@ const handler = async function (ctx) {
     const { source = '../../../assets/data' } = ctx.params
     const sourcePath = path.resolve(__dirname, source)
     const files = glob.sync(`${sourcePath}/archives/**/*.*`)
-    const books = {}
+    // const books = {}
     // STEP 1: generate books
     this.logger.info(ctx.action.name, 'STEP 1: generate books')
     do {
@@ -21,43 +21,27 @@ const handler = async function (ctx) {
       // prepare the data
       const buffer = readChunk.sync(archive, 0, 262)
       const type = archiveType(buffer)
-      const urn = `urn:ouistity:books:${snakeCase(path.basename(archive, path.extname(archive)))}`
-      let data = {}
       if (types.includes(type.ext)) {
-        data = {
-          urn,
+        // upsert books
+        const urn = `urn:ouistity:books:${snakeCase(path.basename(archive, path.extname(archive)))}`
+        const count = await this.broker.call('BooksDomain.count', { query: { id: urn } })
+        const action = (count === 0) ? 'create' : 'update'
+        this.logger.info(ctx.action.name, `${urn} action: ${action}`)
+        await this.broker.call(`BooksDomain.${action}`, {
+          id: urn,
           url: `${gatewayUrl}/api/books/${urn}`,
           archive,
           type
-        }
-        // remove old entries with this book urn
-        const items = await this.broker.call('BooksDomain.find', { query: { urn } })
-        if (items.length > 0) {
-          do {
-            const item = items.shift()
-            await this.broker.call('BooksDomain.remove', { id: item._id })
-          } while (items.length > 0)
-        }
-        // insert new book
-        const result = await this.broker.call('BooksDomain.create', data)
-        books[result.urn] = result._id
+        })
+        // upsert pages for this book
+        await this.broker.call('ArchivesDomain.GeneratePagesCatalogCommand', { id: urn })
       }
     } while (files.length > 0)
-    // STEP 2: generate pages for books
-    this.logger.info(ctx.action.name, 'STEP 2: generate pages for books')
-    const keys = Object.keys(books)
-    const ids = []
-    keys.map(key => {
-      ids.push(books[key])
-      return true
-    })
-    do {
-      const id = ids.shift()
-      await this.broker.call('ArchivesDomain.GeneratePagesCatalogCommand', { id })
-    } while (ids.length > 0)
     return { success: true }
   } catch (e) {
-    this.logger.error(e.message)
+    /* istanbul ignore next */
+    this.logger.error(ctx.action.name, e.message)
+    /* istanbul ignore next */
     return { success: false, error: e.message }
   }
 }

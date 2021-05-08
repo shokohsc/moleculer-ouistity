@@ -2,14 +2,16 @@ version: "3.7"
 
 services:
 
-  mongodb:
-    image: "bitnami/mongodb:4.4"
-    volumes:
-      - "mongodb_data:/bitnami"
+  rethinkdb:
+    image: rethinkdb:2.4.0
     networks:
       - "public"
+    volumes:
+      - rethinkdb_data:/data
     ports:
-      - "27017:27017/tcp"
+      - "28015:28015/tcp"
+      - "29015:29015/tcp"
+      - "8080:8080/tcp"
 
   nats:
     image: "nats:2.2.0-alpine"
@@ -28,7 +30,7 @@ services:
 
 volumes:
 
-  mongodb_data:
+  rethinkdb_data:
 
 networks:
 
