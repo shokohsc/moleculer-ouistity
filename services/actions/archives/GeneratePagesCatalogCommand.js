@@ -11,20 +11,22 @@ const handler = async function (ctx) {
     this.logger.info(ctx.action.name, ctx.params)
     const { id } = ctx.params
     // get the book
-    const book = await this.broker.call('BooksDomain.get', { id })
+    const [book] = await this.broker.call('BooksDomain.find', { query: { urn: id } })
     const { type, archive } = book
     // remove old entries with this book urn
-    const items = await this.broker.call('PagesDomain.find', { query: { book: book.id } })
-    this.logger.info(ctx.action.name, book.id, items.length)
+    const items = await this.broker.call('PagesDomain.find', { query: { book: book.urn } })
+    this.logger.info(ctx.action.name, book.urn, items.length)
+    const entities = []
     if (items.length > 0) {
+      this.logger.info(ctx.action.name, 'remove old entries with this book urn')
       do {
         const item = items.shift()
-        await this.broker.call('PagesDomain.remove', { id: item.id })
+        await this.broker.call('PagesDomain.remove', { id: item._id })
       } while (items.length > 0)
     }
     // analyse zip
     let num = 1
-    if (type.ext === 'zip') {
+    if (type === 'zip') {
       // reading archives
       const zip = new AdmZip(archive)
       const zipEntries = zip.getEntries()
@@ -34,18 +36,19 @@ const handler = async function (ctx) {
         // added only if extname is allowed
         if (ImagesExtensions.includes(path.extname(name))) {
           const urn = `urn:ouistity::books:${id}:pages:${snakeCase(name)}`
-          const data = {
-            id: urn,
-            book: book.id,
+          entities.push({
+            urn,
+            book: book.urn,
             url: `${gatewayUrl}/api/pages/${urn}`,
             archive,
             num
-          }
-          await this.broker.call('PagesDomain.create', data)
+          })
           num += 1
         }
       } while (zipEntries.length > 0)
     }
+    // batch insert
+    await this.broker.call('PagesDomain.insert', { entities })
     return { success: true }
   } catch (e) {
     /* istanbul ignore next */

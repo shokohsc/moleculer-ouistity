@@ -238,6 +238,7 @@ class RethinkDBAdapter {
   insertMany (entities) {
     return new Promise(function (resolve, reject) {
       r.table(this.table).insert(entities).run(this.client, function (err, res) {
+        console.log(err, res)
         if (err) reject(err)
         resolve(
           this.findByIds(res.generated_keys)
@@ -277,6 +278,7 @@ class RethinkDBAdapter {
   updateById (_id, update) {
     return new Promise(function (resolve, reject) {
       if ('$set' in update) { update = update.$set }
+      console.log(update)
       r.table(this.table).get(_id).update(update).run(this.client, function (err, res) {
         if (err) reject(err)
         resolve(

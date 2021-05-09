@@ -13,7 +13,6 @@ const handler = async function (ctx) {
     const { source = '../../../assets/data' } = ctx.params
     const sourcePath = path.resolve(__dirname, source)
     const files = glob.sync(`${sourcePath}/archives/**/*.*`)
-    // const books = {}
     // STEP 1: generate books
     this.logger.info(ctx.action.name, 'STEP 1: generate books')
     do {
@@ -24,15 +23,26 @@ const handler = async function (ctx) {
       if (types.includes(type.ext)) {
         // upsert books
         const urn = `urn:ouistity:books:${snakeCase(path.basename(archive, path.extname(archive)))}`
-        const count = await this.broker.call('BooksDomain.count', { query: { id: urn } })
+        const count = await this.broker.call('BooksDomain.count', { query: { urn } })
         const action = (count === 0) ? 'create' : 'update'
-        this.logger.info(ctx.action.name, `${urn} action: ${action}`)
-        await this.broker.call(`BooksDomain.${action}`, {
-          id: urn,
-          url: `${gatewayUrl}/api/books/${urn}`,
-          archive,
-          type
-        })
+        this.logger.info(ctx.action.name, '...', action)
+        if (action === 'create') {
+          await this.broker.call(`BooksDomain.${action}`, {
+            urn,
+            url: `${gatewayUrl}/api/books/${urn}`,
+            archive,
+            type: type.ext
+          })
+        } else {
+          const [book] = await this.broker.call('BooksDomain.find', { query: { urn } })
+          await this.broker.call(`BooksDomain.${action}`, {
+            ...book,
+            urn,
+            url: `${gatewayUrl}/api/books/${urn}`,
+            archive,
+            type: type.ext
+          })
+        }
         // upsert pages for this book
         await this.broker.call('ArchivesDomain.GeneratePagesCatalogCommand', { id: urn })
       }
