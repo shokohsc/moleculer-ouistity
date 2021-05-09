@@ -56,7 +56,7 @@ spec:
             - name: nfs-shared
               mountPath: /usr/app/assets/data/weekly
         - name: mongodb
-          image: mongodb:4.4.5
+          image: bitnami/mongodb:4.4
           ports:
             - name: mongodb
               containerPort: 27017
