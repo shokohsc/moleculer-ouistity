@@ -1,8 +1,11 @@
-
 # Ouistity
 
 assets/data/archives
 assets/data/content
+
+# Locks
+package-lock.json
+yarn.lock
 
 # Logs
 logs

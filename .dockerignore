@@ -12,4 +12,11 @@ Dockerfile
 jest.config.js
 nconf.json
 yarn-error.log
+package-lock.json
 yarn.lock
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
