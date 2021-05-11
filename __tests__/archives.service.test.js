@@ -19,9 +19,18 @@ afterAll(async () => {
   await broker.stop()
 })
 
-describe('service books', () => {
-  test('should generate catalog from archives', async () => {
-    const { success } = await broker.call('ArchivesDomain.GenerateBooksCatalogCommand')
+describe('service archives', () => {
+  test('should return an error when no data when generate catalog', async () => {
+    const { success, error } = await broker.call('ArchivesDomain.GenerateBooksCatalogCommand', { source: '../../../__tests__/assets/no-data' })
+    expect(error).toEqual('ERR_NO_FILES_IN_ASSETS_DATA')
+    expect(success).toEqual(false)
+  })
+  test('should return success when no data when generate catalog : create', async () => {
+    const { success } = await broker.call('ArchivesDomain.GenerateBooksCatalogCommand', { source: '../../../__tests__/assets/data' })
+    expect(success).toEqual(true)
+  })
+  test('should return success when no data when generate catalog : update', async () => {
+    const { success } = await broker.call('ArchivesDomain.GenerateBooksCatalogCommand', { source: '../../../__tests__/assets/data' })
     expect(success).toEqual(true)
   })
 })

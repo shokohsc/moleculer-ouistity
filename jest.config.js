@@ -4,5 +4,6 @@ module.exports = {
   coverageDirectory: 'coverage',
   coverageReporters: ['text-summary', 'json-summary', 'lcov', 'clover'],
   collectCoverageFrom: ['services/**/*.js', 'actions/**/*.js'],
-  coveragePathIgnorePatterns: ['node_modules']
+  coveragePathIgnorePatterns: ['node_modules'],
+  testTimeout: 10000
 }
