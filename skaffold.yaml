@@ -5,12 +5,13 @@ metadata:
 build:
   artifacts:
   - image: shokohsc/ouistity
+    context: .
     docker:
       dockerfile: Dockerfile
 deploy:
-  kubectl:
-    manifests:
-    - k8s/deployment.yaml
+  kustomize:
+    paths:
+      - k8s/base
 profiles:
   - name: dev
     activation:
@@ -18,11 +19,20 @@ profiles:
     build:
       artifacts:
       - image: shokohsc/ouistity
-        context: .
-        docker:
-          buildArgs:
-            ENV: development
         sync:
           manual:
           - src: 'services/**/*.js'
             dest: .
+  - name: shokohsc
+    build:
+      artifacts:
+      - image: shokohsc/ouistity
+        sync:
+          manual:
+          - src: 'services/**/*.js'
+            dest: .
+    deploy:
+      kustomize:
+        paths:
+          - k8s/base
+          - k8s/overlays/shokohsc
