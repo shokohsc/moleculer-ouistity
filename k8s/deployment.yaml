@@ -17,10 +17,18 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: 80
+    - port: 5000
       targetPort: http
       protocol: TCP
       name: http
+    - port: 7000
+      targetPort: apollo
+      protocol: TCP
+      name: apollo
+    - port: 5050
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
   selector:
     app: ouistity
 ---
@@ -46,15 +54,27 @@ spec:
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
+          env:
+            - name: NODE_ENV
+              value: development
+            - name: APP_MOLECULER_METRICS_ENABLED
+              value: "true"
           args:
+            - --hot
             - services
           ports:
             - name: http
               containerPort: 5000
               protocol: TCP
+            - name: apollo
+              containerPort: 7000
+              protocol: TCP
+            - name: metrics
+              containerPort: 5050
+              protocol: TCP
           volumeMounts:
             - name: nfs-shared
-              mountPath: /usr/app/assets/data/weekly
+              mountPath: /usr/app/assets/data/archives/weekly
         - name: mongodb
           image: bitnami/mongodb:4.4
           ports:
@@ -103,8 +123,26 @@ spec:
           service:
             name: ouistity
             port:
-              number: 80
+              number: 5000
+      - path: /metrics/
+        pathType: Prefix
+        backend:
+          service:
+            name: ouistity
+            port:
+              number: 5050
+  - host: apollo.ouistity.shokohsc.home
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ouistity
+            port:
+              number: 7000
   tls:
   - hosts:
     - ouistity.shokohsc.home
+    - apollo.ouistity.shokohsc.home
     secretName: ouistity-cert

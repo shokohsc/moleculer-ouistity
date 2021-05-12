@@ -34,7 +34,8 @@ module.exports = {
           res.end(JSON.stringify({ ready: true }))
         },
         'GET api/v1/books': 'BooksDomain.list',
-        'GET api/v1/pages': 'PagesDomain.list'
+        'GET api/v1/pages': 'PagesDomain.list',
+        'POST api/v1/archives/generate/books': 'ArchivesDomain.GenerateBooksCatalogCommand'
       }
     }]
   }
