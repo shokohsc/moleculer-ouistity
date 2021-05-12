@@ -1,0 +1,35 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ouistity
+spec:
+  rules:
+  - host: cluster.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ouistity
+            port:
+              number: 5000
+      - path: /metrics
+        pathType: Prefix
+        backend:
+          service:
+            name: ouistity
+            port:
+              number: 5050
+  - host: apollo.cluster.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ouistity
+            port:
+              number: 7000
+  tls: []
