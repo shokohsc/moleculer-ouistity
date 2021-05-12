@@ -1,5 +1,6 @@
 const path = require('path')
 const AdmZip = require('adm-zip')
+const { RarFilesPackage } = require('rar-stream')
 const { snakeCase } = require('lodash')
 
 const { global: { gatewayUrl } } = require('../../../application.config')
@@ -26,6 +27,13 @@ const handler = async function (ctx) {
     }
     // analyse zip
     let num = 1
+    if (type === 'rar') {
+      console.log(archive)
+      const rar = new RarFilesPackage([archive])
+      console.log(rar)
+      const rarFiles = await rar.parse()
+      console.log(rarFiles)
+    }
     if (type === 'zip') {
       // reading archives
       const zip = new AdmZip(archive)
@@ -35,7 +43,7 @@ const handler = async function (ctx) {
         const { name } = zipEntry
         // added only if extname is allowed
         if (ImagesExtensions.includes(path.extname(name))) {
-          const urn = `urn:ouistity::books:${id}:pages:${snakeCase(name)}`
+          const urn = `urn:ouistity:books:${id}:pages:${snakeCase(name)}`
           entities.push({
             urn,
             book: book.urn,
@@ -52,6 +60,7 @@ const handler = async function (ctx) {
     await this.broker.call('PagesDomain.insert', { entities })
     return { success: true }
   } catch (e) {
+    console.log(e.message)
     /* istanbul ignore next */
     this.logger.error(ctx.action.name, e.message)
     /* istanbul ignore next */

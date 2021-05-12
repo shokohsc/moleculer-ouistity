@@ -4,6 +4,7 @@ services:
 
   mongodb:
     image: "bitnami/mongodb:4.4"
+    restart: "always"
     volumes:
       - "mongodb_data:/bitnami"
     networks:
@@ -13,6 +14,7 @@ services:
 
   nats:
     image: "nats:2.2.0-alpine"
+    restart: "always"
     command:
       - "--debug"
       - "--cluster"
@@ -25,6 +27,19 @@ services:
       - "public"
     ports:
       - "4222:4222/tcp"
+
+  rabbitmq:
+    image: "rabbitmq:3.7.17-management-alpine"
+    restart: "always"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "${APP_RABBITMQ_ERLANG_COOKIE}"
+      RABBITMQ_DEFAULT_USER: "${APP_RABBITMQ_USERNAME}"
+      RABBITMQ_DEFAULT_PASS: "${APP_RABBITMQ_PASSWORD}"
+    networks:
+      - "public"
+    ports:
+      - "5672:5672/tcp"
+      - "15672:15672/tcp"
 
 volumes:
 

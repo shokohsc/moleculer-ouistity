@@ -1,3 +1,6 @@
+const path = require('path')
+require('dotenv').config({ path: path.resolve(__dirname, '.env') })
+
 const nconf = require('nconf')
 nconf.argv().env().file({ file: 'nconf.json' })
 
@@ -9,18 +12,24 @@ let APP_MOLECULER_API_GATEWAY_PORT = 5000
 let APP_MOLECULER_METRICS_PORT = 5050
 let APP_MOLECULER_APOLLO_PORT = 7000
 let APP_NATS_PORT = 4222
+let APP_RABBITMQ_PORT = 5672
 // ************************************
 if (nconf.get('APP_MOLECULER_METRICS_ENABLED') && nconf.get('APP_MOLECULER_METRICS_ENABLED') === 'true') { APP_MOLECULER_METRICS_ENABLED = true }
 if (nconf.get('APP_MOLECULER_API_GATEWAY_PORT')) { APP_MOLECULER_API_GATEWAY_PORT = parseInt(nconf.get('APP_MOLECULER_API_GATEWAY_PORT')) }
 if (nconf.get('APP_MOLECULER_METRICS_PORT')) { APP_MOLECULER_METRICS_PORT = parseInt(nconf.get('APP_MOLECULER_METRICS_PORT')) }
 if (nconf.get('APP_MOLECULER_APOLLO_PORT')) { APP_MOLECULER_APOLLO_PORT = parseInt(nconf.get('APP_MOLECULER_APOLLO_PORT')) }
 if (nconf.get('APP_NATS_PORT')) { APP_NATS_PORT = parseInt(nconf.get('APP_NATS_PORT')) }
+if (nconf.get('APP_RABBITMQ_PORT')) { APP_RABBITMQ_PORT = parseInt(nconf.get('APP_RABBITMQ_PORT')) }
 // ************************************
 
 const APP_GLOBAL_GATEWAY_URL = nconf.get('APP_GLOBAL_GATEWAY_URL') || 'http://localhost:5000'
 
 const APP_MONGODB_HOSTNAME = nconf.get('APP_MONGODB_HOSTNAME') || 'localhost'
 const APP_NATS_HOSTNAME = nconf.get('APP_NATS_HOSTNAME') || 'localhost'
+
+const APP_RABBITMQ_HOSTNAME = nconf.get('APP_RABBITMQ_HOSTNAME') || 'localhost'
+const APP_RABBITMQ_USERNAME = nconf.get('APP_RABBITMQ_USERNAME') || 'admin'
+const APP_RABBITMQ_PASSWORD = nconf.get('APP_RABBITMQ_PASSWORD') || 'password'
 
 module.exports = {
   global: {
@@ -38,6 +47,12 @@ module.exports = {
   },
   mongodb: {
     hostname: APP_MONGODB_HOSTNAME
+  },
+  rabbitmq: {
+    hostname: APP_RABBITMQ_HOSTNAME,
+    port: APP_RABBITMQ_PORT,
+    username: APP_RABBITMQ_USERNAME,
+    password: APP_RABBITMQ_PASSWORD
   },
   nats: {
     hostname: APP_NATS_HOSTNAME,

@@ -35,7 +35,7 @@ module.exports = {
         },
         'GET api/v1/books': 'BooksDomain.list',
         'GET api/v1/pages': 'PagesDomain.list',
-        'POST api/v1/archives/generate/books': 'ArchivesDomain.GenerateBooksCatalogCommand'
+        'POST api/v1/generate/catalog': 'ArchivesDomain.GenerateCatalogCommand'
       }
     }]
   }
