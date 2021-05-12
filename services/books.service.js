@@ -16,9 +16,11 @@ const removeAll = async function (ctx) {
         await this.broker.call('BooksDomain.remove', { id })
       } while (ids.length > 0)
     }
-    return { deleted: true }
+    return { success: true }
   } catch (e) {
+    /* istanbul ignore next */
     this.logger.error(ctx.action.name, e.message)
+    /* istanbul ignore next */
     return { success: false, error: e.message }
   }
 }

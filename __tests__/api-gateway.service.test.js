@@ -11,6 +11,7 @@ const broker = new ServiceBroker({
 
 beforeAll(async () => {
   process.env.APP_MOLECULER_API_GATEWAY_PORT = 4444
+  process.env.APP_MOLECULER_APOLLO_PORT = 7777
   await broker.createService(require('../services/api-gateway.service'))
   await broker.start()
 })

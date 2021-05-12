@@ -48,7 +48,9 @@ const handler = async function (ctx) {
     } while (files.length > 0)
     return { success: true }
   } catch (e) {
+    /* istanbul ignore next */
     this.logger.error(ctx.action.name, e.message)
+    /* istanbul ignore next */
     return { success: false, error: e.message }
   }
 }
