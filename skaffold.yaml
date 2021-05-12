@@ -24,7 +24,5 @@ profiles:
             ENV: development
         sync:
           manual:
-          # Sync all the javascript files that are in the src folder
-          # with the container src folder
           - src: 'services/**/*.js'
             dest: .
