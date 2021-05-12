@@ -4,7 +4,7 @@ nconf.argv().env().file({ file: 'nconf.json' })
 // ************************************
 // Typecasting from kube env
 // ************************************
-let APP_MOLECULER_METRICS_ENABLED = false
+let APP_MOLECULER_METRICS_ENABLED = true
 let APP_MOLECULER_API_GATEWAY_PORT = 5000
 let APP_MOLECULER_METRICS_PORT = 5050
 let APP_MOLECULER_APOLLO_PORT = 7000

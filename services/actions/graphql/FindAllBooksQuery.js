@@ -6,7 +6,7 @@ const handler = async function (ctx) {
     if (books.length > 0) {
       do {
         const book = books.shift()
-        book.pages = await this.broker.call('PagesDomain.find', { query: { book: book.id } })
+        book.pages = await this.broker.call('PagesDomain.find', { query: { book: book.urn } })
         result.push(book)
       } while (books.length > 0)
     }

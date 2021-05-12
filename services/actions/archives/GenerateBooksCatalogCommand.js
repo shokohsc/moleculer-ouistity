@@ -29,7 +29,6 @@ const handler = async function (ctx) {
           // upsert books
           const urn = `urn:ouistity:books:${snakeCase(path.basename(archive, path.extname(archive)))}`
           const [book] = await this.broker.call('BooksDomain.find', { query: { urn } })
-          console.log(book)
           if (book) {
             await this.broker.call('BooksDomain.remove', { id: book._id })
           }

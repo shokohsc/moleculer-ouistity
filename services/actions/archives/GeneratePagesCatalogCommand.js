@@ -39,7 +39,8 @@ const handler = async function (ctx) {
           entities.push({
             urn,
             book: book.urn,
-            url: `${gatewayUrl}/api/pages/${urn}`,
+            url: `${gatewayUrl}/api/v1/pages/${urn}`,
+            image: `${gatewayUrl}/images/${urn}`,
             archive,
             num
           })
