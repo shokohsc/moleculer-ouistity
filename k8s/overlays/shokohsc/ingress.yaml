@@ -56,13 +56,13 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ouistity
+  name: api
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: ca-cluster-issuer
     forecastle.stakater.com/expose: "true"
     forecastle.stakater.com/group: dev
-    forecastle.stakater.com/appName: ouistity
+    forecastle.stakater.com/appName: ouistity-api-gateway
 spec:
   rules:
   - host: api.ouistity.shokohsc.home
@@ -78,7 +78,7 @@ spec:
   tls:
   - hosts:
     - api.ouistity.shokohsc.home
-    secretName: ouistity-cert
+    secretName: ouistity-api-cert
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -105,4 +105,4 @@ spec:
   tls:
   - hosts:
     - apollo.ouistity.shokohsc.home
-    secretName: apollo-cert
+    secretName: ouistity-apollo-cert
