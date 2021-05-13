@@ -6,3 +6,18 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingress.yaml
+
+  - api-gateway/deployment.yaml
+  - api-gateway/service.yaml
+
+  - archives/deployment.yaml
+  - archives/service.yaml
+
+  - books/deployment.yaml
+  - books/service.yaml
+
+  - graphql-gateway/deployment.yaml
+  - graphql-gateway/service.yaml
+
+  - pages/deployment.yaml
+  - pages/service.yaml

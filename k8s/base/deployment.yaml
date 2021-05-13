@@ -2,48 +2,6 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: ouistity
-spec:
-  selector:
-    matchLabels:
-      app: ouistity
-  template:
-    metadata:
-      labels:
-        app: ouistity
-    spec:
-      securityContext:
-        fsGroup: 1000
-      containers:
-        - name: ouistity
-          image: shokohsc/ouistity
-          securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
-          env:
-            - name: APP_GLOBAL_GATEWAY_URL
-              value: http://cluster.local
-            - name: APP_MONGODB_HOSTNAME
-              value: mongodb
-            - name: APP_NATS_HOSTNAME
-              value: nats
-          args:
-            - --hot
-            - services
-          ports:
-            - name: http
-              containerPort: 5000
-              protocol: TCP
-            - name: apollo
-              containerPort: 7000
-              protocol: TCP
-            - name: metrics
-              containerPort: 5050
-              protocol: TCP
----
-kind: Deployment
-apiVersion: apps/v1
-metadata:
   name: mongodb
 spec:
   selector:
@@ -62,6 +20,32 @@ spec:
           ports:
             - name: http
               containerPort: 27017
+              protocol: TCP
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: mongo-express
+spec:
+  selector:
+    matchLabels:
+      app: mongo-express
+  template:
+    metadata:
+      labels:
+        app: mongo-express
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: mongo-express
+          image: mongo-express
+          env:
+            - name: ME_CONFIG_MONGODB_SERVER
+              value: mongodb
+          ports:
+            - name: http
+              containerPort: 8081
               protocol: TCP
 ---
 kind: Deployment
@@ -93,4 +77,37 @@ spec:
           ports:
             - name: http
               containerPort: 4222
+              protocol: TCP
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: rabbitmq
+spec:
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:3.7.17-management-alpine
+          env:
+            - name: RABBITMQ_ERLANG_COOKIE
+              value: ""
+            - name: RABBITMQ_DEFAULT_USER
+              value: rabbitmq
+            - name: RABBITMQ_DEFAULT_PASS
+              value: changeme
+          ports:
+            - name: http
+              containerPort: 5672
+              protocol: TCP
+            - name: admin
+              containerPort: 15672
               protocol: TCP
