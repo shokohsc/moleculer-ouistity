@@ -48,7 +48,7 @@ describe('service graphql-gateway', () => {
     expect(json.data.books).toBeDefined()
   })
   test('should return success when no data when generate catalog : create', async () => {
-    const { success } = await broker.call('ArchivesDomain.GenerateBooksCatalogCommand', { source: '../../../__tests__/assets/data' })
+    const { success } = await broker.call('ArchivesDomain.GenerateCatalogCommand', { source: '../../../__tests__/assets/data' })
     expect(success).toEqual(true)
   })
   test('should return data for query books', async () => {

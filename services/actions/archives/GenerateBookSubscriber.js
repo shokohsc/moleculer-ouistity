@@ -32,7 +32,7 @@ const handler = async function (ctx) {
     /* istanbul ignore next */
     this.logger.error(ctx.action.name, e.message)
     /* istanbul ignore next */
-    return { success: false, error: e.message }
+    return Promise.reject(e)
   }
 }
 
