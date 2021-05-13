@@ -8,4 +8,4 @@ spec:
     spec:
       containers:
         - name: ouistity-graphql-gateway
-          image: shokohsc/ouistity
+          image: shokohsc/moleculer-ouistity

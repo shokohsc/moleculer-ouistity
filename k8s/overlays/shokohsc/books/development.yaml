@@ -8,7 +8,7 @@ spec:
     spec:
       containers:
         - name: ouistity-books
-          image: shokohsc/ouistity
+          image: shokohsc/moleculer-ouistity
           env:
             - name: APP_GLOBAL_GATEWAY_URL
               value: https://api.ouistity.shokohsc.home

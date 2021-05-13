@@ -4,7 +4,7 @@ metadata:
   name: ouistity
 build:
   artifacts:
-  - image: shokohsc/ouistity
+  - image: shokohsc/moleculer-ouistity
     context: .
     docker:
       dockerfile: Dockerfile
@@ -18,7 +18,7 @@ profiles:
       - command: dev
     build:
       artifacts:
-      - image: shokohsc/ouistity
+      - image: shokohsc/moleculer-ouistity
         sync:
           manual:
           - src: 'services/**/*.js'
@@ -26,7 +26,7 @@ profiles:
   - name: shokohsc
     build:
       artifacts:
-      - image: shokohsc/ouistity
+      - image: shokohsc/moleculer-ouistity
         sync:
           manual:
           - src: 'services/**/*.js'
