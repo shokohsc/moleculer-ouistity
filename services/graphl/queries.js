@@ -1,5 +1,5 @@
 module.exports = `
   type Query {
-    books: [Book]
+    books(page: Int, pageSize: Int): BooksResult
   }
 `

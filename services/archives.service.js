@@ -9,10 +9,6 @@ module.exports = {
     rabbitmq: {
       ...rabbitmq,
       aliases: {
-        'archives-domain-convert-book': {
-          type: 'topic',
-          subscriber: 'ArchivesDomain.ConvertBookSubscriber'
-        },
         'archives-domain-generate-book': {
           type: 'topic',
           subscriber: 'ArchivesDomain.GenerateBookSubscriber'
@@ -24,8 +20,14 @@ module.exports = {
       }
     }
   },
+  events: {
+    'ArchivesDomain.GenerateCatalogInitialized': {
+      async handler (ctx) {
+        await ctx.broker.call('ArchivesDomain.GenerateCatalogCommand', ctx.params)
+      }
+    }
+  },
   actions: {
-    ConvertBookCommand: require('./actions/archives/ConvertBookCommand'),
     GenerateCatalogCommand: require('./actions/archives/GenerateCatalogCommand'),
     GenerateBookSubscriber: require('./actions/archives/GenerateBookSubscriber'),
     GenerateBookPagesSubscriber: require('./actions/archives/GenerateBookPagesSubscriber')

@@ -1,7 +1,7 @@
 module.exports = {
   Query: {
-    books: (_, __, { $moleculer }, ___) => {
-      return $moleculer.call('BooksDomain.filter')
+    books: (_, { page = -1, pageSize = 10 }, { $moleculer }, ___) => {
+      return $moleculer.call('BooksDomain.filter', { page, pageSize })
     }
   }
 }

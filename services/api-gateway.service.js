@@ -33,12 +33,12 @@ module.exports = {
           res.setHeader('Content-Type', 'application/json; charset=utf-8')
           res.end(JSON.stringify({ ready: true }))
         },
-        'GET api/v1/books': 'BooksDomain.list',
-        'GET api/v1/pages': 'PagesDomain.list',
+        'GET api/v1/books': 'BooksDomain.filter',
+        'GET api/v1/pages': 'PagesDomain.filter',
         'POST generate/catalog' (req, res) {
-          req.$ctx.broker.emit('ArchivesDomain.GenerateCatalogInitialized')
+          req.$ctx.broker.emit('ArchivesDomain.GenerateCatalogInitialized', req.$params)
           res.setHeader('Content-Type', 'application/json; charset=utf-8')
-          res.end(JSON.stringify({ called: true }))
+          res.end(JSON.stringify({ called: true, params: req.$params }))
         }
       }
     }]

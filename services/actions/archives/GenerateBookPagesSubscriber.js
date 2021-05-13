@@ -36,23 +36,20 @@ const handler = async function (ctx) {
   try {
     this.logger.info(ctx.action.name, ctx.params)
     const { book } = ctx.params
-    // get the book
-    const { archive } = await ctx.broker.call('BooksDomain.get', { id: book })
-    // remove old entries with this book urn
-    await ctx.broker.call('PagesDomain.delete', { query: { book } })
     // analyse archive
-    const { stdout } = await sh(`7z l "${archive}"`, true)
+    const { stdout } = await sh(`7z l "${book.archive}"`, true)
     const entries = parse(stdout)
     const entities = []
     do {
-      const { name } = entries.files.shift()
-      const urn = `${book}:pages:${snakeCase(name)}`
+      const entry = entries.files.shift()
+      // console.log(entry)
+      const urn = `${book.urn}:pages:${snakeCase(entry.name)}`
       entities.push({
-        id: urn,
-        book,
+        urn,
+        book: book.urn,
         url: `${gatewayUrl}/api/v1/pages/${urn}`,
         image: `${gatewayUrl}/images/${urn}`,
-        archive
+        size: entry.size
       })
     } while (entries.files.length > 0)
     // // batch insert

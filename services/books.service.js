@@ -11,12 +11,5 @@ module.exports = {
       table: 'books',
       ...rethinkdb
     }
-  },
-  events: {
-    'ArchivesDomain.GenerateCatalogInitialized': {
-      async handler (ctx) {
-        await ctx.broker.call('ArchivesDomain.GenerateCatalogCommand')
-      }
-    }
   }
 }

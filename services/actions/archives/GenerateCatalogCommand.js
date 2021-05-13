@@ -5,16 +5,23 @@ const handler = async function (ctx) {
   try {
     this.logger.info(ctx.action.name, ctx.params)
     // find all files
-    const { source = '../../../assets/data' } = ctx.params
+    const { source = '../../../assets/data', pages = false } = ctx.params
     const sourcePath = path.resolve(__dirname, source)
     const files = glob.sync(`${sourcePath}/archives/**/*.cb*`)
-    if (files.length === 0) {
+    const archives = {}
+    files.map(file => {
+      archives[path.basename(file)] = file
+      return true
+    })
+    if (archives.length === 0) {
       throw new Error('ERR_NO_FILES_IN_ASSETS_DATA')
     }
+    const keys = Object.keys(archives)
     do {
-      const archive = files.shift()
-      await ctx.broker.$rabbitmq.publishExchange('amq.topic', 'moleculer.archives-domain-generate-book.key', { archive })
-    } while (files.length > 0)
+      const key = keys.shift()
+      const archive = archives[key]
+      await ctx.broker.$rabbitmq.publishExchange('amq.topic', 'moleculer.archives-domain-generate-book.key', { archive, pages })
+    } while (keys.length > 0)
     return { success: true }
   } catch (e) {
     console.log(e)
