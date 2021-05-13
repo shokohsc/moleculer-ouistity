@@ -3,5 +3,10 @@ kind: Kustomization
 bases:
   - ../../base
 patchesStrategicMerge:
-  - development.yaml
   - ingress.yaml
+
+  - api-gateway/development.yaml
+  - archives/development.yaml
+  - books/development.yaml
+  - graphql-gateway/development.yaml
+  - pages/development.yaml

@@ -30,7 +30,6 @@
     "mongoose": "5.12.7",
     "nats": "1.4.12",
     "nconf": "0.11.2",
-    "p7zip": "5.0.1",
     "rabbit-queue": "5.2.0",
     "read-chunk": "3.2.0",
     "uuid": "8.3.2",

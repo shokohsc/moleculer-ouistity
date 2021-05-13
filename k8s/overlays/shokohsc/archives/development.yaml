@@ -2,20 +2,27 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: ouistity
+  name: ouistity-archives
 spec:
   template:
     spec:
       containers:
-        - name: ouistity
+        - name: ouistity-archives
+          image: shokohsc/ouistity
           env:
             - name: APP_GLOBAL_GATEWAY_URL
-              value: https://ouistity.shokohsc.home
+              value: https://api.ouistity.shokohsc.home
           volumeMounts:
             - name: nfs-shared
               mountPath: /usr/app/assets/data/archives/weekly
+            - name: nfs-wd2to
+              mountPath: /usr/app/assets/data/archives/comics
       volumes:
         - name: nfs-shared
           nfs:
             server: nfs-shared.nfs-shared
             path: /weekly
+        - name: nfs-wd2to
+          nfs:
+            server: nfs-wd2to.nfs-wd2to
+            path: /comics
