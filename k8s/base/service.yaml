@@ -1,0 +1,56 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ouistity
+  labels:
+    app: ouistity
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5000
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: 7000
+      targetPort: apollo
+      protocol: TCP
+      name: apollo
+    - port: 5050
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    app: ouistity
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+  labels:
+    app: mongodb
+spec:
+  type: ClusterIP
+  ports:
+    - port: 27017
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: mongodb
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nats
+  labels:
+    app: nats
+spec:
+  type: ClusterIP
+  ports:
+    - port: 4222
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: nats
