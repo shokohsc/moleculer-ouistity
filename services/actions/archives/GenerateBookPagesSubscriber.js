@@ -1,10 +1,7 @@
-const path = require('path')
 const sh = require('exec-sh').promise
 const { snakeCase, filter } = require('lodash')
 
 const { global: { gatewayUrl } } = require('../../../application.config')
-
-const ImagesExtensions = ['.jpg', '.png', '.jpeg']
 
 const parse = function (data) {
   const entries = { files: [] }
@@ -38,42 +35,28 @@ const parse = function (data) {
 const handler = async function (ctx) {
   try {
     this.logger.info(ctx.action.name, ctx.params)
-    const { id } = ctx.params
+    const { book } = ctx.params
     // get the book
-    const [book] = await this.broker.call('BooksDomain.find', { query: { urn: id } })
-    const { archive } = book
+    const { archive } = await ctx.broker.call('BooksDomain.get', { id: book })
     // remove old entries with this book urn
-    const items = await this.broker.call('PagesDomain.find', { query: { book: book.urn } })
-    this.logger.info(ctx.action.name, book.urn, items.length)
-    const entities = []
-    if (items.length > 0) {
-      this.logger.info(ctx.action.name, 'remove old entries with this book urn')
-      do {
-        const item = items.shift()
-        await this.broker.call('PagesDomain.remove', { id: item._id }).catch(() => {
-          // WARNING WHY??
-        })
-      } while (items.length > 0)
-    }
-    // analyse zip
+    await ctx.broker.call('PagesDomain.delete', { query: { book } })
+    // analyse archive
     const { stdout } = await sh(`7z l "${archive}"`, true)
     const entries = parse(stdout)
+    const entities = []
     do {
       const { name } = entries.files.shift()
-      // added only if extname is allowed
-      if (ImagesExtensions.includes(path.extname(name))) {
-        const urn = `urn:ouistity:books:${id}:pages:${snakeCase(name)}`
-        entities.push({
-          urn,
-          book: book.urn,
-          url: `${gatewayUrl}/api/v1/pages/${urn}`,
-          image: `${gatewayUrl}/images/${urn}`,
-          archive
-        })
-      }
+      const urn = `${book}:pages:${snakeCase(name)}`
+      entities.push({
+        id: urn,
+        book,
+        url: `${gatewayUrl}/api/v1/pages/${urn}`,
+        image: `${gatewayUrl}/images/${urn}`,
+        archive
+      })
     } while (entries.files.length > 0)
     // // batch insert
-    await this.broker.call('PagesDomain.insert', { entities })
+    await ctx.broker.call('PagesDomain.insert', { data: entities })
     return { success: true }
   } catch (e) {
     /* istanbul ignore next */

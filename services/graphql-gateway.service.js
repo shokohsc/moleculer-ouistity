@@ -9,8 +9,5 @@ module.exports = {
       schemas: require('./graphl/schemas'),
       resolvers: require('./graphl/resolvers')
     }
-  },
-  actions: {
-    FindAllBooksQuery: require('./actions/graphql/FindAllBooksQuery')
   }
 }

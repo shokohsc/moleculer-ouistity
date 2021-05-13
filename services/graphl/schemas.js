@@ -3,7 +3,7 @@ module.exports = `
   This type describes a book entity.
   """
   type Book {
-    urn: String!
+    id: String!
     url: String!
     pages: [Page]
   }
@@ -11,7 +11,7 @@ module.exports = `
   This type describes a page entity.
   """
   type Page {
-    urn: String!
+    id: String!
     book: String!
     url: String!
     image: String!

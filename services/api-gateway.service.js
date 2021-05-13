@@ -35,7 +35,11 @@ module.exports = {
         },
         'GET api/v1/books': 'BooksDomain.list',
         'GET api/v1/pages': 'PagesDomain.list',
-        'POST api/v1/generate/catalog': 'ArchivesDomain.GenerateCatalogCommand'
+        'POST generate/catalog' (req, res) {
+          req.$ctx.broker.emit('ArchivesDomain.GenerateCatalogInitialized')
+          res.setHeader('Content-Type', 'application/json; charset=utf-8')
+          res.end(JSON.stringify({ called: true }))
+        }
       }
     }]
   }
