@@ -21,6 +21,25 @@ module.exports = {
         return cursor
       }
     },
+    getByUrn: {
+      async handler (ctx) {
+        // get book by urn
+        const { urn } = ctx.params
+        const cursor = await r.db(this.settings.rethinkdb.database)
+          .table(this.settings.rethinkdb.table)
+          .filter({ urn })
+          .run(this.conn)
+        const [entity] = await cursor.toArray()
+        if (!entity) { throw new Error('Entity not found') }
+        switch (this.settings.rethinkdb.table) {
+          case 'books':
+            entity.pages = await ctx.broker.call('PagesDomain.filter', { query: { book: entity.urn } })
+            break
+          default:
+        }
+        return entity
+      }
+    },
     get: {
       async handler (ctx) {
         const { id } = ctx.params

@@ -34,6 +34,7 @@ module.exports = {
           res.end(JSON.stringify({ ready: true }))
         },
         'GET api/v1/books': 'BooksDomain.filter',
+        'GET api/v1/books/:urn': 'BooksDomain.getByUrn',
         'GET api/v1/pages': 'PagesDomain.filter',
         'POST generate/catalog' (req, res) {
           req.$ctx.broker.emit('ArchivesDomain.GenerateCatalogInitialized', req.$params)
