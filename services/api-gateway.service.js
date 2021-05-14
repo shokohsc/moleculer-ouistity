@@ -36,11 +36,14 @@ module.exports = {
         'GET api/v1/books': 'BooksDomain.filter',
         'GET api/v1/books/:urn': 'BooksDomain.getByUrn',
         'GET api/v1/pages': 'PagesDomain.filter',
+        'GET api/v1/pages/:urn': 'PagesDomain.getByUrn',
         'POST generate/catalog' (req, res) {
+          // Emit a moleculer event to accelerate the ccallback.
           req.$ctx.broker.emit('ArchivesDomain.GenerateCatalogInitialized', req.$params)
           res.setHeader('Content-Type', 'application/json; charset=utf-8')
           res.end(JSON.stringify({ called: true, params: req.$params }))
-        }
+        },
+        'GET images/:urn': 'ArchivesDomain.ExtractImage'
       }
     }]
   }

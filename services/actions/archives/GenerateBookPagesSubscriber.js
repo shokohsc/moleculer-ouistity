@@ -1,10 +1,11 @@
 const sh = require('exec-sh').promise
+const path = require('path')
 const { snakeCase, filter } = require('lodash')
 
 const { global: { gatewayUrl } } = require('../../../application.config')
 
 const parse = function (data) {
-  const entries = { files: [] }
+  const entries = { files: [], type: false }
   // split lines
   const content = data.toString().split('\n')
   const lines = filter(content, function (o) { return o !== '' })
@@ -12,6 +13,14 @@ const parse = function (data) {
   lines.map(line => {
     const tmp = line.split('  ') // hack
     const words = filter(tmp, function (o) { return o !== '' })
+    // path
+    if (words[0].search(/Path/) !== -1) {
+      entries.path = words[0].split(' = ')[1].toLowerCase()
+    }
+    // type
+    if (words[0].search(/Type/) !== -1) {
+      entries.type = words[0].split(' = ')[1].toLowerCase()
+    }
     // files content
     if (words.length === 4) {
       switch (true) {
@@ -42,14 +51,15 @@ const handler = async function (ctx) {
     const entities = []
     do {
       const entry = entries.files.shift()
-      // console.log(entry)
-      const urn = `${book.urn}:pages:${snakeCase(entry.name)}`
+      const urn = `${book.urn}:pages:${snakeCase(path.basename(entry.name, path.extname(entry.name)))}`
       entities.push({
         urn,
         book: book.urn,
         url: `${gatewayUrl}/api/v1/pages/${urn}`,
         image: `${gatewayUrl}/images/${urn}`,
-        size: entry.size
+        path: entries.path,
+        type: entries.type,
+        ...entry
       })
     } while (entries.files.length > 0)
     // // batch insert

@@ -26,7 +26,6 @@ const handler = async function (ctx) {
     } while (keys.length > 0)
     return { success: true }
   } catch (e) {
-    console.log(e)
     /* istanbul ignore next */
     this.logger.error(ctx.action.name, e.message)
     /* istanbul ignore next */
