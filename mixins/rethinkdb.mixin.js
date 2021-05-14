@@ -47,7 +47,6 @@ module.exports = {
             .limit(_pageSize)
             .run(this.conn)
           const rows = await cursor.toArray()
-          console.log(rows)
           return {
             rows,
             total,
@@ -60,8 +59,8 @@ module.exports = {
             .table(this.settings.rethinkdb.table)
             .filter(query)
             .run(this.conn)
-          const rows = await cursor.toArray()
-          return rows
+          const result = await cursor.toArray()
+          return result
         }
       }
     },
