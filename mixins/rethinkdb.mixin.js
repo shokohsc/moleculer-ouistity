@@ -35,22 +35,24 @@ module.exports = {
       async handler (ctx) {
         this.logger.info(ctx.action.name, ctx.params)
         const { query = {}, page = -1, pageSize = 10 } = ctx.params
+        const _page = parseInt(page)
+        const _pageSize = parseInt(pageSize)
         if (parseInt(page) > 0) {
           const total = await await r.db(this.settings.rethinkdb.database).table(this.settings.rethinkdb.table).filter(query).count().run(this.conn)
-          const totalPages = (Math.floor((parseInt(total) + parseInt(pageSize) - 1) / parseInt(pageSize))) - 1
+          const totalPages = total / _pageSize
           const cursor = await r.db(this.settings.rethinkdb.database)
             .table(this.settings.rethinkdb.table)
             .filter(query)
-            .skip(parseInt(parseInt(page) * parseInt(pageSize)))
-            .limit(parseInt(pageSize))
+            .skip((_page - 1) * _pageSize)
+            .limit(_pageSize)
             .run(this.conn)
           const rows = await cursor.toArray()
           return {
             rows,
-            total: parseInt(total),
-            page: parseInt(page),
-            pageSize: parseInt(pageSize),
-            totalPages
+            total,
+            page: _page,
+            pageSize: _pageSize,
+            totalPages: Number.isInteger(totalPages) ? totalPages : Math.floor(totalPages) + 1
           }
         } else {
           const cursor = await r.db(this.settings.rethinkdb.database)
