@@ -10,10 +10,8 @@
     "start:dev": "moleculer-runner --repl --hot --config moleculer.config.js services"
   },
   "dependencies": {
-    "adm-zip": "0.5.5",
     "apollo-server": "2.24.0",
     "apollo-server-plugin-response-cache": "0.8.0",
-    "axios": "0.21.1",
     "dotenv": "9.0.2",
     "exec-sh": "0.4.0",
     "fs-extra": "10.0.0",
@@ -34,6 +32,7 @@
     "yamljs": "0.3.0"
   },
   "devDependencies": {
+    "axios": "0.21.1",
     "jest": "26.6.3",
     "standard": "16.0.3"
   },

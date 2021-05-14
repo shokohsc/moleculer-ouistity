@@ -43,7 +43,7 @@ module.exports = {
           res.setHeader('Content-Type', 'application/json; charset=utf-8')
           res.end(JSON.stringify({ called: true, params: req.$params }))
         },
-        'GET images/:urn': 'ArchivesDomain.ExtractImage'
+        'GET images/:urn': 'ArchivesDomain.ExtractImageToMemory'
       }
     }]
   }

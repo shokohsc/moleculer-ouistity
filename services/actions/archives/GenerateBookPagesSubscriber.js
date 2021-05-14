@@ -15,7 +15,7 @@ const parse = function (data) {
     const words = filter(tmp, function (o) { return o !== '' })
     // path
     if (words[0].search(/Path/) !== -1) {
-      entries.path = words[0].split(' = ')[1].toLowerCase()
+      entries.filepath = words[0].split(' = ')[1].toLowerCase()
     }
     // type
     if (words[0].search(/Type/) !== -1) {
@@ -57,7 +57,7 @@ const handler = async function (ctx) {
         book: book.urn,
         url: `${gatewayUrl}/api/v1/pages/${urn}`,
         image: `${gatewayUrl}/images/${urn}`,
-        path: entries.path,
+        filepath: entries.filepath,
         type: entries.type,
         ...entry
       })

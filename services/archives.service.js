@@ -23,12 +23,13 @@ module.exports = {
   events: {
     'ArchivesDomain.GenerateCatalogInitialized': {
       async handler (ctx) {
-        await ctx.broker.call('ArchivesDomain.GenerateCatalogCommand', ctx.params)
+        await ctx.broker.call('ArchivesDomain.GenerateCatalog', ctx.params)
       }
     }
   },
   actions: {
-    GenerateCatalogCommand: require('./actions/archives/GenerateCatalogCommand'),
+    ExtractImageToMemory: require('./actions/archives/ExtractImageToMemory'),
+    GenerateCatalog: require('./actions/archives/GenerateCatalog'),
     GenerateBookSubscriber: require('./actions/archives/GenerateBookSubscriber'),
     GenerateBookPagesSubscriber: require('./actions/archives/GenerateBookPagesSubscriber')
   }
