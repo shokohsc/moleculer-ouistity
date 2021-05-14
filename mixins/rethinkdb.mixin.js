@@ -47,6 +47,7 @@ module.exports = {
             .limit(_pageSize)
             .run(this.conn)
           const rows = await cursor.toArray()
+          console.log(rows)
           return {
             rows,
             total,

@@ -1,11 +1,13 @@
 module.exports = `
   """
-  This type describes a pagination entity.
+  This type describes a result of paginate books listing.
   """
-  type Pagination {
+  type BooksResult {
+    rows: [Book]
     total: Int!
-    page(page: Int): Int!
-    pageSize(pageSize: Int): Int!
+    page: Int!
+    pageSize: Int!
+    totalPages: Int!
   }
   """
   This type describes a book entity.
@@ -24,12 +26,5 @@ module.exports = `
     url: String!
     image: String!
     archive: String!
-  }
-  """
-  This type describes a result of paginate books listing.
-  """
-  type BooksResult {
-    pagination: Pagination
-    nodes: [Book]
   }
 `
