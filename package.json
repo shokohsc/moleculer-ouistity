@@ -1,6 +1,6 @@
 {
   "name": "moleculer-ouistity",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "repository": "git@github.com:gperreymond/moleculer-ouistity.git",
   "author": "Gilles Perreymond <gilles.perreymond@gmail.com>",
   "license": "MIT",
@@ -26,7 +26,6 @@
     "moleculer-db-adapter-mongoose": "0.8.9",
     "moleculer-repl": "0.6.4",
     "moleculer-web": "0.10.0-beta2",
-    "mongoose": "5.12.7",
     "nats": "1.4.12",
     "nconf": "0.11.2",
     "rabbit-queue": "5.2.0",

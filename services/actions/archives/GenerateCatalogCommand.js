@@ -5,11 +5,13 @@ const handler = async function (ctx) {
   try {
     this.logger.info(ctx.action.name, ctx.params)
     // find all files
-    const { source = '../../../assets/data', pages = false } = ctx.params
-    const sourcePath = path.resolve(__dirname, source)
-    const files = glob.sync(`${sourcePath}/archives/**/*.cb*`)
+    const { source = false, pages = false } = ctx.params
+    const sourceGlob = (source === false) ? path.resolve(__dirname, '../../../assets/data/archives/**/*.cb*') : source
+    this.logger.info(ctx.action.name, sourceGlob)
+    const files = glob.sync(`${sourceGlob}`)
     const archives = {}
     files.map(file => {
+      this.logger.info(ctx.action.name, `... add archive: ${file}`)
       archives[path.basename(file)] = file
       return true
     })
