@@ -2,26 +2,60 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ouistity
+  name: mongo-express
 spec:
   rules:
-  - host: cluster.local
+  - host: mongo.cluster.local
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: ouistity
+            name: mongo-express
             port:
-              number: 5000
-      - path: /metrics
+              number: 8081
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rabbitmq
+spec:
+  rules:
+  - host: rabbitmq.cluster.local
+    http:
+      paths:
+      - path: /
         pathType: Prefix
         backend:
           service:
-            name: ouistity
+            name: rabbitmq
             port:
-              number: 5050
+              number: 15672
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api
+spec:
+  rules:
+  - host: api.cluster.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ouistity-api-gateway
+            port:
+              number: 5000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: apollo
+spec:
+  rules:
   - host: apollo.cluster.local
     http:
       paths:
@@ -29,7 +63,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: ouistity
+            name: ouistity-graphql-gateway
             port:
               number: 7000
-  tls: []

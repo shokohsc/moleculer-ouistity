@@ -2,32 +2,96 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ouistity
+  name: mongo-express
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: ca-cluster-issuer
     forecastle.stakater.com/expose: "true"
-    forecastle.stakater.com/group: home
-    forecastle.stakater.com/appName: ouistity
+    forecastle.stakater.com/group: dev
+    forecastle.stakater.com/appName: ouistity-mongo
 spec:
   rules:
-  - host: ouistity.shokohsc.home
+  - host: mongo.ouistity.shokohsc.home
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: ouistity
+            name: mongo-express
             port:
-              number: 5000
-      - path: /metrics
+              number: 8081
+  tls:
+  - hosts:
+    - mongo.ouistity.shokohsc.home
+    secretName: ouistity-mongo-cert
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rabbitmq
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: ca-cluster-issuer
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/group: dev
+    forecastle.stakater.com/appName: ouistity-rabbitmq
+spec:
+  rules:
+  - host: rabbitmq.ouistity.shokohsc.home
+    http:
+      paths:
+      - path: /
         pathType: Prefix
         backend:
           service:
-            name: ouistity
+            name: rabbitmq
             port:
-              number: 5050
+              number: 15672
+  tls:
+  - hosts:
+    - rabbitmq.ouistity.shokohsc.home
+    secretName: ouistity-rabbitmq-cert
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: ca-cluster-issuer
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/group: dev
+    forecastle.stakater.com/appName: ouistity-api-gateway
+spec:
+  rules:
+  - host: api.ouistity.shokohsc.home
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ouistity-api-gateway
+            port:
+              number: 5000
+  tls:
+  - hosts:
+    - api.ouistity.shokohsc.home
+    secretName: ouistity-api-cert
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: apollo
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: ca-cluster-issuer
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/group: dev
+    forecastle.stakater.com/appName: ouistity-apollo
+spec:
+  rules:
   - host: apollo.ouistity.shokohsc.home
     http:
       paths:
@@ -35,11 +99,10 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: ouistity
+            name: ouistity-graphql-gateway
             port:
               number: 7000
   tls:
   - hosts:
-    - ouistity.shokohsc.home
     - apollo.ouistity.shokohsc.home
-    secretName: ouistity-cert
+    secretName: ouistity-apollo-cert

@@ -1,0 +1,49 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: ouistity-pages
+spec:
+  selector:
+    matchLabels:
+      app: ouistity-pages
+  template:
+    metadata:
+      labels:
+        app: ouistity-pages
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /api/v1/pages/metrics
+        prometheus.io/port: "5050"
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: ouistity-pages
+          image: shokohsc/moleculer-ouistity
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+          env:
+            - name: APP_GLOBAL_GATEWAY_URL
+              value: http://api.cluster.local
+            - name: APP_MONGODB_HOSTNAME
+              value: mongodb
+            - name: APP_NATS_HOSTNAME
+              value: nats
+            - name: APP_RABBITMQ_HOSTNAME
+              value: rabbitmq
+            - name: APP_RABBITMQ_USERNAME
+              value: rabbitmq
+            - name: APP_RABBITMQ_PASSWORD
+              value: changeme
+          args:
+            - --hot
+            - services/pages.service.js
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+            - name: metrics
+              containerPort: 5050
+              protocol: TCP

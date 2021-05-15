@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: moleculer
+  name: moleculer-ouistity
   labels:
-    namespace: moleculer
+    namespace: moleculer-ouistity
     goldilocks.fairwinds.com/enabled: "true"

@@ -1,0 +1,14 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: ouistity-api-gateway
+spec:
+  template:
+    spec:
+      containers:
+        - name: ouistity-api-gateway
+          image: shokohsc/moleculer-ouistity
+          env:
+            - name: APP_GLOBAL_GATEWAY_URL
+              value: https://api.ouistity.shokohsc.home
