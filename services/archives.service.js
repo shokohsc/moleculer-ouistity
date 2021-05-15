@@ -20,8 +20,15 @@ module.exports = {
       }
     }
   },
+  events: {
+    'ArchivesDomain.GenerateCatalogInitialized': {
+      async handler (ctx) {
+        await ctx.broker.call('ArchivesDomain.GenerateCatalog', ctx.params)
+      }
+    }
+  },
   actions: {
-    GenerateCatalogCommand: require('./actions/archives/GenerateCatalogCommand'),
+    GenerateCatalog: require('./actions/archives/GenerateCatalog'),
     GenerateBookSubscriber: require('./actions/archives/GenerateBookSubscriber'),
     GenerateBookPagesSubscriber: require('./actions/archives/GenerateBookPagesSubscriber')
   }

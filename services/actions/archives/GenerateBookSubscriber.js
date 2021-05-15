@@ -1,32 +1,35 @@
 const path = require('path')
 const { snakeCase } = require('lodash')
-const archiveType = require('archive-type')
-const readChunk = require('read-chunk')
 
 const { global: { gatewayUrl } } = require('../../../application.config')
 
 const handler = async function (ctx) {
   try {
     this.logger.info(ctx.action.name, ctx.params)
-    const { archive } = ctx.params
-    // prepare the data
-    const buffer = readChunk.sync(archive, 0, 262)
-    const type = archiveType(buffer)
-    this.logger.info(ctx.action.name, '... zip enabled')
+    const { archive, pages = false } = ctx.params
     // upsert books
     const urn = `urn:ouistity:books:${snakeCase(path.basename(archive, path.extname(archive)))}`
-    const [book] = await this.broker.call('BooksDomain.find', { query: { urn } })
-    if (book) {
-      await this.broker.call('BooksDomain.remove', { id: book._id })
-    }
-    await this.broker.call('BooksDomain.create', {
-      urn,
-      url: `${gatewayUrl}/api/books/${urn}`,
-      archive,
-      type: type.ext
+    const [book] = await ctx.broker.call('BooksDomain.filter', {
+      query: {
+        urn
+      }
     })
+    const data = {
+      urn,
+      url: `${gatewayUrl}/api/v1/books/${urn}`,
+      archive
+    }
+    if (book) {
+      await ctx.broker.call('BooksDomain.update', { id: book.id, data: { ...data, updatedAt: Date.now() } })
+    } else {
+      await ctx.broker.call('BooksDomain.insert', { data: { ...data, createdAt: Date.now() } })
+    }
     // upsert pages for this book
-    await ctx.broker.$rabbitmq.publishExchange('amq.topic', 'moleculer.archives-domain-generate-book-pages-catalog.key', { id: urn })
+    if (pages === true) {
+      // remove old entries with this book urn
+      await ctx.broker.call('PagesDomain.delete', { query: { book: urn } })
+      await ctx.broker.$rabbitmq.publishExchange('amq.topic', 'moleculer.archives-domain-generate-book-pages-catalog.key', { book: data })
+    }
     return { success: true }
   } catch (e) {
     /* istanbul ignore next */

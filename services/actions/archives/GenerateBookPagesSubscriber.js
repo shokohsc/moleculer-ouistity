@@ -1,13 +1,11 @@
-const path = require('path')
 const sh = require('exec-sh').promise
+const path = require('path')
 const { snakeCase, filter } = require('lodash')
 
 const { global: { gatewayUrl } } = require('../../../application.config')
 
-const ImagesExtensions = ['.jpg', '.png', '.jpeg']
-
 const parse = function (data) {
-  const entries = { files: [] }
+  const entries = { files: [], type: false }
   // split lines
   const content = data.toString().split('\n')
   const lines = filter(content, function (o) { return o !== '' })
@@ -15,6 +13,14 @@ const parse = function (data) {
   lines.map(line => {
     const tmp = line.split('  ') // hack
     const words = filter(tmp, function (o) { return o !== '' })
+    // path
+    if (words[0].search(/Path/) !== -1) {
+      entries.filepath = words[0].split(' = ')[1]
+    }
+    // type
+    if (words[0].search(/Type/) !== -1) {
+      entries.type = words[0].split(' = ')[1].toLowerCase()
+    }
     // files content
     if (words.length === 4) {
       switch (true) {
@@ -38,42 +44,26 @@ const parse = function (data) {
 const handler = async function (ctx) {
   try {
     this.logger.info(ctx.action.name, ctx.params)
-    const { id } = ctx.params
-    // get the book
-    const [book] = await this.broker.call('BooksDomain.find', { query: { urn: id } })
-    const { archive } = book
-    // remove old entries with this book urn
-    const items = await this.broker.call('PagesDomain.find', { query: { book: book.urn } })
-    this.logger.info(ctx.action.name, book.urn, items.length)
-    const entities = []
-    if (items.length > 0) {
-      this.logger.info(ctx.action.name, 'remove old entries with this book urn')
-      do {
-        const item = items.shift()
-        await this.broker.call('PagesDomain.remove', { id: item._id }).catch(() => {
-          // WARNING WHY??
-        })
-      } while (items.length > 0)
-    }
-    // analyse zip
-    const { stdout } = await sh(`7z l "${archive}"`, true)
+    const { book } = ctx.params
+    // analyse archive
+    const { stdout } = await sh(`7z l "${book.archive}"`, true)
     const entries = parse(stdout)
+    const entities = []
     do {
-      const { name } = entries.files.shift()
-      // added only if extname is allowed
-      if (ImagesExtensions.includes(path.extname(name))) {
-        const urn = `urn:ouistity:books:${id}:pages:${snakeCase(name)}`
-        entities.push({
-          urn,
-          book: book.urn,
-          url: `${gatewayUrl}/api/v1/pages/${urn}`,
-          image: `${gatewayUrl}/images/${urn}`,
-          archive
-        })
-      }
+      const entry = entries.files.shift()
+      const urn = `${book.urn}:pages:${snakeCase(path.basename(entry.name, path.extname(entry.name)))}`
+      entities.push({
+        urn,
+        book: book.urn,
+        url: `${gatewayUrl}/api/v1/pages/${urn}`,
+        image: `${gatewayUrl}/images/${urn}`,
+        filepath: entries.filepath,
+        type: entries.type,
+        ...entry
+      })
     } while (entries.files.length > 0)
     // // batch insert
-    await this.broker.call('PagesDomain.insert', { entities })
+    await ctx.broker.call('PagesDomain.insert', { data: entities })
     return { success: true }
   } catch (e) {
     /* istanbul ignore next */

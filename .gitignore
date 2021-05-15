@@ -2,6 +2,7 @@
 
 assets/data/archives
 assets/data/content
+nconf.json
 
 # Locks
 package-lock.json
