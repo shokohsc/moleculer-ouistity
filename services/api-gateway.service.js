@@ -1,4 +1,9 @@
+const sh = require('exec-sh').promise
+const path = require('path')
+const { readFileSync, unlinkSync } = require('fs')
+const { snakeCase } = require('lodash')
 const WebMixin = require('moleculer-web')
+
 
 const { moleculer: { port } } = require('../application.config')
 
@@ -43,7 +48,36 @@ module.exports = {
           res.setHeader('Content-Type', 'application/json; charset=utf-8')
           res.end(JSON.stringify({ called: true, params: req.$params }))
         },
-        'GET images/:urn': 'ArchivesDomain.ExtractImageToMemory'
+        async 'GET images/:urn' (req, res) {
+          try {
+            const { urn } = req.$params
+            const { filepath, name, type } = await req.$ctx.broker.call('PagesDomain.getByUrn', { urn })
+            const basename = snakeCase(path.basename(filepath, path.extname(filepath)))
+            const extname = path.extname(filepath)
+            console.log(`/tmp/${basename}${extname}`)
+            let cmd = false
+            if (type === 'zip') {
+              // write tmp file
+              cmd = `unzip -p "${filepath}" "${name}" > /tmp/${basename}${extname}`
+              console.log(cmd)
+            }
+            if (type === 'rar') {
+              // write tmp file
+              cmd = `unrar p -idq "${filepath}" "${name}" > /tmp/${basename}${extname}`
+            }
+            await sh(cmd, true)
+            // read file
+            const buffer = readFileSync(`/tmp/${basename}${extname}`)
+            unlinkSync(`/tmp/${basename}${extname}`)
+            // send buffer as image
+            res.setHeader('Content-Type', 'image')
+            res.end(buffer)
+          } catch (e) {
+            console.log(e)
+            /* istanbul ignore next */
+            return Promise.reject(e)
+          }
+        }
       }
     }]
   }

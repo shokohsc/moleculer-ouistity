@@ -15,7 +15,7 @@ const parse = function (data) {
     const words = filter(tmp, function (o) { return o !== '' })
     // path
     if (words[0].search(/Path/) !== -1) {
-      entries.filepath = words[0].split(' = ')[1].toLowerCase()
+      entries.filepath = words[0].split(' = ')[1]
     }
     // type
     if (words[0].search(/Type/) !== -1) {

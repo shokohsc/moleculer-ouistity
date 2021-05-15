@@ -2,6 +2,14 @@ version: "3.7"
 
 services:
 
+  thumbor:
+    image: "minimalcompact/thumbor"
+    restart: "always"
+    networks:
+      - "public"
+    ports:
+      - "8880:80/tcp"
+
   rethinkdb:
     image: "rethinkdb:2.4.1"
     restart: "always"

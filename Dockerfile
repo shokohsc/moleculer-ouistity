@@ -7,7 +7,7 @@ ARG GITLAB_SHA1
 # Declare some hardcode environment vars for the image
 ENV APP_LAST_COMMIT=${GITLAB_SHA1}
 
-RUN apk add --update bash p7zip
+RUN apk add --update bash p7zip unzip unrar
 
 # Prepare the destination
 RUN mkdir -p /usr/app

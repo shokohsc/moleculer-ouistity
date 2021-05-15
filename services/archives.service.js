@@ -28,7 +28,6 @@ module.exports = {
     }
   },
   actions: {
-    ExtractImageToMemory: require('./actions/archives/ExtractImageToMemory'),
     GenerateCatalog: require('./actions/archives/GenerateCatalog'),
     GenerateBookSubscriber: require('./actions/archives/GenerateBookSubscriber'),
     GenerateBookPagesSubscriber: require('./actions/archives/GenerateBookPagesSubscriber')
