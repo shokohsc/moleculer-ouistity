@@ -3,10 +3,22 @@ const path = require('path')
 const { readFileSync, unlinkSync } = require('fs')
 const { snakeCase } = require('lodash')
 const WebMixin = require('moleculer-web')
+const swaggerJsdoc = require('swagger-jsdoc')
 
 const Error404 = readFileSync(path.resolve(__dirname, '../assets/images/404.jpg'))
 
 const { moleculer: { port } } = require('../application.config')
+
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'OUISTITY',
+      version: require('../package.json').version,
+    },
+  },
+  apis: ['./services/**/*.js'], // files containing annotations as above
+};
 
 module.exports = {
   name: 'ApiGateway',
@@ -39,13 +51,23 @@ module.exports = {
           res.setHeader('Content-Type', 'application/json; charset=utf-8')
           res.end(JSON.stringify({ ready: true }))
         },
+        async 'GET swagger' (req, res) {
+          const openapiSpecification = await swaggerJsdoc(options)
+          res.setHeader('Content-Type', 'application/json; charset=utf-8')
+          res.end(JSON.stringify(openapiSpecification))
+        },
         'GET api/v1/books': 'BooksDomain.filter',
         'GET api/v1/books/:urn': 'BooksDomain.getByUrn',
         'GET api/v1/pages': 'PagesDomain.filter',
         'GET api/v1/pages/:urn': 'PagesDomain.getByUrn',
         'POST generate/catalog' (req, res) {
-          // Emit a moleculer event to accelerate the ccallback.
-          req.$ctx.broker.emit('ArchivesDomain.GenerateCatalogInitialized', req.$params)
+          // Emit a moleculer event to accelerate the callback.
+          const params = {
+            source: path.resolve(__dirname, '../assets/data/archives/**/*.cb*'),
+            pages: false,
+            ...req.$params
+          }
+          req.$ctx.broker.emit('ArchivesDomain.GenerateCatalogInitialized', params)
           res.setHeader('Content-Type', 'application/json; charset=utf-8')
           res.end(JSON.stringify({ called: true, params: req.$params }))
         },

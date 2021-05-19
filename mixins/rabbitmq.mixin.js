@@ -31,6 +31,9 @@ module.exports = {
     this.broker.$rabbitmq.on('disconnected', (err) => {
       this.logger.error('Rabbitmq disconnected', err)
     })
+    this.broker.$rabbitmq.on('log', (component, level, ...args) => {
+      this.logger.info(...args)
+    })
   },
   async started () {
     this.logger.info('rabbitmq mixin started')

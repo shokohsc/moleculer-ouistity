@@ -31,7 +31,5 @@ module.exports = {
         }
       }
     ]
-  },
-  async started (broker) {
   }
 }

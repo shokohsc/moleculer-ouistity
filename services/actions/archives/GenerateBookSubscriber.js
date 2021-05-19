@@ -6,7 +6,7 @@ const { global: { gatewayUrl } } = require('../../../application.config')
 const handler = async function (ctx) {
   try {
     this.logger.info(ctx.action.name, ctx.params)
-    const { archive, pages = false } = ctx.params
+    const { archive, pages } = ctx.params
     // upsert books
     const urn = `urn:ouistity:books:${snakeCase(path.basename(archive, path.extname(archive)))}`
     const [book] = await ctx.broker.call('BooksDomain.filter', {
@@ -40,5 +40,9 @@ const handler = async function (ctx) {
 }
 
 module.exports = {
+  params: {
+    archive: { type: 'string'},
+    pages: { type: 'boolean'}
+  },
   handler
 }

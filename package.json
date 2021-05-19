@@ -28,6 +28,7 @@
     "nconf": "0.11.2",
     "rabbit-queue": "5.2.0",
     "rethinkdb": "2.4.2",
+    "swagger-jsdoc": "6.1.0",
     "uuid": "8.3.2",
     "yamljs": "0.3.0"
   },
