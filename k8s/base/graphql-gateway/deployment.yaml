@@ -27,6 +27,8 @@ spec:
           env:
             - name: APP_NATS_HOSTNAME
               value: nats
+            - name: APP_RETHINKDB_HOSTNAME
+              value: rethinkdb
           args:
             - --hot
             - services/graphql-gateway.service.js

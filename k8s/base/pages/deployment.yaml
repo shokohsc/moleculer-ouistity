@@ -27,8 +27,8 @@ spec:
           env:
             - name: APP_GLOBAL_GATEWAY_URL
               value: http://api.cluster.local
-            - name: APP_MONGODB_HOSTNAME
-              value: mongodb
+            - name: APP_RETHINKDB_HOSTNAME
+              value: rethinkdb
             - name: APP_NATS_HOSTNAME
               value: nats
             - name: APP_RABBITMQ_HOSTNAME

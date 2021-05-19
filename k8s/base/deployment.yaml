@@ -2,50 +2,53 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: mongodb
+  name: thumbor
 spec:
   selector:
     matchLabels:
-      app: mongodb
+      app: thumbor
   template:
     metadata:
       labels:
-        app: mongodb
+        app: thumbor
     spec:
       securityContext:
         fsGroup: 1000
       containers:
-        - name: mongodb
-          image: bitnami/mongodb:4.4
+        - name: thumbor
+          image: minimalcompact/thumbor
+          env:
+            - name: THUMBOR_PORT
+              value: "80"
           ports:
             - name: http
-              containerPort: 27017
+              containerPort: 80
               protocol: TCP
 ---
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: mongo-express
+  name: rethinkdb
 spec:
   selector:
     matchLabels:
-      app: mongo-express
+      app: rethinkdb
   template:
     metadata:
       labels:
-        app: mongo-express
+        app: rethinkdb
     spec:
       securityContext:
         fsGroup: 1000
       containers:
-        - name: mongo-express
-          image: mongo-express
-          env:
-            - name: ME_CONFIG_MONGODB_SERVER
-              value: mongodb
+        - name: rethinkdb
+          image: rethinkdb:2.4.1
           ports:
             - name: http
-              containerPort: 8081
+              containerPort: 8080
+              protocol: TCP
+            - name: rethinkdb
+              containerPort: 28015
               protocol: TCP
 ---
 kind: Deployment

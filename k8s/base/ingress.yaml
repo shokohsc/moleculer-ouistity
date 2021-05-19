@@ -2,19 +2,36 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: mongo-express
+  name: thumbor
 spec:
   rules:
-  - host: mongo.cluster.local
+  - host: thumbor.cluster.local
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: mongo-express
+            name: thumbor
             port:
-              number: 8081
+              number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rethinkdb
+spec:
+  rules:
+  - host: rethinkdb.cluster.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: rethinkdb
+            port:
+              number: 8080
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

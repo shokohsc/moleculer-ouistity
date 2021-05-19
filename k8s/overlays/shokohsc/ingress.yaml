@@ -2,29 +2,56 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: mongo-express
+  name: thumbor
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: ca-cluster-issuer
     forecastle.stakater.com/expose: "true"
     forecastle.stakater.com/group: dev
-    forecastle.stakater.com/appName: ouistity-mongo
+    forecastle.stakater.com/appName: ouistity-thumbor
 spec:
   rules:
-  - host: mongo.ouistity.shokohsc.home
+  - host: thumbor.ouistity.shokohsc.home
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: mongo-express
+            name: thumbor
             port:
-              number: 8081
+              number: 80
   tls:
   - hosts:
-    - mongo.ouistity.shokohsc.home
-    secretName: ouistity-mongo-cert
+    - thumbor.ouistity.shokohsc.home
+    secretName: ouistity-thumbor-cert
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rethinkdb
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: ca-cluster-issuer
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/group: dev
+    forecastle.stakater.com/appName: ouistity-rethinkdb
+spec:
+  rules:
+  - host: rethinkdb.ouistity.shokohsc.home
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: rethinkdb
+            port:
+              number: 8080
+  tls:
+  - hosts:
+    - rethinkdb.ouistity.shokohsc.home
+    secretName: ouistity-rethinkdb-cert
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
