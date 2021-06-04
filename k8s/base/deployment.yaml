@@ -50,6 +50,24 @@ spec:
             - name: rethinkdb
               containerPort: 28015
               protocol: TCP
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: rethinkdb
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: rethinkdb
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
 ---
 kind: Deployment
 apiVersion: apps/v1
@@ -114,3 +132,21 @@ spec:
             - name: admin
               containerPort: 15672
               protocol: TCP
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/rabbitmq
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: rabbitmq
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: rabbitmq
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
