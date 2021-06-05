@@ -7,7 +7,7 @@ const swaggerJsdoc = require('swagger-jsdoc')
 
 const Error404 = readFileSync(path.resolve(__dirname, '../assets/images/404.jpg'))
 
-const { moleculer: { port } } = require('../application.config')
+const { moleculer: { port }, global: { archivesMountPath } } = require('../application.config')
 
 const options = {
   definition: {
@@ -63,7 +63,7 @@ module.exports = {
         'POST generate/catalog' (req, res) {
           // Emit a moleculer event to accelerate the callback.
           const params = {
-            source: path.resolve(__dirname, '../assets/data/archives/**/*.cb*'),
+            source: path.resolve(__dirname, `${archivesMountPath}/**/*.cb*`),
             pages: false,
             ...req.$params
           }

@@ -1,8 +1,6 @@
 const path = require('path')
 const { snakeCase } = require('lodash')
 
-const { global: { gatewayUrl } } = require('../../../application.config')
-
 const handler = async function (ctx) {
   try {
     this.logger.info(ctx.action.name, ctx.params)
@@ -16,8 +14,9 @@ const handler = async function (ctx) {
     })
     const data = {
       urn,
-      url: `${gatewayUrl}/api/v1/books/${urn}`,
-      archive
+      url: `/api/v1/books/${urn}`,
+      archive,
+      basename: path.basename(archive)
     }
     if (book) {
       await ctx.broker.call('BooksDomain.update', { id: book.id, data: { ...data, updatedAt: Date.now() } })

@@ -2,15 +2,15 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: ouistity-api-gateway
+  name: graphql
 spec:
   selector:
     matchLabels:
-      app: ouistity-api-gateway
+      app: graphql
   template:
     metadata:
       labels:
-        app: ouistity-api-gateway
+        app: graphql
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/path: /metrics
@@ -19,26 +19,20 @@ spec:
       securityContext:
         fsGroup: 1000
       containers:
-        - name: ouistity-api-gateway
+        - name: graphql
           image: shokohsc/moleculer-ouistity
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
           env:
-            - name: APP_GLOBAL_GATEWAY_URL
-              value: http://api.cluster.local
             - name: APP_NATS_HOSTNAME
               value: nats
+            - name: APP_RETHINKDB_HOSTNAME
+              value: rethinkdb
           args:
             - --hot
-            - services/api-gateway.service.js
+            - services/graphql-gateway.service.js
           ports:
             - name: http
-              containerPort: 5000
-              protocol: TCP
-            - name: apollo
               containerPort: 7000
-              protocol: TCP
-            - name: metrics
-              containerPort: 5050
               protocol: TCP

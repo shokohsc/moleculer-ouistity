@@ -5,7 +5,7 @@ metadata:
   name: thumbor
 spec:
   rules:
-  - host: thumbor.cluster.local
+  - host: thumbor.svc.cluster.local
     http:
       paths:
       - path: /
@@ -22,7 +22,7 @@ metadata:
   name: rethinkdb
 spec:
   rules:
-  - host: rethinkdb.cluster.local
+  - host: rethinkdb.svc.cluster.local
     http:
       paths:
       - path: /
@@ -39,7 +39,7 @@ metadata:
   name: rabbitmq
 spec:
   rules:
-  - host: rabbitmq.cluster.local
+  - host: rabbitmq.svc.cluster.local
     http:
       paths:
       - path: /
@@ -56,14 +56,14 @@ metadata:
   name: api
 spec:
   rules:
-  - host: api.cluster.local
+  - host: api.svc.cluster.local
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: ouistity-api-gateway
+            name: api
             port:
               number: 5000
 ---
@@ -73,13 +73,13 @@ metadata:
   name: apollo
 spec:
   rules:
-  - host: apollo.cluster.local
+  - host: apollo.svc.cluster.local
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: ouistity-graphql-gateway
+            name: graphql
             port:
               number: 7000

@@ -25,6 +25,7 @@ if (nconf.get('APP_RETHINKDB_PORT')) { APP_RETHINKDB_PORT = parseInt(nconf.get('
 // ************************************
 
 const APP_GLOBAL_GATEWAY_URL = nconf.get('APP_GLOBAL_GATEWAY_URL') || 'http://localhost:5000'
+const APP_MOLECULER_APOLLO_HOSTNAME = nconf.get('APP_APOLLO_HOSTNAME') || 'localhost'
 
 const APP_RETHINKDB_HOSTNAME = nconf.get('APP_RETHINKDB_HOSTNAME') || 'localhost'
 const APP_NATS_HOSTNAME = nconf.get('APP_NATS_HOSTNAME') || 'localhost'
@@ -33,9 +34,12 @@ const APP_RABBITMQ_HOSTNAME = nconf.get('APP_RABBITMQ_HOSTNAME') || 'localhost'
 const APP_RABBITMQ_USERNAME = nconf.get('APP_RABBITMQ_USERNAME') || 'admin'
 const APP_RABBITMQ_PASSWORD = nconf.get('APP_RABBITMQ_PASSWORD') || 'password'
 
+const APP_ARCHIVES_MOUNT_PATH = nconf.get('APP_ARCHIVES_MOUNT_PATH') || '/usr/app/assets/data/archives'
+
 module.exports = {
   global: {
-    gatewayUrl: APP_GLOBAL_GATEWAY_URL
+    gatewayUrl: APP_GLOBAL_GATEWAY_URL,
+    archivesMountPath: APP_ARCHIVES_MOUNT_PATH
   },
   moleculer: {
     port: APP_MOLECULER_API_GATEWAY_PORT,
@@ -45,6 +49,7 @@ module.exports = {
     }
   },
   apollo: {
+    hostname: APP_MOLECULER_APOLLO_HOSTNAME,
     port: APP_MOLECULER_APOLLO_PORT
   },
   rethinkdb: {

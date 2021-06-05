@@ -12,9 +12,9 @@ module.exports = {
       ...rethinkdb
     },
     graphql: {
-      queries: require('./graphl/queries'),
-      schemas: require('./graphl/schemas'),
-      resolvers: require('./graphl/resolvers')
+      queries: require('./graphql/queries'),
+      schemas: require('./graphql/schemas'),
+      resolvers: require('./graphql/resolvers')
     }
   }
 }

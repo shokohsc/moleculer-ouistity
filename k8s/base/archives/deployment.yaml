@@ -2,15 +2,15 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: ouistity-archives
+  name: archives
 spec:
   selector:
     matchLabels:
-      app: ouistity-archives
+      app: archives
   template:
     metadata:
       labels:
-        app: ouistity-archives
+        app: archives
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/path: /api/v1/archives/metrics
@@ -19,14 +19,14 @@ spec:
       securityContext:
         fsGroup: 1000
       containers:
-        - name: ouistity-archives
+        - name: archives
           image: shokohsc/moleculer-ouistity
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
           env:
             - name: APP_GLOBAL_GATEWAY_URL
-              value: http://api.cluster.local
+              value: http://api.svc.cluster.local
             - name: APP_RETHINKDB_HOSTNAME
               value: rethinkdb
             - name: APP_NATS_HOSTNAME

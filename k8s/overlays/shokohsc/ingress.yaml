@@ -8,7 +8,7 @@ metadata:
     cert-manager.io/cluster-issuer: ca-cluster-issuer
     forecastle.stakater.com/expose: "true"
     forecastle.stakater.com/group: dev
-    forecastle.stakater.com/appName: ouistity-thumbor
+    forecastle.stakater.com/appName: thumbor
 spec:
   rules:
   - host: thumbor.ouistity.shokohsc.home
@@ -24,7 +24,7 @@ spec:
   tls:
   - hosts:
     - thumbor.ouistity.shokohsc.home
-    secretName: ouistity-thumbor-cert
+    secretName: thumbor-cert
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -35,7 +35,7 @@ metadata:
     cert-manager.io/cluster-issuer: ca-cluster-issuer
     forecastle.stakater.com/expose: "true"
     forecastle.stakater.com/group: dev
-    forecastle.stakater.com/appName: ouistity-rethinkdb
+    forecastle.stakater.com/appName: rethinkdb
 spec:
   rules:
   - host: rethinkdb.ouistity.shokohsc.home
@@ -51,7 +51,7 @@ spec:
   tls:
   - hosts:
     - rethinkdb.ouistity.shokohsc.home
-    secretName: ouistity-rethinkdb-cert
+    secretName: rethinkdb-cert
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -62,7 +62,7 @@ metadata:
     cert-manager.io/cluster-issuer: ca-cluster-issuer
     forecastle.stakater.com/expose: "true"
     forecastle.stakater.com/group: dev
-    forecastle.stakater.com/appName: ouistity-rabbitmq
+    forecastle.stakater.com/appName: rabbitmq
 spec:
   rules:
   - host: rabbitmq.ouistity.shokohsc.home
@@ -78,7 +78,7 @@ spec:
   tls:
   - hosts:
     - rabbitmq.ouistity.shokohsc.home
-    secretName: ouistity-rabbitmq-cert
+    secretName: rabbitmq-cert
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -89,7 +89,7 @@ metadata:
     cert-manager.io/cluster-issuer: ca-cluster-issuer
     forecastle.stakater.com/expose: "true"
     forecastle.stakater.com/group: dev
-    forecastle.stakater.com/appName: ouistity-api-gateway
+    forecastle.stakater.com/appName: api
 spec:
   rules:
   - host: api.ouistity.shokohsc.home
@@ -99,13 +99,13 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: ouistity-api-gateway
+            name: api
             port:
               number: 5000
   tls:
   - hosts:
     - api.ouistity.shokohsc.home
-    secretName: ouistity-api-cert
+    secretName: api-cert
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -116,7 +116,7 @@ metadata:
     cert-manager.io/cluster-issuer: ca-cluster-issuer
     forecastle.stakater.com/expose: "true"
     forecastle.stakater.com/group: dev
-    forecastle.stakater.com/appName: ouistity-apollo
+    forecastle.stakater.com/appName: apollo
 spec:
   rules:
   - host: apollo.ouistity.shokohsc.home
@@ -126,10 +126,10 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: ouistity-graphql-gateway
+            name: graphql
             port:
               number: 7000
   tls:
   - hosts:
     - apollo.ouistity.shokohsc.home
-    secretName: ouistity-apollo-cert
+    secretName: apollo-cert

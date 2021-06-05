@@ -23,6 +23,8 @@ profiles:
           manual:
           - src: 'services/**/*.js'
             dest: .
+          - src: 'mixins/*.js'
+            dest: .
   - name: shokohsc
     build:
       artifacts:
@@ -30,6 +32,8 @@ profiles:
         sync:
           manual:
           - src: 'services/**/*.js'
+            dest: .
+          - src: 'mixins/*.js'
             dest: .
     deploy:
       kustomize:
