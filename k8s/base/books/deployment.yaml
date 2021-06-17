@@ -2,15 +2,15 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: ouistity-books
+  name: books
 spec:
   selector:
     matchLabels:
-      app: ouistity-books
+      app: books
   template:
     metadata:
       labels:
-        app: ouistity-books
+        app: books
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/path: /api/v1/books/metrics
@@ -19,14 +19,14 @@ spec:
       securityContext:
         fsGroup: 1000
       containers:
-        - name: ouistity-books
+        - name: books
           image: shokohsc/moleculer-ouistity
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
           env:
             - name: APP_GLOBAL_GATEWAY_URL
-              value: http://api.cluster.local
+              value: http://api.svc.cluster.local
             - name: APP_RETHINKDB_HOSTNAME
               value: rethinkdb
             - name: APP_NATS_HOSTNAME

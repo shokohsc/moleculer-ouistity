@@ -33,8 +33,8 @@ module.exports = {
     await r.dbCreate(this.settings.rethinkdb.database).run(this.conn).catch(() => { })
     // create moleculer to ass to the context
     const $moleculer = this.broker
-    // start appole
-    this.controler = new ApolloServer({
+    // start apollo
+    this.controller = new ApolloServer({
       tracing: true,
       typeDefs: gql`${this.settings.graphql.schemas}${this.settings.graphql.queries}`,
       resolvers: this.settings.graphql.resolvers,
@@ -47,12 +47,12 @@ module.exports = {
     return true
   },
   async started () {
-    await this.controler.listen(apollo)
+    await this.controller.listen(apollo)
     return true
   },
   async stopped () {
-    await this.controler.stop()
-    this.controler = false
+    await this.controller.stop()
+    this.controller = false
     return true
   }
 }

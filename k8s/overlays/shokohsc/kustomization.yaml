@@ -5,8 +5,8 @@ bases:
 patchesStrategicMerge:
   - ingress.yaml
 
-  - api-gateway/development.yaml
-  - archives/development.yaml
-  - books/development.yaml
-  - graphql-gateway/development.yaml
-  - pages/development.yaml
+  - api/deployment.yaml
+  - archives/deployment.yaml
+  - books/deployment.yaml
+  - graphql/deployment.yaml
+  - pages/deployment.yaml

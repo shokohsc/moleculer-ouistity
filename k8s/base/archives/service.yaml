@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ouistity-archives
+  name: archives
   labels:
-    app: ouistity-archives
+    app: archives
 spec:
   type: ClusterIP
   ports:
@@ -17,4 +17,4 @@ spec:
       protocol: TCP
       name: metrics
   selector:
-    app: ouistity-archives
+    app: archives

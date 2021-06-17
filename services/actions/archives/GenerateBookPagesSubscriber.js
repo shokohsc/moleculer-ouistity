@@ -2,8 +2,6 @@ const sh = require('exec-sh').promise
 const path = require('path')
 const { snakeCase, filter } = require('lodash')
 
-const { global: { gatewayUrl } } = require('../../../application.config')
-
 const parse = function (data) {
   const entries = { files: [], type: false }
   // split lines
@@ -52,15 +50,17 @@ const handler = async function (ctx) {
     do {
       const entry = entries.files.shift()
       const urn = `${book.urn}:pages:${snakeCase(path.basename(entry.name, path.extname(entry.name)))}`
-      entities.push({
-        urn,
-        book: book.urn,
-        url: `${gatewayUrl}/api/v1/pages/${urn}`,
-        image: `${gatewayUrl}/images/${urn}`,
-        filepath: entries.filepath,
-        type: entries.type,
-        ...entry
-      })
+      if (entry.name.match(/\.(jp(e)?g)|(png)$/)) { // Let's insert only images for now
+        entities.push({
+          urn,
+          book: book.urn,
+          url: `/api/v1/pages/${urn}`,
+          image: `/images/${urn}`,
+          filepath: entries.filepath,
+          type: entries.type,
+          ...entry
+        })
+      }
     } while (entries.files.length > 0)
     // // batch insert
     await ctx.broker.call('PagesDomain.insert', { data: entities })

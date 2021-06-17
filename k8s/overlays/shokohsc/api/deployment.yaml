@@ -2,12 +2,12 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: ouistity-books
+  name: api
 spec:
   template:
     spec:
       containers:
-        - name: ouistity-books
+        - name: api
           image: shokohsc/moleculer-ouistity
           env:
             - name: APP_GLOBAL_GATEWAY_URL
