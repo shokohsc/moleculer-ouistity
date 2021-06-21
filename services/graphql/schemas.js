@@ -28,9 +28,9 @@ module.exports = `
     archive: String!
   }
   """
-  This type describes files as a result of browsing a directory.
+  This type describes files as a result of browsing a directory or a query search.
   """
-  type BrowseResult {
+  type FilesResult {
     rows: [File]
     total: Int
     page: Int
