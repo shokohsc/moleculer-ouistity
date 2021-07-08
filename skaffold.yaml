@@ -8,6 +8,12 @@ build:
     context: .
     docker:
       dockerfile: Dockerfile
+    sync:
+      manual:
+      - src: 'services/**/*.js'
+        dest: .
+      - src: 'mixins/*.js'
+        dest: .
 deploy:
   kustomize:
     paths:
@@ -19,22 +25,15 @@ profiles:
     build:
       artifacts:
       - image: shokohsc/moleculer-ouistity
-        sync:
-          manual:
-          - src: 'services/**/*.js'
-            dest: .
-          - src: 'mixins/*.js'
-            dest: .
   - name: shokohsc
     build:
+      cluster:
+        namespace: kaniko
+        pullSecretName: kaniko-secret
+        dockerConfig:
+          secretName: kaniko-secret
       artifacts:
       - image: shokohsc/moleculer-ouistity
-        sync:
-          manual:
-          - src: 'services/**/*.js'
-            dest: .
-          - src: 'mixins/*.js'
-            dest: .
     deploy:
       kustomize:
         paths:

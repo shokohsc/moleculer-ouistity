@@ -95,6 +95,68 @@ module.exports = {
         }
         }))
 
+        return {
+          rows,
+          total,
+          page,
+          pageSize,
+          totalPages: Number.isInteger(totalPages) ? totalPages : Math.floor(totalPages) + 1
+        }
+      } catch (e) {
+        console.log(e);
+        return {}
+      }
+    },
+    search: async (_, { query = '', page = 1, pageSize = 10 }, { $moleculer, $conn }, ___) => {
+      try {
+        const folders = await sh(`find ${archivesMountPath} -iname "*${query}*" -type d |sort -n`, true)
+        const files = await sh(`find ${archivesMountPath} -iname "*${query}*" -type f |sort -n`, true)
+
+        let rows = initial(folders.stdout.split('\n'))
+          .map(function (item) { return {name: item.replace(archivesMountPath, ''), type: `folder`}; })
+          .concat(initial(files.stdout.split('\n'))
+            .map(function (item) { return {name: item, type: `file`}; }))
+
+        const _page = (parseInt(page) - 1) >= 0 ? parseInt(page) - 1 : 0
+        const _pageSize = (parseInt(pageSize)) >= 0 ? parseInt(pageSize) : 1
+        const total = rows.length
+        const totalPages = total / _pageSize
+        rows = rows.slice(_page * _pageSize, _page * _pageSize + _pageSize);
+        const foldersToKeep = rows.filter(row => 'folder' === row.type)
+        const filesToSearch = rows.filter(row => 'file' === row.type).map(row => row.name)
+
+        const cursor = await r.db('ouistity')
+          .table('books')
+          .filter(function(book){
+            return r
+              .expr(filesToSearch)
+              .contains(book('archive'));
+            }
+          )
+          .pluck('urn', 'basename')
+          .orderBy('archive')
+          .merge(function(book){
+            return {
+              cover: r.db('ouistity')
+              .table('pages')
+              .filter({ book: book('urn') })
+              .orderBy('name')
+              .pluck('image')
+              .limit(1)
+              .coerceTo('array')
+            }
+          })
+          .run($conn)
+        rows = await cursor.toArray()
+
+        rows = foldersToKeep.concat(rows.map(row => {
+        return {
+          name: row.basename,
+          type: 'file',
+          cover: (row.cover.length > 0 && row.cover[0].image) ? row.cover[0].image : '',
+          urn: row.urn
+        }
+        }))
 
         return {
           rows,
