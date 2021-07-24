@@ -3,21 +3,12 @@ kind: Kustomization
 namespace: moleculer-ouistity
 resources:
   - namespace.yaml
-  - deployment.yaml
-  - service.yaml
-  - ingress.yaml
+  # - deployment.yaml
+  # - service.yaml
+  # - ingress.yaml
 
-  - api/deployment.yaml
-  - api/service.yaml
-
-  - archives/deployment.yaml
-  - archives/service.yaml
-
-  - books/deployment.yaml
-  - books/service.yaml
-
-  - graphql/deployment.yaml
-  - graphql/service.yaml
-
-  - pages/deployment.yaml
-  - pages/service.yaml
+  - api/
+  - archives/
+  - books/
+  - graphql/
+  - pages/

@@ -30,7 +30,7 @@ module.exports = `
   """
   This type describes files as a result of browsing a directory or a query search.
   """
-  type FilesResult {
+  type FilesResult @cacheControl(maxAge: 3600) {
     rows: [File]
     total: Int
     page: Int
@@ -40,7 +40,7 @@ module.exports = `
   """
   This type describes a File, either folder or file.
   """
-  type File {
+  type File @cacheControl(maxAge: 3600) {
     name: String!
     type: String!
     cover: String
@@ -49,14 +49,14 @@ module.exports = `
   """
   This type describes pages as a result of querying a book.
   """
-  type ReadResult {
+  type ReadResult @cacheControl(maxAge: 3600) {
     rows: [BookPage]
     total: Int!
   }
   """
   This type describes a File, either folder or file.
   """
-  type BookPage {
+  type BookPage @cacheControl(maxAge: 3600) {
     image: String!
   }
 `

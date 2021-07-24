@@ -3,12 +3,14 @@ kind: Kustomization
 namespace: moleculer-ouistity
 bases:
   - ../../base
-  - keda.yaml
+  # - keda.yaml
 patchesStrategicMerge:
-  - ingress.yaml
+  # - ingress.yaml
 
   - api/deployment.yaml
+  - api/ingress.yaml
   - archives/deployment.yaml
   - books/deployment.yaml
   - graphql/deployment.yaml
+  - graphql/ingress.yaml
   - pages/deployment.yaml
