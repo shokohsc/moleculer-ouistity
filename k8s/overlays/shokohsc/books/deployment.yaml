@@ -12,3 +12,5 @@ spec:
           env:
             - name: APP_GLOBAL_GATEWAY_URL
               value: https://api.ouistity.shokohsc.home
+            - name: APP_NATS_HOSTNAME
+              value: nats.nats

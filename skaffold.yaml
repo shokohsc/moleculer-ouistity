@@ -25,7 +25,33 @@ profiles:
     build:
       artifacts:
       - image: shokohsc/moleculer-ouistity
+        sync:
+          manual:
+          - src: 'services/**/*.js'
+            dest: .
+          - src: 'mixins/*.js'
+            dest: .
   - name: shokohsc
+    build:
+      cluster:
+        namespace: kaniko
+        pullSecretName: kaniko-secret
+        dockerConfig:
+          # path: ~/.docker/config.json
+          secretName: kaniko-secret
+      artifacts:
+      - image: shokohsc/moleculer-ouistity
+        sync:
+          manual:
+          - src: 'services/**/*.js'
+            dest: .
+          - src: 'mixins/*.js'
+            dest: .
+    deploy:
+      kustomize:
+        paths:
+          - k8s/overlays/shokohsc
+  - name: prod
     build:
       cluster:
         namespace: kaniko
@@ -34,7 +60,5 @@ profiles:
           secretName: kaniko-secret
       artifacts:
       - image: shokohsc/moleculer-ouistity
-    deploy:
-      kustomize:
-        paths:
-          - k8s/overlays/shokohsc
+        kaniko:
+          dockerfile: Dockerfile

@@ -9,6 +9,11 @@ spec:
       containers:
         - name: graphql
           image: shokohsc/moleculer-ouistity
+          env:
+            - name: APP_NATS_HOSTNAME
+              value: nats.nats
+            - name: APP_RETHINKDB_HOSTNAME
+              value: rethinkdb.rethinkdb
           volumeMounts:
             - name: nfs-shared
               mountPath: /usr/app/assets/data/archives/weekly

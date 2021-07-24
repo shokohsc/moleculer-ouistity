@@ -51,37 +51,3 @@ spec:
             name: rabbitmq
             port:
               number: 15672
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: api
-spec:
-  rules:
-  - host: api.svc.cluster.local
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: api
-            port:
-              number: 5000
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: apollo
-spec:
-  rules:
-  - host: apollo.svc.cluster.local
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: graphql
-            port:
-              number: 7000
