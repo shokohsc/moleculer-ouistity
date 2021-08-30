@@ -25,11 +25,13 @@ module.exports = {
       replyPattern: false,
       scheduledPublish: false
     })
+    const r = this.broker.$rabbitmq
     this.broker.$rabbitmq.on('connected', () => {
       this.logger.info('rabbitmq connected')
     })
     this.broker.$rabbitmq.on('disconnected', (err) => {
       this.logger.error('Rabbitmq disconnected', err)
+      setTimeout(() => r.reconnect(), 5000)
     })
     this.broker.$rabbitmq.on('log', (component, level, ...args) => {
       this.logger.info(...args)

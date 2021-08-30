@@ -127,6 +127,10 @@ module.exports = {
         db: 'ouistity',
         silent: true
       })
+      this.conn.on('error', (err) => {
+        this.logger.error('RethinkDB disconnected', err)
+        setTimeout(() => this.conn.reconnect(), 100)
+      })
       this.logger.info('RethinkDB adapter has connected successfully.')
       await r.dbCreate(this.settings.rethinkdb.database).run(this.conn).catch(() => { })
       const tables = await r.db(this.settings.rethinkdb.database).tableList().run(this.conn)

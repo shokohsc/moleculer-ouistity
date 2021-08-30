@@ -14,6 +14,9 @@ let APP_MOLECULER_APOLLO_PORT = 7000
 let APP_NATS_PORT = 4222
 let APP_RABBITMQ_PORT = 5672
 let APP_RETHINKDB_PORT = 28015
+let APP_GRAPHQL_DEFAULT_CACHE_TTL = 60
+let APP_GRAPHQL_FOLDER_CACHE_TTL = 86400
+let APP_GRAPHQL_BOOKS_CACHE_TTL = 31557600
 // ************************************
 if (nconf.get('APP_MOLECULER_METRICS_ENABLED') && nconf.get('APP_MOLECULER_METRICS_ENABLED') === 'true') { APP_MOLECULER_METRICS_ENABLED = true }
 if (nconf.get('APP_MOLECULER_API_GATEWAY_PORT')) { APP_MOLECULER_API_GATEWAY_PORT = parseInt(nconf.get('APP_MOLECULER_API_GATEWAY_PORT')) }
@@ -22,6 +25,9 @@ if (nconf.get('APP_MOLECULER_APOLLO_PORT')) { APP_MOLECULER_APOLLO_PORT = parseI
 if (nconf.get('APP_NATS_PORT')) { APP_NATS_PORT = parseInt(nconf.get('APP_NATS_PORT')) }
 if (nconf.get('APP_RABBITMQ_PORT')) { APP_RABBITMQ_PORT = parseInt(nconf.get('APP_RABBITMQ_PORT')) }
 if (nconf.get('APP_RETHINKDB_PORT')) { APP_RETHINKDB_PORT = parseInt(nconf.get('APP_RETHINKDB_PORT')) }
+if (nconf.get('APP_GRAPHQL_DEFAULT_CACHE_TTL')) { APP_GRAPHQL_DEFAULT_CACHE_TTL = parseInt(nconf.get('APP_GRAPHQL_DEFAULT_CACHE_TTL')) }
+if (nconf.get('APP_GRAPHQL_FOLDER_CACHE_TTL')) { APP_GRAPHQL_FOLDER_CACHE_TTL = parseInt(nconf.get('APP_GRAPHQL_FOLDER_CACHE_TTL')) }
+if (nconf.get('APP_GRAPHQL_BOOKS_CACHE_TTL')) { APP_GRAPHQL_BOOKS_CACHE_TTL = parseInt(nconf.get('APP_GRAPHQL_BOOKS_CACHE_TTL')) }
 // ************************************
 
 const APP_GLOBAL_GATEWAY_URL = nconf.get('APP_GLOBAL_GATEWAY_URL') || 'http://localhost:5000'
@@ -65,5 +71,10 @@ module.exports = {
   nats: {
     hostname: APP_NATS_HOSTNAME,
     port: APP_NATS_PORT
+  },
+  graphqlCache: {
+    default: APP_GRAPHQL_DEFAULT_CACHE_TTL,
+    folder: APP_GRAPHQL_FOLDER_CACHE_TTL,
+    books: APP_GRAPHQL_BOOKS_CACHE_TTL
   }
 }

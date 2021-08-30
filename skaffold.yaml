@@ -1,4 +1,4 @@
-apiVersion: skaffold/v2beta15
+apiVersion: skaffold/v2beta20
 kind: Config
 metadata:
   name: ouistity
@@ -6,59 +6,63 @@ build:
   artifacts:
   - image: shokohsc/moleculer-ouistity
     context: .
-    docker:
-      dockerfile: Dockerfile
     sync:
       manual:
-      - src: 'services/**/*.js'
+      - src: services/**/*.js
         dest: .
-      - src: 'mixins/*.js'
+      - src: mixins/*.js
         dest: .
+    docker:
+      dockerfile: Dockerfile
 deploy:
   kustomize:
     paths:
-      - k8s/base
+    - k8s/base
 profiles:
-  - name: dev
-    activation:
-      - command: dev
-    build:
-      artifacts:
-      - image: shokohsc/moleculer-ouistity
-        sync:
-          manual:
-          - src: 'services/**/*.js'
-            dest: .
-          - src: 'mixins/*.js'
-            dest: .
-  - name: shokohsc
-    build:
-      cluster:
-        namespace: kaniko
-        pullSecretName: kaniko-secret
-        dockerConfig:
-          # path: ~/.docker/config.json
-          secretName: kaniko-secret
-      artifacts:
-      - image: shokohsc/moleculer-ouistity
-        sync:
-          manual:
-          - src: 'services/**/*.js'
-            dest: .
-          - src: 'mixins/*.js'
-            dest: .
-    deploy:
-      kustomize:
-        paths:
-          - k8s/overlays/shokohsc
-  - name: prod
-    build:
-      cluster:
-        namespace: kaniko
-        pullSecretName: kaniko-secret
-        dockerConfig:
-          secretName: kaniko-secret
-      artifacts:
-      - image: shokohsc/moleculer-ouistity
-        kaniko:
-          dockerfile: Dockerfile
+- name: dev
+  activation:
+  - command: dev
+  build:
+    artifacts:
+    - image: shokohsc/moleculer-ouistity
+      sync:
+        manual:
+        - src: services/**/*.js
+          dest: .
+        - src: mixins/*.js
+          dest: .
+- name: shokohsc
+  build:
+    artifacts:
+    - image: shokohsc/moleculer-ouistity
+      sync:
+        manual:
+        - src: services/**/*.js
+          dest: .
+        - src: mixins/*.js
+          dest: .
+      kaniko:
+        cache:
+          repo: shokohsc/moleculer-ouistity
+    cluster:
+      dockerConfig:
+        secretName: kaniko-secret
+      namespace: kaniko
+      pullSecretName: kaniko-secret
+  deploy:
+    kustomize:
+      paths:
+      - k8s/overlays/shokohsc
+- name: prod
+  build:
+    artifacts:
+    - image: shokohsc/moleculer-ouistity
+      kaniko:
+        dockerfile: Dockerfile
+        cache:
+          repo: shokohsc/moleculer-ouistity
+    cluster:
+      dockerConfig:
+        secretName: kaniko-secret
+      namespace: kaniko
+      pullSecretName: kaniko-secret
