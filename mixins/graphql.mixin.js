@@ -29,9 +29,13 @@ module.exports = {
       db: 'ouistity',
       silent: true
     })
+    $conn.on('error', (err) => {
+      this.logger.error('RethinkDB disconnected', err)
+      setTimeout(() => this.conn.reconnect(), 100)
+    })
     this.logger.info('RethinkDB adapter has connected successfully.')
     await r.dbCreate(this.settings.rethinkdb.database).run(this.conn).catch(() => { })
-    // create moleculer to ass to the context
+    // create moleculer to pass to the context
     const $moleculer = this.broker
     // start apollo
     this.controller = new ApolloServer({
@@ -47,6 +51,7 @@ module.exports = {
     return true
   },
   async started () {
+    // TODO this.controller is sometimes undefined, why ?
     await this.controller.listen(apollo)
     return true
   },

@@ -12,8 +12,11 @@ spec:
           env:
             - name: APP_GLOBAL_GATEWAY_URL
               value: https://api.ouistity.shokohsc.home
-            - name: APP_NATS_HOSTNAME
-              value: nats.nats
+            # - name: APP_NATS_HOSTNAME
+            #   value: nats.nats
+          args:
+            - --hot
+            - services/archives.service.js
           volumeMounts:
             - name: nfs-shared
               mountPath: /usr/app/assets/data/archives/weekly

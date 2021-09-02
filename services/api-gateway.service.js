@@ -77,6 +77,7 @@ module.exports = {
             const { filepath, name, type } = await req.$ctx.broker.call('PagesDomain.getByUrn', { urn })
             const basename = snakeCase(path.basename(filepath, path.extname(filepath)))
             const extname = path.extname(filepath)
+            // const { stdout } = await sh(`7z e -so "${filepath}" "${name}"`, true)
             let cmd = false
             if (type === 'zip') {
               // write tmp file
@@ -94,6 +95,7 @@ module.exports = {
             res.setHeader('Content-Type', 'image')
             res.end(buffer)
           } catch (e) {
+            console.log(e);
             // send buffer as image
             res.setHeader('Content-Type', 'image')
             res.end(Error404)

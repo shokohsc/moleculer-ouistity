@@ -70,7 +70,7 @@ module.exports = {
               .contains(book("basename"));
             }
           )
-          .pluck('urn', 'basename')
+          .pluck('urn', 'basename', 'info')
           .orderBy('archive')
           .merge(function(book){
             return {
@@ -91,7 +91,8 @@ module.exports = {
           name: row.basename,
           type: 'file',
           cover: (row.cover.length > 0 && row.cover[0].image) ? row.cover[0].image : '',
-          urn: row.urn
+          urn: row.urn,
+          info: row.info
         }
         }))
 
@@ -133,7 +134,7 @@ module.exports = {
               .contains(book('archive'));
             }
           )
-          .pluck('urn', 'basename')
+          .pluck('urn', 'basename', 'info')
           .orderBy('archive')
           .merge(function(book){
             return {
@@ -154,7 +155,8 @@ module.exports = {
           name: row.basename,
           type: 'file',
           cover: (row.cover.length > 0 && row.cover[0].image) ? row.cover[0].image : '',
-          urn: row.urn
+          urn: row.urn,
+          info: row.info
         }
         }))
 
