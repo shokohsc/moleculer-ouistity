@@ -53,10 +53,3 @@ spec:
             httpGet:
               port: http
               path: /status/readiness
-          resources:
-            requests:
-              cpu: 10m
-              memory: 128M
-            limits:
-              cpu: 100m
-              memory: 128M

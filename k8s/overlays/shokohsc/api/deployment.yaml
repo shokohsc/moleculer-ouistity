@@ -12,8 +12,8 @@ spec:
           env:
             - name: APP_GLOBAL_GATEWAY_URL
               value: https://api.ouistity.shokohsc.home
-            - name: APP_IMAGE_CACHE_TTL
-              value: "30"
+            # - name: APP_NATS_HOSTNAME
+            #   value: nats.nats
           args:
             - --hot
             - services/api-gateway.service.js

@@ -63,20 +63,38 @@ module.exports = {
         const foldersToKeep = rows.filter(row => 'folder' === row.type)
         const filesToSearch = rows.filter(row => 'file' === row.type).map(row => archivesMountPath + '/' + directory + row.name)
 
-        const filesChecksums = []
-        await Promise.all(filesToSearch.map(async (fileToSearch) => {
-          filesChecksums.push(await $moleculer.call('ArchivesDomain.GenerateChecksum', { file: fileToSearch}))
-        }))
-        rows = 0 < filesToSearch.length ? await $moleculer.call('BooksDomain.getBooksAndCovers', {filesChecksums: filesChecksums}) : []
+        const cursor = await r.db('ouistity')
+          .table('books')
+          .filter(function(book){
+            return r
+              .expr(filesToSearch)
+              .contains(book("basename"));
+            }
+          )
+          .pluck('urn', 'basename', 'info')
+          .orderBy('archive')
+          .merge(function(book){
+            return {
+              cover: r.db('ouistity')
+              .table('pages')
+              .filter({ book: book('urn') })
+              .orderBy('name')
+              .pluck('image')
+              .limit(1)
+              .coerceTo('array')
+            }
+          })
+          .run($conn)
+        rows = await cursor.toArray()
 
-        rows = foldersToKeep.concat(rows.flat().map(row => {
-          return {
-            name: row.basename,
-            type: 'file',
-            cover: (row.cover.length > 0 && row.cover[0].image) ? row.cover[0].image : '',
-            urn: row.urn,
-            info: row.info
-          }
+        rows = foldersToKeep.concat(rows.map(row => {
+        return {
+          name: row.basename,
+          type: 'file',
+          cover: (row.cover.length > 0 && row.cover[0].image) ? row.cover[0].image : '',
+          urn: row.urn,
+          info: row.info
+        }
         }))
 
         return {
@@ -110,20 +128,38 @@ module.exports = {
         const foldersToKeep = rows.filter(row => 'folder' === row.type)
         const filesToSearch = rows.filter(row => 'file' === row.type).map(row => row.name)
 
-        const filesChecksums = []
-        await Promise.all(filesToSearch.map(async (fileToSearch) => {
-          filesChecksums.push(await $moleculer.call('ArchivesDomain.GenerateChecksum', { file: fileToSearch}))
-        }))
-        rows = 0 < filesToSearch.length ? await $moleculer.call('BooksDomain.getBooksAndCovers', {filesChecksums: filesChecksums}) : []
+        const cursor = await r.db('ouistity')
+          .table('books')
+          .filter(function(book){
+            return r
+              .expr(filesToSearch)
+              .contains(book('archive'));
+            }
+          )
+          .pluck('urn', 'basename', 'info')
+          .orderBy('archive')
+          .merge(function(book){
+            return {
+              cover: r.db('ouistity')
+              .table('pages')
+              .filter({ book: book('urn') })
+              .orderBy('name')
+              .pluck('image')
+              .limit(1)
+              .coerceTo('array')
+            }
+          })
+          .run($conn)
+        rows = await cursor.toArray()
 
-        rows = foldersToKeep.concat(rows.flat().map(row => {
-          return {
-            name: row.basename,
-            type: 'file',
-            cover: (row.cover.length > 0 && row.cover[0].image) ? row.cover[0].image : '',
-            urn: row.urn,
-            info: row.info
-          }
+        rows = foldersToKeep.concat(rows.map(row => {
+        return {
+          name: row.basename,
+          type: 'file',
+          cover: (row.cover.length > 0 && row.cover[0].image) ? row.cover[0].image : '',
+          urn: row.urn,
+          info: row.info
+        }
         }))
 
         return {

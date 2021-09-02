@@ -12,22 +12,8 @@ spec:
           env:
             - name: APP_GLOBAL_GATEWAY_URL
               value: https://api.ouistity.shokohsc.home
+            # - name: APP_NATS_HOSTNAME
+            #   value: nats.nats
           args:
             - --hot
             - services/pages.service.js
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                  - api
-                  - archives
-                  - books
-                  - graphql
-                  - pages
-              topologyKey: kubernetes.io/hostname

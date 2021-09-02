@@ -75,8 +75,9 @@ module.exports = {
           try {
             const { urn } = req.$params
             const { filepath, name, type } = await req.$ctx.broker.call('PagesDomain.getByUrn', { urn })
-            const basename = snakeCase(path.basename(name, path.extname(name)))
-            // await sh(`7z e -o/tmp "${filepath}" "${name}"`, true)
+            const basename = snakeCase(path.basename(filepath, path.extname(filepath)))
+            const extname = path.extname(filepath)
+            // const { stdout } = await sh(`7z e -so "${filepath}" "${name}"`, true)
             let cmd = false
             if (type === 'zip') {
               // write tmp file
