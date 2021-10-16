@@ -2,13 +2,15 @@ const sh = require('exec-sh').promise
 const path = require('path')
 const { snakeCase } = require('lodash')
 const parseString = require('xml2js').parseString
+const md5File = require('md5-file')
 
 const handler = async function (ctx) {
   try {
     this.logger.info(ctx.action.name, ctx.params)
     const { archive, pages } = ctx.params
     // upsert books
-    const urn = `urn:ouistity:books:${snakeCase(path.basename(archive, path.extname(archive)))}`
+    const hash = md5File.sync(archive)
+    const urn = `urn:ouistity:books:${snakeCase(path.basename(archive, path.extname(archive)))}:${hash}`
     const [book] = await ctx.broker.call('BooksDomain.filter', {
       query: {
         urn

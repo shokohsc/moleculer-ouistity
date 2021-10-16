@@ -60,14 +60,14 @@ module.exports = {
         const totalPages = total / _pageSize
         rows = rows.slice(_page * _pageSize, _page * _pageSize + _pageSize);
         const foldersToKeep = rows.filter(row => 'folder' === row.type)
-        const filesToSearch = rows.filter(row => 'file' === row.type).map(row => row.name)
+        const filesToSearch = rows.filter(row => 'file' === row.type).map(row => archivesMountPath + '/' + directory + row.name)
 
         const cursor = await r.db('ouistity')
           .table('books')
           .filter(function(book){
             return r
               .expr(filesToSearch)
-              .contains(book("basename"));
+              .contains(book('archive'))
             }
           )
           .pluck('urn', 'basename', 'info')
