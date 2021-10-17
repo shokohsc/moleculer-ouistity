@@ -1,4 +1,4 @@
-apiVersion: skaffold/v2beta20
+apiVersion: skaffold/v2beta22
 kind: Config
 metadata:
   name: ouistity
@@ -58,9 +58,9 @@ profiles:
     artifacts:
     - image: shokohsc/moleculer-ouistity
       kaniko:
-        dockerfile: Dockerfile
         cache:
           repo: shokohsc/moleculer-ouistity
+        dockerfile: Dockerfile
     cluster:
       dockerConfig:
         secretName: kaniko-secret

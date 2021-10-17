@@ -32,7 +32,6 @@ spec:
             - name: APP_NATS_HOSTNAME
               value: nats
           args:
-            - --hot
             - services/api-gateway.service.js
           ports:
             - name: http
@@ -44,3 +43,11 @@ spec:
             - name: metrics
               containerPort: 5050
               protocol: TCP
+          livenessProbe:
+            httpGet:
+              port: http
+              path: /status/liveness
+          readinessProbe:
+            httpGet:
+              port: http
+              path: /status/readiness

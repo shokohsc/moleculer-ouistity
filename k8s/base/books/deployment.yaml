@@ -11,10 +11,10 @@ spec:
     metadata:
       labels:
         app: books
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/path: /api/v1/books/metrics
-        prometheus.io/port: "5050"
+      # annotations:
+      #   prometheus.io/scrape: "true"
+      #   prometheus.io/path: /api/v1/books/metrics
+      #   prometheus.io/port: "5050"
     spec:
       securityContext:
         fsGroup: 1000
@@ -38,12 +38,19 @@ spec:
             - name: APP_RABBITMQ_PASSWORD
               value: changeme
           args:
-            - --hot
             - services/books.service.js
-          ports:
-            - name: http
-              containerPort: 5000
-              protocol: TCP
-            - name: metrics
-              containerPort: 5050
-              protocol: TCP
+          # ports:
+          #   - name: http
+          #     containerPort: 5000
+          #     protocol: TCP
+          #   - name: metrics
+          #     containerPort: 5050
+          #     protocol: TCP
+          # livenessProbe:
+          #   httpGet:
+          #     port: http
+          #     path: /
+          # readinessProbe:
+          #   httpGet:
+          #     port: http
+          #     path: /

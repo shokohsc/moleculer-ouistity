@@ -47,6 +47,18 @@ module.exports = `
     type: String!
     cover: String
     urn: String
+    info: ComicInfo
+  }
+  """
+  This type describes a ComicInfo, optional metadata fields. Cached for a year
+  """
+  type ComicInfo @cacheControl(maxAge: ${graphqlCache.books}) {
+    series: String
+    number: String
+    summary: String
+    writer: String
+    coverArtist: String
+    penciller: String
   }
   """
   This type describes pages as a result of querying a book. Cached for a year

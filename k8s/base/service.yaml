@@ -45,9 +45,9 @@ spec:
   type: ClusterIP
   ports:
     - port: 4222
-      targetPort: http
+      targetPort: nats
       protocol: TCP
-      name: http
+      name: nats
   selector:
     app: nats
 ---
@@ -61,12 +61,12 @@ spec:
   type: ClusterIP
   ports:
     - port: 5672
+      targetPort: amqp
+      protocol: TCP
+      name: amqp
+    - port: 15672
       targetPort: http
       protocol: TCP
       name: http
-    - port: 15672
-      targetPort: admin
-      protocol: TCP
-      name: admin
   selector:
     app: rabbitmq

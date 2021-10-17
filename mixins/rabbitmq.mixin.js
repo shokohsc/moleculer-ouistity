@@ -39,7 +39,7 @@ module.exports = {
   },
   async started () {
     this.logger.info('rabbitmq mixin started')
-    // Step 1: From aliases to bindins
+    // Step 1: From aliases to bindings
     const aliases = this.settings.rabbitmq.aliases
     const keys = Object.keys(aliases)
     keys.map(name => {
@@ -51,6 +51,7 @@ module.exports = {
     this.metadata.$bindings.map(binding => {
       const base = { durable: true, autoDelete: false }
       const options = { ...base }
+      // TODO Need to create queues when connection is up, or wait for it
       this.broker.$rabbitmq.createQueue(binding.target, options, async (msg, ack) => {
         const routingKey = msg.fields.routingKey
         const refName = routingKey.split('.')[1]

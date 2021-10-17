@@ -10,10 +10,19 @@ spec:
         - name: graphql
           image: shokohsc/moleculer-ouistity
           env:
-            - name: APP_NATS_HOSTNAME
-              value: nats.nats
-            - name: APP_RETHINKDB_HOSTNAME
-              value: rethinkdb.rethinkdb
+            - name: APP_GRAPHQL_DEFAULT_CACHE_TTL
+              value: "0"
+            - name: APP_GRAPHQL_FOLDER_CACHE_TTL
+              value: "0"
+            - name: APP_GRAPHQL_BOOKS_CACHE_TTL
+              value: "0"
+          #   - name: APP_NATS_HOSTNAME
+          #     value: nats.nats
+          #   - name: APP_RETHINKDB_HOSTNAME
+          #     value: rethinkdb.rethinkdb
+          args:
+            - --hot
+            - services/graphql-gateway.service.js
           volumeMounts:
             - name: nfs-shared
               mountPath: /usr/app/assets/data/archives/weekly

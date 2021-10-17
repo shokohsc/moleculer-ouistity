@@ -24,6 +24,14 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
+          # livenessProbe:
+          #   httpGet:
+          #     port: http
+          #     path: /
+          # readinessProbe:
+          #   httpGet:
+          #     port: http
+          #     path: /
 ---
 kind: Deployment
 apiVersion: apps/v1
@@ -50,6 +58,14 @@ spec:
             - name: rethinkdb
               containerPort: 28015
               protocol: TCP
+          livenessProbe:
+            httpGet:
+              port: http
+              path: /
+          readinessProbe:
+            httpGet:
+              port: http
+              path: /
           volumeMounts:
             - name: data
               mountPath: /data
@@ -67,7 +83,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 10Gi
+      storage: 2Gi
 ---
 kind: Deployment
 apiVersion: apps/v1
@@ -96,9 +112,20 @@ spec:
             - "--port"
             - "4222"
           ports:
-            - name: http
+            - name: nats
               containerPort: 4222
               protocol: TCP
+            - name: http
+              containerPort: 8222
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              port: http
+              path: /
+          readinessProbe:
+            httpGet:
+              port: http
+              path: /
 ---
 kind: Deployment
 apiVersion: apps/v1
@@ -126,12 +153,20 @@ spec:
             - name: RABBITMQ_DEFAULT_PASS
               value: changeme
           ports:
-            - name: http
+            - name: amqp
               containerPort: 5672
               protocol: TCP
-            - name: admin
+            - name: http
               containerPort: 15672
               protocol: TCP
+          livenessProbe:
+            httpGet:
+              port: http
+              path: /
+          readinessProbe:
+            httpGet:
+              port: http
+              path: /
           volumeMounts:
             - name: data
               mountPath: /var/lib/rabbitmq
@@ -149,4 +184,4 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 10Gi
+      storage: 2Gi

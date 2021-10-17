@@ -1,4 +1,3 @@
-const path = require('path')
 const glob = require('glob-promise')
 
 /**
@@ -32,7 +31,7 @@ const handler = async function (ctx) {
     const archives = {}
     files.map(file => {
       this.logger.info(ctx.action.name, `archive: ${file} prepared and ready to rumble!`)
-      archives[path.basename(file)] = file
+      archives[file] = file
       return true
     })
     if (archives.length === 0) {

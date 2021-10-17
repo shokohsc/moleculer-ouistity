@@ -60,17 +60,17 @@ module.exports = {
         const totalPages = total / _pageSize
         rows = rows.slice(_page * _pageSize, _page * _pageSize + _pageSize);
         const foldersToKeep = rows.filter(row => 'folder' === row.type)
-        const filesToSearch = rows.filter(row => 'file' === row.type).map(row => row.name)
+        const filesToSearch = rows.filter(row => 'file' === row.type).map(row => archivesMountPath + '/' + directory + row.name)
 
         const cursor = await r.db('ouistity')
           .table('books')
           .filter(function(book){
             return r
               .expr(filesToSearch)
-              .contains(book("basename"));
+              .contains(book('archive'))
             }
           )
-          .pluck('urn', 'basename')
+          .pluck('urn', 'basename', 'info')
           .orderBy('archive')
           .merge(function(book){
             return {
@@ -91,7 +91,8 @@ module.exports = {
           name: row.basename,
           type: 'file',
           cover: (row.cover.length > 0 && row.cover[0].image) ? row.cover[0].image : '',
-          urn: row.urn
+          urn: row.urn,
+          info: row.info
         }
         }))
 
@@ -133,7 +134,7 @@ module.exports = {
               .contains(book('archive'));
             }
           )
-          .pluck('urn', 'basename')
+          .pluck('urn', 'basename', 'info')
           .orderBy('archive')
           .merge(function(book){
             return {
@@ -154,7 +155,8 @@ module.exports = {
           name: row.basename,
           type: 'file',
           cover: (row.cover.length > 0 && row.cover[0].image) ? row.cover[0].image : '',
-          urn: row.urn
+          urn: row.urn,
+          info: row.info
         }
         }))
 
