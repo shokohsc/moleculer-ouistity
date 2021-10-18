@@ -114,7 +114,7 @@ module.exports = {
         const files = await sh(`find ${archivesMountPath} -iname "*${query}*" -type f |sort -n`, true)
 
         let rows = initial(folders.stdout.split('\n'))
-          .map(function (item) { return {name: item.replace(archivesMountPath, ''), type: `folder`}; })
+          .map(function (item) { return {name: item.replace(archivesMountPath + '/', '') + '/', type: `folder`}; })
           .concat(initial(files.stdout.split('\n'))
             .map(function (item) { return {name: item, type: `file`}; }))
 
