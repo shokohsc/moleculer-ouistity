@@ -12,6 +12,7 @@
   "dependencies": {
     "apollo-server": "2.24.0",
     "apollo-server-plugin-response-cache": "0.8.0",
+    "checksum": "1.0.0",
     "dotenv": "9.0.2",
     "exec-sh": "0.4.0",
     "fs-extra": "10.0.0",
@@ -19,7 +20,6 @@
     "glob-promise": "4.1.0",
     "graphql": "15.5.0",
     "lodash": "4.17.21",
-    "md5-file": "5.0.0",
     "moleculer": "0.14.13",
     "moleculer-db": "0.8.13",
     "moleculer-db-adapter-mongoose": "0.8.9",
