@@ -12,26 +12,36 @@ spec:
       labels:
         app: thumbor
     spec:
-      securityContext:
-        fsGroup: 1000
       containers:
         - name: thumbor
-          image: minimalcompact/thumbor
+          image: minimalcompact/thumbor:latest
+          imagePullPolicy: Always
           env:
             - name: THUMBOR_PORT
               value: "80"
+            - name: HTTP_LOADER_CONNECT_TIMEOUT
+              value: "10"
+            - name: ENGINE_THREADPOOL_SIZE
+              value: "2"
           ports:
             - name: http
               containerPort: 80
               protocol: TCP
-          # livenessProbe:
-          #   httpGet:
-          #     port: http
-          #     path: /
-          # readinessProbe:
-          #   httpGet:
-          #     port: http
-          #     path: /
+          livenessProbe:
+            httpGet:
+              port: http
+              path: /healthcheck
+          readinessProbe:
+            httpGet:
+              port: http
+              path: /healthcheck
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64M
+            limits:
+              cpu: 200m
+              memory: 256M
 ---
 kind: Deployment
 apiVersion: apps/v1

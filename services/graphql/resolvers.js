@@ -2,6 +2,15 @@ const r = require('rethinkdb')
 const sh = require('exec-sh').promise
 const path = require('path')
 const { initial } = require('lodash')
+const checksum = require('checksum')
+const checksumFilePromise = file => {
+  return new Promise((resolve, reject) => {
+    checksum.file(file, (err, data) => {
+      if (err) return reject(err)
+      resolve(data)
+    })
+  })
+}
 
 const { global: { archivesMountPath } } = require('../../application.config')
 
@@ -61,39 +70,37 @@ module.exports = {
         rows = rows.slice(_page * _pageSize, _page * _pageSize + _pageSize);
         const foldersToKeep = rows.filter(row => 'folder' === row.type)
         const filesToSearch = rows.filter(row => 'file' === row.type).map(row => archivesMountPath + '/' + directory + row.name)
+        const filesChecksums = await Promise.all(filesToSearch.map(async (row) => await checksumFilePromise(row)))
 
-        const cursor = await r.db('ouistity')
-          .table('books')
-          .filter(function(book){
-            return r
-              .expr(filesToSearch)
-              .contains(book('archive'))
-            }
-          )
-          .pluck('urn', 'basename', 'info')
-          .orderBy('archive')
-          .merge(function(book){
-            return {
-              cover: r.db('ouistity')
-              .table('pages')
-              .filter({ book: book('urn') })
-              .orderBy('name')
-              .pluck('image')
-              .limit(1)
-              .coerceTo('array')
-            }
-          })
-          .run($conn)
-        rows = await cursor.toArray()
+        rows = []
+        await Promise.all(filesChecksums.map(async (fileChecksum) => {
+          const cursor = await r.db('ouistity')
+            .table('books')
+            .filter({checksum: fileChecksum})
+            .pluck('urn', 'basename', 'info')
+            .orderBy('archive')
+            .merge(function(book){
+              return {
+                cover: r.db('ouistity')
+                .table('pages')
+                .filter({ book: book('urn') })
+                .orderBy('name')
+                .pluck('image')
+                .limit(1)
+              }
+            })
+            .run($conn)
+          rows.push(cursor)
+        }))
 
-        rows = foldersToKeep.concat(rows.map(row => {
-        return {
-          name: row.basename,
-          type: 'file',
-          cover: (row.cover.length > 0 && row.cover[0].image) ? row.cover[0].image : '',
-          urn: row.urn,
-          info: row.info
-        }
+        rows = foldersToKeep.concat(rows.flat().map(row => {
+          return {
+            name: row.basename,
+            type: 'file',
+            cover: (row.cover.length > 0 && row.cover[0].image) ? row.cover[0].image : '',
+            urn: row.urn,
+            info: row.info
+          }
         }))
 
         return {
@@ -125,39 +132,37 @@ module.exports = {
         rows = rows.slice(_page * _pageSize, _page * _pageSize + _pageSize);
         const foldersToKeep = rows.filter(row => 'folder' === row.type)
         const filesToSearch = rows.filter(row => 'file' === row.type).map(row => row.name)
+        const filesChecksums = await Promise.all(filesToSearch.map(async (row) => await checksumFilePromise(row)))
 
-        const cursor = await r.db('ouistity')
-          .table('books')
-          .filter(function(book){
-            return r
-              .expr(filesToSearch)
-              .contains(book('archive'));
-            }
-          )
-          .pluck('urn', 'basename', 'info')
-          .orderBy('archive')
-          .merge(function(book){
-            return {
-              cover: r.db('ouistity')
-              .table('pages')
-              .filter({ book: book('urn') })
-              .orderBy('name')
-              .pluck('image')
-              .limit(1)
-              .coerceTo('array')
-            }
-          })
-          .run($conn)
-        rows = await cursor.toArray()
+        rows = []
+        await Promise.all(filesChecksums.map(async (fileChecksum) => {
+          const cursor = await r.db('ouistity')
+            .table('books')
+            .filter({checksum: fileChecksum})
+            .pluck('urn', 'basename', 'info')
+            .orderBy('archive')
+            .merge(function(book){
+              return {
+                cover: r.db('ouistity')
+                .table('pages')
+                .filter({ book: book('urn') })
+                .orderBy('name')
+                .pluck('image')
+                .limit(1)
+              }
+            })
+            .run($conn)
+          rows.push(cursor)
+        }))
 
-        rows = foldersToKeep.concat(rows.map(row => {
-        return {
-          name: row.basename,
-          type: 'file',
-          cover: (row.cover.length > 0 && row.cover[0].image) ? row.cover[0].image : '',
-          urn: row.urn,
-          info: row.info
-        }
+        rows = foldersToKeep.concat(rows.flat().map(row => {
+          return {
+            name: row.basename,
+            type: 'file',
+            cover: (row.cover.length > 0 && row.cover[0].image) ? row.cover[0].image : '',
+            urn: row.urn,
+            info: row.info
+          }
         }))
 
         return {

@@ -17,8 +17,8 @@ const handler = async function (ctx) {
     this.logger.info(ctx.action.name, ctx.params)
     const { archive, pages } = ctx.params
     // upsert books
-    const hash = await checksumFilePromise(archive)
-    const urn = `urn:ouistity:books:${snakeCase(path.basename(archive, path.extname(archive)))}:${hash}`
+    const checksum = await checksumFilePromise(archive)
+    const urn = `urn:ouistity:books:${snakeCase(path.basename(archive, path.extname(archive)))}:${checksum}`
     const [book] = await ctx.broker.call('BooksDomain.filter', {
       query: {
         urn
@@ -26,6 +26,7 @@ const handler = async function (ctx) {
     })
     const data = {
       urn,
+      checksum,
       url: `/api/v1/books/${urn}`,
       archive,
       basename: path.basename(archive)
