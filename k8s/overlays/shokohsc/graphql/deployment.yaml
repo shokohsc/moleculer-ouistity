@@ -10,12 +10,12 @@ spec:
         - name: graphql
           image: shokohsc/moleculer-ouistity
           env:
-            - name: APP_GRAPHQL_DEFAULT_CACHE_TTL
-              value: "0"
-            - name: APP_GRAPHQL_FOLDER_CACHE_TTL
-              value: "0"
-            - name: APP_GRAPHQL_BOOKS_CACHE_TTL
-              value: "0"
+            - name: APP_GRAPHQL_ONE_MINUTE_CACHE_TTL
+              value: "5"
+            - name: APP_GRAPHQL_ONE_DAY_CACHE_TTL
+              value: "5"
+            - name: APP_GRAPHQL_ONE_YEAR_CACHE_TTL
+              value: "5"
           #   - name: APP_NATS_HOSTNAME
           #     value: nats.nats
           #   - name: APP_RETHINKDB_HOSTNAME
@@ -31,9 +31,9 @@ spec:
       volumes:
         - name: nfs-shared
           nfs:
-            server: nfs-shared.nfs-shared
+            server: nfs-shared.nfs-shared.svc.cluster.local
             path: /weekly
         - name: nfs-wd-zarya
           nfs:
-            server: nfs-wd-zarya.nfs-wd-zarya
+            server: nfs-wd-zarya.nfs-wd-zarya.svc.cluster.local
             path: /comics

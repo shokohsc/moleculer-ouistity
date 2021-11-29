@@ -25,9 +25,9 @@ spec:
       volumes:
         - name: nfs-shared
           nfs:
-            server: nfs-shared.nfs-shared
+            server: nfs-shared.nfs-shared.svc.cluster.local
             path: /weekly
         - name: nfs-wd-zarya
           nfs:
-            server: nfs-wd-zarya.nfs-wd-zarya
+            server: nfs-wd-zarya.nfs-wd-zarya.svc.cluster.local
             path: /comics

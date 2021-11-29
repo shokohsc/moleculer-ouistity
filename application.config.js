@@ -25,9 +25,9 @@ if (nconf.get('APP_MOLECULER_APOLLO_PORT')) { APP_MOLECULER_APOLLO_PORT = parseI
 if (nconf.get('APP_NATS_PORT')) { APP_NATS_PORT = parseInt(nconf.get('APP_NATS_PORT')) }
 if (nconf.get('APP_RABBITMQ_PORT')) { APP_RABBITMQ_PORT = parseInt(nconf.get('APP_RABBITMQ_PORT')) }
 if (nconf.get('APP_RETHINKDB_PORT')) { APP_RETHINKDB_PORT = parseInt(nconf.get('APP_RETHINKDB_PORT')) }
-if (nconf.get('APP_GRAPHQL_DEFAULT_CACHE_TTL')) { APP_GRAPHQL_DEFAULT_CACHE_TTL = parseInt(nconf.get('APP_GRAPHQL_DEFAULT_CACHE_TTL')) }
-if (nconf.get('APP_GRAPHQL_FOLDER_CACHE_TTL')) { APP_GRAPHQL_FOLDER_CACHE_TTL = parseInt(nconf.get('APP_GRAPHQL_FOLDER_CACHE_TTL')) }
-if (nconf.get('APP_GRAPHQL_BOOKS_CACHE_TTL')) { APP_GRAPHQL_BOOKS_CACHE_TTL = parseInt(nconf.get('APP_GRAPHQL_BOOKS_CACHE_TTL')) }
+if (nconf.get('APP_GRAPHQL_ONE_MINUTE_CACHE_TTL')) { APP_GRAPHQL_ONE_MINUTE_CACHE_TTL = parseInt(nconf.get('APP_GRAPHQL_ONE_MINUTE_CACHE_TTL')) }
+if (nconf.get('APP_GRAPHQL_ONE_DAY_CACHE_TTL')) { APP_GRAPHQL_ONE_DAY_CACHE_TTL = parseInt(nconf.get('APP_GRAPHQL_ONE_DAY_CACHE_TTL')) }
+if (nconf.get('APP_GRAPHQL_ONE_YEAR_CACHE_TTL')) { APP_GRAPHQL_ONE_YEAR_CACHE_TTL = parseInt(nconf.get('APP_GRAPHQL_ONE_YEAR_CACHE_TTL')) }
 // ************************************
 
 const APP_GLOBAL_GATEWAY_URL = nconf.get('APP_GLOBAL_GATEWAY_URL') || 'http://localhost:5000'

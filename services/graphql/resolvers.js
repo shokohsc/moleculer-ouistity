@@ -73,25 +73,44 @@ module.exports = {
         const filesChecksums = await Promise.all(filesToSearch.map(async (row) => await checksumFilePromise(row)))
 
         rows = []
-        await Promise.all(filesChecksums.map(async (fileChecksum) => {
-          const cursor = await r.db('ouistity')
-            .table('books')
-            .filter({checksum: fileChecksum})
-            .pluck('urn', 'basename', 'info')
-            .orderBy('archive')
-            .merge(function(book){
-              return {
-                cover: r.db('ouistity')
-                .table('pages')
-                .filter({ book: book('urn') })
-                .orderBy('name')
-                .pluck('image')
-                .limit(1)
-              }
-            })
-            .run($conn)
-          rows.push(cursor)
-        }))
+
+        const cursor = await r.db('ouistity')
+          .table('books')
+          .getAll(...filesChecksums, {index: "checksum"})
+          .pluck('urn', 'basename', 'info')
+          .orderBy('archive')
+          .merge(function(book){
+            return {
+              cover: r.db('ouistity')
+              .table('pages')
+              .getAll(book('urn'), {index: "book"})
+              .orderBy('name')
+              .pluck('image')
+              .limit(1)
+            }
+          })
+          .run($conn)
+          rows = await cursor.toArray()
+
+        // await Promise.all(filesChecksums.map(async (fileChecksum) => {
+        //   const cursor = await r.db('ouistity')
+        //     .table('books')
+        //     .getAll(fileChecksum, {index: "checksum"})
+        //     .pluck('urn', 'basename', 'info')
+        //     .orderBy('archive')
+        //     .merge(function(book){
+        //       return {
+        //         cover: r.db('ouistity')
+        //         .table('pages')
+        //         .getAll(book('urn'), {index: "book"})
+        //         .orderBy('name')
+        //         .pluck('image')
+        //         .limit(1)
+        //       }
+        //     })
+        //     .run($conn)
+        //   rows.push(cursor)
+        // }))
 
         rows = foldersToKeep.concat(rows.flat().map(row => {
           return {
@@ -135,25 +154,44 @@ module.exports = {
         const filesChecksums = await Promise.all(filesToSearch.map(async (row) => await checksumFilePromise(row)))
 
         rows = []
-        await Promise.all(filesChecksums.map(async (fileChecksum) => {
-          const cursor = await r.db('ouistity')
-            .table('books')
-            .filter({checksum: fileChecksum})
-            .pluck('urn', 'basename', 'info')
-            .orderBy('archive')
-            .merge(function(book){
-              return {
-                cover: r.db('ouistity')
-                .table('pages')
-                .filter({ book: book('urn') })
-                .orderBy('name')
-                .pluck('image')
-                .limit(1)
-              }
-            })
-            .run($conn)
-          rows.push(cursor)
-        }))
+
+        const cursor = await r.db('ouistity')
+          .table('books')
+          .getAll(...filesChecksums, {index: "checksum"})
+          .pluck('urn', 'basename', 'info')
+          .orderBy('archive')
+          .merge(function(book){
+            return {
+              cover: r.db('ouistity')
+              .table('pages')
+              .getAll(book('urn'), {index: "book"})
+              .orderBy('name')
+              .pluck('image')
+              .limit(1)
+            }
+          })
+          .run($conn)
+          rows = await cursor.toArray()
+
+        // await Promise.all(filesChecksums.map(async (fileChecksum) => {
+        //   const cursor = await r.db('ouistity')
+        //     .table('books')
+        //     .getAll(fileChecksum, {index: "checksum"})
+        //     .pluck('urn', 'basename', 'info')
+        //     .orderBy('archive')
+        //     .merge(function(book){
+        //       return {
+        //         cover: r.db('ouistity')
+        //         .table('pages')
+        //         .getAll(book('urn'), {index: "book"})
+        //         .orderBy('name')
+        //         .pluck('image')
+        //         .limit(1)
+        //       }
+        //     })
+        //     .run($conn)
+        //   rows.push(cursor)
+        // }))
 
         rows = foldersToKeep.concat(rows.flat().map(row => {
           return {
