@@ -16,10 +16,14 @@ spec:
               value: "5"
             - name: APP_GRAPHQL_ONE_YEAR_CACHE_TTL
               value: "5"
-          #   - name: APP_NATS_HOSTNAME
-          #     value: nats.nats
-          #   - name: APP_RETHINKDB_HOSTNAME
-          #     value: rethinkdb.rethinkdb
+            # - name: APP_NATS_HOSTNAME
+            #   value: nats.nats
+            # - name: APP_RETHINKDB_HOSTNAME
+            #   value: rethinkdb.rethinkdb
+            # - name: APP_REDIS_HOSTNAME
+            #   value: redis-master.redis
+            - name: APP_REDIS_CACHE_TTL
+              value: "15"
           args:
             - --hot
             - services/graphql-gateway.service.js

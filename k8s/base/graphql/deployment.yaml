@@ -25,6 +25,8 @@ spec:
               value: nats
             - name: APP_RETHINKDB_HOSTNAME
               value: rethinkdb
+            - name: APP_REDIS_HOSTNAME
+              value: redis
           args:
             - services/graphql-gateway.service.js
           ports:

@@ -14,9 +14,11 @@ let APP_MOLECULER_APOLLO_PORT = 7000
 let APP_NATS_PORT = 4222
 let APP_RABBITMQ_PORT = 5672
 let APP_RETHINKDB_PORT = 28015
+let APP_REDIS_PORT = 6379
 let APP_GRAPHQL_ONE_MINUTE_CACHE_TTL = 60
 let APP_GRAPHQL_ONE_DAY_CACHE_TTL = 86400
 let APP_GRAPHQL_ONE_YEAR_CACHE_TTL = 31557600
+let APP_REDIS_CACHE_TTL = 86400
 // ************************************
 if (nconf.get('APP_MOLECULER_METRICS_ENABLED') && nconf.get('APP_MOLECULER_METRICS_ENABLED') === 'true') { APP_MOLECULER_METRICS_ENABLED = true }
 if (nconf.get('APP_MOLECULER_API_GATEWAY_PORT')) { APP_MOLECULER_API_GATEWAY_PORT = parseInt(nconf.get('APP_MOLECULER_API_GATEWAY_PORT')) }
@@ -25,9 +27,11 @@ if (nconf.get('APP_MOLECULER_APOLLO_PORT')) { APP_MOLECULER_APOLLO_PORT = parseI
 if (nconf.get('APP_NATS_PORT')) { APP_NATS_PORT = parseInt(nconf.get('APP_NATS_PORT')) }
 if (nconf.get('APP_RABBITMQ_PORT')) { APP_RABBITMQ_PORT = parseInt(nconf.get('APP_RABBITMQ_PORT')) }
 if (nconf.get('APP_RETHINKDB_PORT')) { APP_RETHINKDB_PORT = parseInt(nconf.get('APP_RETHINKDB_PORT')) }
+if (nconf.get('APP_REDIS_PORT')) { APP_REDIS_PORT = parseInt(nconf.get('APP_REDIS_PORT')) }
 if (nconf.get('APP_GRAPHQL_ONE_MINUTE_CACHE_TTL')) { APP_GRAPHQL_ONE_MINUTE_CACHE_TTL = parseInt(nconf.get('APP_GRAPHQL_ONE_MINUTE_CACHE_TTL')) }
 if (nconf.get('APP_GRAPHQL_ONE_DAY_CACHE_TTL')) { APP_GRAPHQL_ONE_DAY_CACHE_TTL = parseInt(nconf.get('APP_GRAPHQL_ONE_DAY_CACHE_TTL')) }
 if (nconf.get('APP_GRAPHQL_ONE_YEAR_CACHE_TTL')) { APP_GRAPHQL_ONE_YEAR_CACHE_TTL = parseInt(nconf.get('APP_GRAPHQL_ONE_YEAR_CACHE_TTL')) }
+if (nconf.get('APP_REDIS_CACHE_TTL')) { APP_REDIS_CACHE_TTL = parseInt(nconf.get('APP_REDIS_CACHE_TTL')) }
 // ************************************
 
 const APP_GLOBAL_GATEWAY_URL = nconf.get('APP_GLOBAL_GATEWAY_URL') || 'http://localhost:5000'
@@ -35,6 +39,7 @@ const APP_MOLECULER_APOLLO_HOSTNAME = nconf.get('APP_APOLLO_HOSTNAME') || 'local
 
 const APP_RETHINKDB_HOSTNAME = nconf.get('APP_RETHINKDB_HOSTNAME') || 'localhost'
 const APP_NATS_HOSTNAME = nconf.get('APP_NATS_HOSTNAME') || 'localhost'
+const APP_REDIS_HOSTNAME = nconf.get('APP_REDIS_HOSTNAME') || 'localhost'
 
 const APP_RABBITMQ_HOSTNAME = nconf.get('APP_RABBITMQ_HOSTNAME') || 'localhost'
 const APP_RABBITMQ_USERNAME = nconf.get('APP_RABBITMQ_USERNAME') || 'admin'
@@ -71,6 +76,11 @@ module.exports = {
   nats: {
     hostname: APP_NATS_HOSTNAME,
     port: APP_NATS_PORT
+  },
+  redis: {
+    hostname: APP_REDIS_HOSTNAME,
+    port: APP_REDIS_PORT,
+    cacheTTL: APP_REDIS_CACHE_TTL
   },
   graphqlCache: {
     oneMinute: APP_GRAPHQL_ONE_MINUTE_CACHE_TTL,

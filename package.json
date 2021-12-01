@@ -10,7 +10,7 @@
     "start:dev": "moleculer-runner --repl --hot --config moleculer.config.js services"
   },
   "dependencies": {
-    "apollo-server": "2.24.0",
+    "apollo-server": "2.25.3",
     "apollo-server-plugin-response-cache": "0.8.0",
     "checksum": "1.0.0",
     "dotenv": "9.0.2",
@@ -21,13 +21,14 @@
     "graphql": "15.5.0",
     "lodash": "4.17.21",
     "moleculer": "0.14.13",
-    "moleculer-db": "0.8.13",
+    "moleculer-db": "0.8.16",
     "moleculer-db-adapter-mongoose": "0.8.9",
-    "moleculer-repl": "0.6.5",
+    "moleculer-repl": "0.5.7",
     "moleculer-web": "0.10.0-beta2",
     "nats": "1.4.12",
     "nconf": "0.11.2",
     "rabbit-queue": "5.2.0",
+    "redis": "4.0.0",
     "rethinkdb": "2.4.2",
     "swagger-jsdoc": "6.1.0",
     "uuid": "8.3.2",
@@ -35,9 +36,9 @@
     "yamljs": "0.3.0"
   },
   "devDependencies": {
-    "axios": "0.21.1",
+    "axios": "0.21.4",
     "jest": "26.6.3",
-    "standard": "16.0.3"
+    "standard": "16.0.4"
   },
   "standard": {
     "ignore": [],

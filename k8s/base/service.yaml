@@ -38,6 +38,22 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: redis
+  labels:
+    app: redis
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6379
+      targetPort: redis
+      protocol: TCP
+      name: redis
+  selector:
+    app: redis
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: nats
   labels:
     app: nats

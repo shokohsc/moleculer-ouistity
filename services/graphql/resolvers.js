@@ -2,8 +2,9 @@ const r = require('rethinkdb')
 const sh = require('exec-sh').promise
 const path = require('path')
 const { initial } = require('lodash')
+const redis = require('redis')
 const checksum = require('checksum')
-const checksumFilePromise = file => {
+const checksumFilePromise = (file) => {
   return new Promise((resolve, reject) => {
     checksum.file(file, (err, data) => {
       if (err) return reject(err)
@@ -13,6 +14,74 @@ const checksumFilePromise = file => {
 }
 
 const { global: { archivesMountPath } } = require('../../application.config')
+
+const { redis: mem } = require('../../application.config')
+const client = redis.createClient({ url: `redis://${mem.hostname}:${mem.port}` })
+client.on('error', (err) => console.log('Redis Client Error', err))
+
+async function getFilesChecksums(key, filesToSearch = []) {
+  await client.connect()
+  let filesChecksums = []
+  try {
+    const exists = await client.exists(key)
+    if (exists) {
+      filesChecksums = JSON.parse(await client.get(key))
+    }
+    else {
+      filesChecksums = await Promise.all(filesToSearch.map(async (row) => await checksumFilePromise(row)))
+      await client.set(key, JSON.stringify(filesChecksums))
+      await client.expire(key, mem.cacheTTL)
+    }
+  } catch(err) {
+    console.log({message: err.message})
+  }
+  await client.quit()
+
+  return filesChecksums
+}
+
+async function getBooksAndCovers($conn, filesChecksums = []) {
+  // const result = []
+  // await Promise.all(filesChecksums.map(async (fileChecksum) => {
+  //   const cursor = await r.db('ouistity')
+  //     .table('books')
+  //     .getAll(fileChecksum, {index: "checksum"})
+  //     .pluck('urn', 'basename', 'info')
+  //     .orderBy('archive')
+  //     .merge(function(book){
+  //       return {
+  //         cover: r.db('ouistity')
+  //         .table('pages')
+  //         .getAll(book('urn'), {index: "book"})
+  //         .orderBy('name')
+  //         .pluck('image')
+  //         .limit(1)
+  //       }
+  //     })
+  //     .run($conn)
+  //   result.push(await cursor.toArray())
+  // }))
+
+  const cursor = await r.db('ouistity')
+    .table('books')
+    .getAll(...filesChecksums, {index: "checksum"})
+    .pluck('urn', 'basename', 'info')
+    .orderBy('archive')
+    .merge(function(book){
+      return {
+        cover: r.db('ouistity')
+        .table('pages')
+        .getAll(book('urn'), {index: "book"})
+        .orderBy('name')
+        .pluck('image')
+        .limit(1)
+      }
+    })
+    .run($conn)
+  const result = await cursor.toArray()
+
+  return result
+}
 
 module.exports = {
   Query: {
@@ -59,7 +128,7 @@ module.exports = {
         const files = await sh(`ls -p ${archivesMountPath + '/' + targetDirectory} | egrep -v '/$' | sort -n`, true)
 
         let rows = initial(folders.stdout.split('\n'))
-          .map(function (item) { return {name: item, type: `folder`}; })
+          .map(function (item) { return {name: item.replace(archivesMountPath + '/', ''), type: `folder`}; })
           .concat(initial(files.stdout.split('\n'))
             .map(function (item) { return {name: item, type: `file`}; }))
 
@@ -68,49 +137,12 @@ module.exports = {
         const total = rows.length
         const totalPages = total / _pageSize
         rows = rows.slice(_page * _pageSize, _page * _pageSize + _pageSize);
+
         const foldersToKeep = rows.filter(row => 'folder' === row.type)
         const filesToSearch = rows.filter(row => 'file' === row.type).map(row => archivesMountPath + '/' + directory + row.name)
-        const filesChecksums = await Promise.all(filesToSearch.map(async (row) => await checksumFilePromise(row)))
 
-        rows = []
-
-        const cursor = await r.db('ouistity')
-          .table('books')
-          .getAll(...filesChecksums, {index: "checksum"})
-          .pluck('urn', 'basename', 'info')
-          .orderBy('archive')
-          .merge(function(book){
-            return {
-              cover: r.db('ouistity')
-              .table('pages')
-              .getAll(book('urn'), {index: "book"})
-              .orderBy('name')
-              .pluck('image')
-              .limit(1)
-            }
-          })
-          .run($conn)
-          rows = await cursor.toArray()
-
-        // await Promise.all(filesChecksums.map(async (fileChecksum) => {
-        //   const cursor = await r.db('ouistity')
-        //     .table('books')
-        //     .getAll(fileChecksum, {index: "checksum"})
-        //     .pluck('urn', 'basename', 'info')
-        //     .orderBy('archive')
-        //     .merge(function(book){
-        //       return {
-        //         cover: r.db('ouistity')
-        //         .table('pages')
-        //         .getAll(book('urn'), {index: "book"})
-        //         .orderBy('name')
-        //         .pluck('image')
-        //         .limit(1)
-        //       }
-        //     })
-        //     .run($conn)
-        //   rows.push(cursor)
-        // }))
+        const filesChecksums = 0 < filesToSearch.length ? await getFilesChecksums(directory + ':' + _page + ':' + _pageSize, filesToSearch) : []
+        rows = 0 < filesToSearch.length ? await getBooksAndCovers($conn, filesChecksums) : []
 
         rows = foldersToKeep.concat(rows.flat().map(row => {
           return {
@@ -149,49 +181,12 @@ module.exports = {
         const total = rows.length
         const totalPages = total / _pageSize
         rows = rows.slice(_page * _pageSize, _page * _pageSize + _pageSize);
+
         const foldersToKeep = rows.filter(row => 'folder' === row.type)
         const filesToSearch = rows.filter(row => 'file' === row.type).map(row => row.name)
-        const filesChecksums = await Promise.all(filesToSearch.map(async (row) => await checksumFilePromise(row)))
 
-        rows = []
-
-        const cursor = await r.db('ouistity')
-          .table('books')
-          .getAll(...filesChecksums, {index: "checksum"})
-          .pluck('urn', 'basename', 'info')
-          .orderBy('archive')
-          .merge(function(book){
-            return {
-              cover: r.db('ouistity')
-              .table('pages')
-              .getAll(book('urn'), {index: "book"})
-              .orderBy('name')
-              .pluck('image')
-              .limit(1)
-            }
-          })
-          .run($conn)
-          rows = await cursor.toArray()
-
-        // await Promise.all(filesChecksums.map(async (fileChecksum) => {
-        //   const cursor = await r.db('ouistity')
-        //     .table('books')
-        //     .getAll(fileChecksum, {index: "checksum"})
-        //     .pluck('urn', 'basename', 'info')
-        //     .orderBy('archive')
-        //     .merge(function(book){
-        //       return {
-        //         cover: r.db('ouistity')
-        //         .table('pages')
-        //         .getAll(book('urn'), {index: "book"})
-        //         .orderBy('name')
-        //         .pluck('image')
-        //         .limit(1)
-        //       }
-        //     })
-        //     .run($conn)
-        //   rows.push(cursor)
-        // }))
+        const filesChecksums = 0 < filesToSearch.length ? await getFilesChecksums(query + ':' + _page + ':' + _pageSize, filesToSearch) : []
+        rows = 0 < filesToSearch.length ? await getBooksAndCovers($conn, filesChecksums) : []
 
         rows = foldersToKeep.concat(rows.flat().map(row => {
           return {
