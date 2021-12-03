@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: moleculer-ouistity
 bases:
   - ../../base
-  # - keda.yaml
+  - keda.yaml
 patchesStrategicMerge:
   - ingress.yaml
 

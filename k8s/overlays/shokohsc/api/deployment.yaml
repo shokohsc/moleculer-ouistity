@@ -14,6 +14,8 @@ spec:
               value: https://api.ouistity.shokohsc.home
             # - name: APP_NATS_HOSTNAME
             #   value: nats.nats
+            - name: APP_IMAGE_CACHE_TTL
+              value: "30"
           args:
             - --hot
             - services/api-gateway.service.js

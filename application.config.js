@@ -19,6 +19,7 @@ let APP_GRAPHQL_ONE_MINUTE_CACHE_TTL = 60
 let APP_GRAPHQL_ONE_DAY_CACHE_TTL = 86400
 let APP_GRAPHQL_ONE_YEAR_CACHE_TTL = 31557600
 let APP_REDIS_CACHE_TTL = 86400
+let APP_IMAGE_CACHE_TTL = 31557600
 // ************************************
 if (nconf.get('APP_MOLECULER_METRICS_ENABLED') && nconf.get('APP_MOLECULER_METRICS_ENABLED') === 'true') { APP_MOLECULER_METRICS_ENABLED = true }
 if (nconf.get('APP_MOLECULER_API_GATEWAY_PORT')) { APP_MOLECULER_API_GATEWAY_PORT = parseInt(nconf.get('APP_MOLECULER_API_GATEWAY_PORT')) }
@@ -32,6 +33,7 @@ if (nconf.get('APP_GRAPHQL_ONE_MINUTE_CACHE_TTL')) { APP_GRAPHQL_ONE_MINUTE_CACH
 if (nconf.get('APP_GRAPHQL_ONE_DAY_CACHE_TTL')) { APP_GRAPHQL_ONE_DAY_CACHE_TTL = parseInt(nconf.get('APP_GRAPHQL_ONE_DAY_CACHE_TTL')) }
 if (nconf.get('APP_GRAPHQL_ONE_YEAR_CACHE_TTL')) { APP_GRAPHQL_ONE_YEAR_CACHE_TTL = parseInt(nconf.get('APP_GRAPHQL_ONE_YEAR_CACHE_TTL')) }
 if (nconf.get('APP_REDIS_CACHE_TTL')) { APP_REDIS_CACHE_TTL = parseInt(nconf.get('APP_REDIS_CACHE_TTL')) }
+if (nconf.get('APP_IMAGE_CACHE_TTL')) { APP_IMAGE_CACHE_TTL = parseInt(nconf.get('APP_IMAGE_CACHE_TTL')) }
 // ************************************
 
 const APP_GLOBAL_GATEWAY_URL = nconf.get('APP_GLOBAL_GATEWAY_URL') || 'http://localhost:5000'
@@ -50,7 +52,8 @@ const APP_ARCHIVES_MOUNT_PATH = nconf.get('APP_ARCHIVES_MOUNT_PATH') || '/usr/ap
 module.exports = {
   global: {
     gatewayUrl: APP_GLOBAL_GATEWAY_URL,
-    archivesMountPath: APP_ARCHIVES_MOUNT_PATH
+    archivesMountPath: APP_ARCHIVES_MOUNT_PATH,
+    imageCacheTTL: APP_IMAGE_CACHE_TTL
   },
   moleculer: {
     port: APP_MOLECULER_API_GATEWAY_PORT,

@@ -7,7 +7,7 @@ const swaggerJsdoc = require('swagger-jsdoc')
 
 const Error404 = readFileSync(path.resolve(__dirname, '../assets/images/404.jpg'))
 
-const { moleculer: { port }, global: { archivesMountPath } } = require('../application.config')
+const { moleculer: { port }, global: { archivesMountPath, imageCacheTTL } } = require('../application.config')
 
 const options = {
   definition: {
@@ -93,11 +93,13 @@ module.exports = {
             unlinkSync(`/tmp/${basename}${extname}`)
             // send buffer as image
             res.setHeader('Content-Type', 'image')
+            res.setHeader('Cache-Control', `public, max-age=${imageCacheTTL}`)
             res.end(buffer)
           } catch (e) {
             console.log(e);
             // send buffer as image
             res.setHeader('Content-Type', 'image')
+            res.setHeader('Cache-Control', 'no-cache')
             res.end(Error404)
           }
         }
