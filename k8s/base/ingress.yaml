@@ -2,25 +2,6 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: thumbor
-  annotations:
-    nginx.ingress.kubernetes.io/enable-cors: "true"
-spec:
-  rules:
-  - host: thumbor.svc.cluster.local
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: thumbor
-            port:
-              number: 80
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
   name: rethinkdb
 spec:
   rules:
