@@ -11,10 +11,6 @@ spec:
     metadata:
       labels:
         app: pages
-      # annotations:
-      #   prometheus.io/scrape: "true"
-      #   prometheus.io/path: /api/v1/pages/metrics
-      #   prometheus.io/port: "5050"
     spec:
       securityContext:
         fsGroup: 1000
@@ -37,6 +33,8 @@ spec:
               value: rabbitmq
             - name: APP_RABBITMQ_PASSWORD
               value: changeme
+            - name: APP_REDIS_HOSTNAME
+              value: redis
           args:
             - services/pages.service.js
           resources:

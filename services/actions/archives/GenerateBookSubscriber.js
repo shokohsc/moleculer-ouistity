@@ -2,22 +2,13 @@ const sh = require('exec-sh').promise
 const path = require('path')
 const { snakeCase } = require('lodash')
 const parseString = require('xml2js').parseString
-const checksum = require('checksum')
-const checksumFilePromise = file => {
-  return new Promise((resolve, reject) => {
-    checksum.file(file, (err, data) => {
-      if (err) return reject(err)
-      resolve(data)
-    })
-  })
-}
 
 const handler = async function (ctx) {
   try {
     this.logger.info(ctx.action.name, ctx.params)
     const { archive, pages } = ctx.params
     // upsert books
-    const checksum = await checksumFilePromise(archive)
+    const checksum = await ctx.broker.call('ArchivesDomain.GenerateChecksum', { file: archive })
     const urn = `urn:ouistity:books:${snakeCase(path.basename(archive, path.extname(archive)))}:${checksum}`
     const [book] = await ctx.broker.call('BooksDomain.filter', {
       query: {

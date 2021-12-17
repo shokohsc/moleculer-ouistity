@@ -86,53 +86,53 @@ module.exports = {
         }
       }
     },
-    // getBooksAndCovers: {
-    //   async handler (ctx) {
-    //     this.logger.info(ctx.action.name, ctx.params)
-    //     const { filesChecksums } = ctx.params
-    //
-    //     // const result = []
-    //     // await Promise.all(filesChecksums.map(async (fileChecksum) => {
-    //     //   const cursor = await r.db('ouistity')
-    //     //     .table('books')
-    //     //     .getAll(fileChecksum, {index: "checksum"})
-    //     //     .pluck('urn', 'basename', 'info')
-    //     //     .orderBy('archive')
-    //     //     .merge(function(book){
-    //     //       return {
-    //     //         cover: r.db('ouistity')
-    //     //         .table('pages')
-    //     //         .getAll(book('urn'), {index: "book"})
-    //     //         .orderBy('name')
-    //     //         .pluck('image')
-    //     //         .limit(1)
-    //     //       }
-    //     //     })
-    //     //     .run($conn)
-    //     //   result.push(await cursor.toArray())
-    //     // }))
-    //
-    //     const cursor = await r.db('ouistity')
-    //       .table('books')
-    //       .getAll(...filesChecksums, {index: "checksum"})
-    //       .pluck('urn', 'basename', 'info')
-    //       .orderBy('archive')
-    //       .merge(function(book){
-    //         return {
-    //           cover: r.db('ouistity')
-    //           .table('pages')
-    //           .getAll(book('urn'), {index: "book"})
-    //           .orderBy('name')
-    //           .pluck('image')
-    //           .limit(1)
-    //         }
-    //       })
-    //       .run($conn)
-    //     const result = await cursor.toArray()
-    //
-    //     return result
-    //   }
-    // },
+    getBooksAndCovers: {
+      async handler (ctx) {
+        this.logger.info(ctx.action.name, ctx.params)
+        const { filesChecksums } = ctx.params
+
+        // const result = []
+        // await Promise.all(filesChecksums.map(async (fileChecksum) => {
+        //   const cursor = await r.db('ouistity')
+        //     .table('books')
+        //     .getAll(fileChecksum, {index: "checksum"})
+        //     .pluck('urn', 'basename', 'info')
+        //     .orderBy('archive')
+        //     .merge(function(book){
+        //       return {
+        //         cover: r.db('ouistity')
+        //         .table('pages')
+        //         .getAll(book('urn'), {index: "book"})
+        //         .orderBy('name')
+        //         .pluck('image')
+        //         .limit(1)
+        //       }
+        //     })
+        //     .run(this.conn)
+        //   result.push(await cursor.toArray())
+        // }))
+
+        const cursor = await r.db('ouistity')
+          .table('books')
+          .getAll(...filesChecksums, {index: "checksum"})
+          .pluck('urn', 'basename', 'info')
+          .orderBy('archive')
+          .merge(function(book){
+            return {
+              cover: r.db('ouistity')
+              .table('pages')
+              .getAll(book('urn'), {index: "book"})
+              .orderBy('name')
+              .pluck('image')
+              .limit(1)
+            }
+          })
+          .run(this.conn)
+        const result = await cursor.toArray()
+
+        return result
+      }
+    },
     delete: {
       async handler (ctx) {
         const { query = {} } = ctx.params
@@ -172,7 +172,8 @@ module.exports = {
         host: this.settings.rethinkdb.hostname,
         port: this.settings.rethinkdb.port,
         db: 'ouistity',
-        silent: true
+        silent: true,
+        durability: "soft"
       })
       this.conn.on('error', (err) => {
         this.logger.error('RethinkDB disconnected', err)

@@ -12,9 +12,5 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
-    - port: 5050
-      targetPort: metrics
-      protocol: TCP
-      name: metrics
   selector:
     app: books

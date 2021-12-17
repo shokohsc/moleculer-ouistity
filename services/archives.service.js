@@ -30,6 +30,7 @@ module.exports = {
   actions: {
     GenerateCatalog: require('./actions/archives/GenerateCatalog'),
     GenerateBookSubscriber: require('./actions/archives/GenerateBookSubscriber'),
-    GenerateBookPagesSubscriber: require('./actions/archives/GenerateBookPagesSubscriber')
+    GenerateBookPagesSubscriber: require('./actions/archives/GenerateBookPagesSubscriber'),
+    GenerateChecksum: require('./actions/archives/GenerateChecksum')
   }
 }

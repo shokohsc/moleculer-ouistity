@@ -31,6 +31,8 @@ spec:
               value: graphql
             - name: APP_NATS_HOSTNAME
               value: nats
+            - name: APP_REDIS_HOSTNAME
+              value: redis
           args:
             - services/api-gateway.service.js
           ports:

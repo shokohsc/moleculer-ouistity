@@ -11,18 +11,10 @@ spec:
           image: shokohsc/moleculer-ouistity
           env:
             - name: APP_GRAPHQL_ONE_MINUTE_CACHE_TTL
-              value: "5"
+              value: "15"
             - name: APP_GRAPHQL_ONE_DAY_CACHE_TTL
-              value: "5"
+              value: "15"
             - name: APP_GRAPHQL_ONE_YEAR_CACHE_TTL
-              value: "5"
-            # - name: APP_NATS_HOSTNAME
-            #   value: nats.nats
-            # - name: APP_RETHINKDB_HOSTNAME
-            #   value: rethinkdb.rethinkdb
-            # - name: APP_REDIS_HOSTNAME
-            #   value: redis-master.redis
-            - name: APP_REDIS_CACHE_TTL
               value: "15"
           args:
             - --hot
@@ -30,14 +22,24 @@ spec:
           volumeMounts:
             - name: nfs-shared
               mountPath: /usr/app/assets/data/archives/weekly
-            - name: nfs-wd-zarya
-              mountPath: /usr/app/assets/data/archives/comics
       volumes:
         - name: nfs-shared
           nfs:
             server: nfs-shared.nfs-shared.svc.cluster.local
             path: /weekly
-        - name: nfs-wd-zarya
-          nfs:
-            server: nfs-wd-zarya.nfs-wd-zarya.svc.cluster.local
-            path: /comics
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - api
+                  - archives
+                  - books
+                  - graphql
+                  - pages
+              topologyKey: kubernetes.io/hostname

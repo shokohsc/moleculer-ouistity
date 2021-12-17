@@ -2,86 +2,8 @@ const r = require('rethinkdb')
 const sh = require('exec-sh').promise
 const path = require('path')
 const { initial } = require('lodash')
-const redis = require('redis')
-const checksum = require('checksum')
-const checksumFilePromise = (file) => {
-  return new Promise((resolve, reject) => {
-    checksum.file(file, (err, data) => {
-      if (err) return reject(err)
-      resolve(data)
-    })
-  })
-}
 
 const { global: { archivesMountPath } } = require('../../application.config')
-
-const { redis: mem } = require('../../application.config')
-const client = redis.createClient({ url: `redis://${mem.hostname}:${mem.port}` })
-client.on('error', (err) => console.log('Redis Client Error', err))
-
-async function getFilesChecksums(key, filesToSearch = []) {
-  await client.connect()
-  let filesChecksums = []
-  try {
-    const exists = await client.exists(key)
-    if (exists) {
-      filesChecksums = JSON.parse(await client.get(key))
-    }
-    else {
-      filesChecksums = await Promise.all(filesToSearch.map(async (row) => await checksumFilePromise(row)))
-      await client.set(key, JSON.stringify(filesChecksums))
-      await client.expire(key, mem.cacheTTL)
-    }
-  } catch(err) {
-    console.log({message: err.message})
-  }
-  await client.quit()
-
-  return filesChecksums
-}
-
-async function getBooksAndCovers($conn, filesChecksums = []) {
-  // const result = []
-  // await Promise.all(filesChecksums.map(async (fileChecksum) => {
-  //   const cursor = await r.db('ouistity')
-  //     .table('books')
-  //     .getAll(fileChecksum, {index: "checksum"})
-  //     .pluck('urn', 'basename', 'info')
-  //     .orderBy('archive')
-  //     .merge(function(book){
-  //       return {
-  //         cover: r.db('ouistity')
-  //         .table('pages')
-  //         .getAll(book('urn'), {index: "book"})
-  //         .orderBy('name')
-  //         .pluck('image')
-  //         .limit(1)
-  //       }
-  //     })
-  //     .run($conn)
-  //   result.push(await cursor.toArray())
-  // }))
-
-  const cursor = await r.db('ouistity')
-    .table('books')
-    .getAll(...filesChecksums, {index: "checksum"})
-    .pluck('urn', 'basename', 'info')
-    .orderBy('archive')
-    .merge(function(book){
-      return {
-        cover: r.db('ouistity')
-        .table('pages')
-        .getAll(book('urn'), {index: "book"})
-        .orderBy('name')
-        .pluck('image')
-        .limit(1)
-      }
-    })
-    .run($conn)
-  const result = await cursor.toArray()
-
-  return result
-}
 
 module.exports = {
   Query: {
@@ -141,8 +63,11 @@ module.exports = {
         const foldersToKeep = rows.filter(row => 'folder' === row.type)
         const filesToSearch = rows.filter(row => 'file' === row.type).map(row => archivesMountPath + '/' + directory + row.name)
 
-        const filesChecksums = 0 < filesToSearch.length ? await getFilesChecksums(directory + ':' + _page + ':' + _pageSize, filesToSearch) : []
-        rows = 0 < filesToSearch.length ? await getBooksAndCovers($conn, filesChecksums) : []
+        const filesChecksums = []
+        await Promise.all(filesToSearch.map(async (fileToSearch) => {
+          filesChecksums.push(await $moleculer.call('ArchivesDomain.GenerateChecksum', { file: fileToSearch}))
+        }))
+        rows = 0 < filesToSearch.length ? await $moleculer.call('BooksDomain.getBooksAndCovers', {filesChecksums: filesChecksums}) : []
 
         rows = foldersToKeep.concat(rows.flat().map(row => {
           return {
@@ -185,8 +110,11 @@ module.exports = {
         const foldersToKeep = rows.filter(row => 'folder' === row.type)
         const filesToSearch = rows.filter(row => 'file' === row.type).map(row => row.name)
 
-        const filesChecksums = 0 < filesToSearch.length ? await getFilesChecksums(query + ':' + _page + ':' + _pageSize, filesToSearch) : []
-        rows = 0 < filesToSearch.length ? await getBooksAndCovers($conn, filesChecksums) : []
+        const filesChecksums = []
+        await Promise.all(filesToSearch.map(async (fileToSearch) => {
+          filesChecksums.push(await $moleculer.call('ArchivesDomain.GenerateChecksum', { file: fileToSearch}))
+        }))
+        rows = 0 < filesToSearch.length ? await $moleculer.call('BooksDomain.getBooksAndCovers', {filesChecksums: filesChecksums}) : []
 
         rows = foldersToKeep.concat(rows.flat().map(row => {
           return {

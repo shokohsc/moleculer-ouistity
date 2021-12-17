@@ -4,6 +4,7 @@ namespace: moleculer-ouistity
 bases:
   - ../../base
   - keda.yaml
+  - redis-commander.yaml
 patchesStrategicMerge:
   - ingress.yaml
 

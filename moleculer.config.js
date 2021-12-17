@@ -1,12 +1,25 @@
 const { v4: uuidv4 } = require('uuid')
 
 const { name, version } = require('./package.json')
-const { moleculer: { metrics }, nats } = require('./application.config')
+const { moleculer: { metrics }, nats, redis } = require('./application.config')
 
 module.exports = {
   nodeID: `node-${name}-${version}-${uuidv4()}`,
   logger: true,
-  cacher: 'Memory',
+  cacher: {
+    type: "Redis",
+    options: {
+      prefix: "MOL",
+      ttl: redis.cacheTTL,
+      monitor: false,
+      redis: {
+        host: redis.hostname,
+        port: redis.port,
+        family: 4,
+        db: 0
+      }
+    }
+  },
   transporter: {
     type: 'NATS',
     options: {

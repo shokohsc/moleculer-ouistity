@@ -33,6 +33,8 @@ spec:
               value: rabbitmq
             - name: APP_RABBITMQ_PASSWORD
               value: changeme
+            - name: APP_REDIS_HOSTNAME
+              value: redis
           args:
             - services/archives.service.js
           resources:

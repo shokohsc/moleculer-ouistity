@@ -19,6 +19,28 @@ spec:
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
+  name: archives
+spec:
+  scaleTargetRef:
+    name: archives
+  pollingInterval: 10
+  cooldownPeriod:  10
+  # idleReplicaCount: 0
+  minReplicaCount: 1
+  maxReplicaCount: 5
+  triggers:
+  - type: rabbitmq
+    metadata:
+      protocol: amqp
+      queueName: moleculer.archives-domain-generate-book.queue
+      mode: QueueLength
+      value: "20"
+    authenticationRef:
+      name: rabbitmq-conn
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
   name: books
 spec:
   scaleTargetRef:
@@ -27,14 +49,14 @@ spec:
   cooldownPeriod:  10
   # idleReplicaCount: 0
   minReplicaCount: 1
-  maxReplicaCount: 10
+  maxReplicaCount: 5
   triggers:
   - type: rabbitmq
     metadata:
       protocol: amqp
       queueName: moleculer.archives-domain-generate-book.queue
       mode: QueueLength
-      value: "100"
+      value: "20"
     authenticationRef:
       name: rabbitmq-conn
 ---
@@ -49,13 +71,13 @@ spec:
   cooldownPeriod:  10
   # idleReplicaCount: 0
   minReplicaCount: 1
-  maxReplicaCount: 10
+  maxReplicaCount: 5
   triggers:
   - type: rabbitmq
     metadata:
       protocol: amqp
       queueName: moleculer.archives-domain-generate-book-pages-catalog.queue
       mode: QueueLength
-      value: "1000"
+      value: "2"
     authenticationRef:
       name: rabbitmq-conn
