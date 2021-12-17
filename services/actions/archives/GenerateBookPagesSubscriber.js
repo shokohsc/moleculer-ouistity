@@ -50,6 +50,8 @@ const handler = async function (ctx) {
     do {
       const entry = entries.files.shift()
       const urn = `${book.urn}:pages:${snakeCase(path.basename(entry.name, path.extname(entry.name)))}`
+      // remove old entries with this book urn
+      await ctx.broker.call('PagesDomain.delete', { query: { book: urn } })
       if (entry.name.match(/\.(jp(e)?g)|(png)$/)) { // Let's insert only images for now
         entities.push({
           urn,

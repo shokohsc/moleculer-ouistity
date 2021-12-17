@@ -46,8 +46,6 @@ const handler = async function (ctx) {
     }
     // upsert pages for this book
     if (pages === true) {
-      // remove old entries with this book urn
-      await ctx.broker.call('PagesDomain.delete', { query: { book: urn } })
       await ctx.broker.$rabbitmq.publishExchange('amq.topic', 'moleculer.archives-domain-generate-book-pages-catalog.key', { book: data })
     }
     return { success: true }

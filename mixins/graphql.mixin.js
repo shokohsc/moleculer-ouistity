@@ -74,7 +74,6 @@ module.exports = {
     return true
   },
   async stopped () {
-    await this.controller.stop()
     this.controller = false
     return true
   }

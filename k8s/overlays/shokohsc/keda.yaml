@@ -25,7 +25,6 @@ spec:
     name: archives
   pollingInterval: 10
   cooldownPeriod:  10
-  # idleReplicaCount: 0
   minReplicaCount: 1
   maxReplicaCount: 5
   triggers:
@@ -69,7 +68,6 @@ spec:
     name: pages
   pollingInterval: 10
   cooldownPeriod:  10
-  # idleReplicaCount: 0
   minReplicaCount: 1
   maxReplicaCount: 5
   triggers:
@@ -78,6 +76,6 @@ spec:
       protocol: amqp
       queueName: moleculer.archives-domain-generate-book-pages-catalog.queue
       mode: QueueLength
-      value: "2"
+      value: "20"
     authenticationRef:
       name: rabbitmq-conn
