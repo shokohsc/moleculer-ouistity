@@ -13,6 +13,7 @@ module.exports = {
   actions: {
     count: {
       async handler (ctx) {
+        this.logger.info(ctx.action.name, ctx.params)
         const { query = {} } = ctx.params
         const cursor = await r.db(this.settings.rethinkdb.database)
           .table(this.settings.rethinkdb.table)
@@ -23,6 +24,7 @@ module.exports = {
     },
     getByUrn: {
       async handler (ctx) {
+        this.logger.info(ctx.action.name, ctx.params)
         const { urn } = ctx.params
         const cursor = await r.db(this.settings.rethinkdb.database)
           .table(this.settings.rethinkdb.table)
@@ -45,6 +47,7 @@ module.exports = {
     },
     get: {
       async handler (ctx) {
+        this.logger.info(ctx.action.name, ctx.params)
         const { id } = ctx.params
         const cursor = await r.db(this.settings.rethinkdb.database)
           .table(this.settings.rethinkdb.table)
@@ -135,6 +138,7 @@ module.exports = {
     },
     delete: {
       async handler (ctx) {
+        this.logger.info(ctx.action.name, ctx.params)
         const { query = {} } = ctx.params
         await r.db(this.settings.rethinkdb.database)
           .table(this.settings.rethinkdb.table)
@@ -146,6 +150,7 @@ module.exports = {
     },
     insert: {
       async handler (ctx) {
+        this.logger.info(ctx.action.name, ctx.params)
         const { data } = ctx.params
         await r.db(this.settings.rethinkdb.database)
           .table(this.settings.rethinkdb.table)
@@ -156,6 +161,7 @@ module.exports = {
     },
     update: {
       async handler (ctx) {
+        this.logger.info(ctx.action.name, ctx.params)
         const { id, data } = ctx.params
         await r.db(this.settings.rethinkdb.database)
           .table(this.settings.rethinkdb.table)
