@@ -10,6 +10,7 @@ module.exports = {
       username: '',
       password: '',
       vhost: '',
+      prefetchCount: 0,
       aliases: {}
     }
   },
@@ -21,7 +22,7 @@ module.exports = {
     this.logger.info('rabbitmq mixin created')
     const options = `amqp://${this.settings.rabbitmq.username}:${this.settings.rabbitmq.password}@${this.settings.rabbitmq.hostname}:${this.settings.rabbitmq.port}`
     this.broker.$rabbitmq = new Rabbit(options, {
-      prefetch: 1,
+      prefetch: this.settings.rabbitmq.prefetchCount,
       replyPattern: false,
       scheduledPublish: false
     })

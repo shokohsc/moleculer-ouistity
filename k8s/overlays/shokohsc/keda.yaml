@@ -23,7 +23,7 @@ metadata:
 spec:
   scaleTargetRef:
     name: archives
-  pollingInterval: 10
+  pollingInterval: 30
   cooldownPeriod:  10
   minReplicaCount: 1
   maxReplicaCount: 5
@@ -44,7 +44,7 @@ metadata:
 spec:
   scaleTargetRef:
     name: books
-  pollingInterval: 10
+  pollingInterval: 30
   cooldownPeriod:  10
   # idleReplicaCount: 0
   minReplicaCount: 1
@@ -66,7 +66,7 @@ metadata:
 spec:
   scaleTargetRef:
     name: pages
-  pollingInterval: 10
+  pollingInterval: 30
   cooldownPeriod:  10
   minReplicaCount: 1
   maxReplicaCount: 5

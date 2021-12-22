@@ -12,6 +12,8 @@ spec:
           env:
             - name: APP_GLOBAL_GATEWAY_URL
               value: https://api.ouistity.shokohsc.home
+            - name: APP_RABBITMQ_PREFETCH_COUNT
+              value: "10"
           args:
             - --hot
             - services/books.service.js
