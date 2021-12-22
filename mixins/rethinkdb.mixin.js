@@ -188,9 +188,7 @@ module.exports = {
       await r.dbCreate(this.settings.rethinkdb.database).run(this.conn).catch(() => { })
       const tables = await r.db(this.settings.rethinkdb.database).tableList().run(this.conn)
       if (!tables.includes(this.settings.rethinkdb.table)) {
-        await r.db(this.settings.rethinkdb.database).tableCreate(this.settings.rethinkdb.table, {
-          durability: "soft"
-        }).run(this.conn)
+        await r.db(this.settings.rethinkdb.database).tableCreate(this.settings.rethinkdb.table).run(this.conn)
         const indexes = await r.table(this.settings.rethinkdb.table).indexList().run(this.conn)
         if (false === indexes.includes(this.settings.rethinkdb.secondaryIndex)) {
           await r.table(this.settings.rethinkdb.table).indexCreate(this.settings.rethinkdb.secondaryIndex).run(this.conn)

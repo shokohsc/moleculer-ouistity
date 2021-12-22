@@ -47,11 +47,11 @@ const handler = async function (ctx) {
     const { stdout } = await sh(`7z l "${book.archive}"`, true)
     const entries = parse(stdout)
     const entities = []
+    await ctx.broker.call('PagesDomain.delete', { query: { book: book.urn } })
     do {
       const entry = entries.files.shift()
       const urn = `${book.urn}:pages:${snakeCase(path.basename(entry.name, path.extname(entry.name)))}`
       // remove old entries with this book urn
-      await ctx.broker.call('PagesDomain.delete', { query: { book: urn } })
       if (entry.name.match(/\.(jp(e)?g)|(png)$/)) { // Let's insert only images for now
         entities.push({
           urn,
