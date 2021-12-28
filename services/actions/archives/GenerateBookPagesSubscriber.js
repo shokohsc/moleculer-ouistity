@@ -69,7 +69,7 @@ const handler = async function (ctx) {
     return { success: true }
   } catch (e) {
     /* istanbul ignore next */
-    this.logger.error(ctx.action.name, e.message)
+    this.logger.error(ctx.action.name, `Archive: ${ctx.params.book.archive} Message: ${e.message}`)
     /* istanbul ignore next */
     return Promise.reject(e)
   }
