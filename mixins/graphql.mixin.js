@@ -43,10 +43,10 @@ module.exports = {
     })
     $conn.on('error', (err) => {
       this.logger.error('RethinkDB disconnected', err)
-      setTimeout(() => this.conn.reconnect(), 1000)
+      setTimeout(() => $conn.reconnect(), 1000)
     })
     this.logger.info('RethinkDB adapter has connected successfully.')
-    await r.dbCreate(this.settings.rethinkdb.database).run(this.conn).catch(() => { })
+    // await r.dbCreate(this.settings.rethinkdb.database).run($conn).catch(() => { })
     // create moleculer to pass to the context
     const $moleculer = this.broker
     // start apollo
@@ -64,7 +64,7 @@ module.exports = {
       })
       $conn.on('error', (err) => {
         this.logger.error('RethinkDB disconnected', err)
-        setTimeout(() => this.conn.reconnect(), 100)
+        setTimeout(() => $conn.reconnect(), 1000)
       })
       this.logger.info('RethinkDB adapter has connected successfully.')
       const $moleculer = this.broker
