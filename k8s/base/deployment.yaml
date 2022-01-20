@@ -190,7 +190,7 @@ spec:
               memory: 1024M
           volumeMounts:
             - name: data
-              mountPath: /var/lib/rabbitmq
+              mountPath: /var/lib/rabbitmq/mnesia
       volumes:
         - name: data
           persistentVolumeClaim:
