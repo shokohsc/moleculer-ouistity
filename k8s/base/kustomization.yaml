@@ -12,3 +12,10 @@ resources:
   - books/
   - graphql/
   - pages/
+
+configMapGenerator:
+- name: config
+  files:
+  - ./config/server.conf
+generatorOptions:
+  disableNameSuffixHash: true

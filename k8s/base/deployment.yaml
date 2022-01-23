@@ -111,13 +111,8 @@ spec:
         - name: nats
           image: nats:2.6.5-alpine
           args:
-            - "--debug"
-            - "--cluster"
-            - "nats://0.0.0.0:6222"
-            - "--http_port"
-            - "8222"
-            - "--port"
-            - "4222"
+            - -c
+            - /server.conf
           ports:
             - name: nats
               containerPort: 4222
@@ -140,6 +135,14 @@ spec:
             limits:
               cpu: 1000m
               memory: 1024M
+          volumeMounts:
+            - name: config
+              mountPath: /server.conf
+              subPath: server.conf
+      volumes:
+        - name: config
+          configMap:
+            name: config
 ---
 kind: Deployment
 apiVersion: apps/v1

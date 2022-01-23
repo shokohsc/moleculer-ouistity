@@ -1,13 +1,8 @@
-const sh = require('exec-sh').promise
 const path = require('path')
-const { readFileSync, unlinkSync } = require('fs')
-const { snakeCase } = require('lodash')
 const WebMixin = require('moleculer-web')
 const swaggerJsdoc = require('swagger-jsdoc')
 
-const Error404 = readFileSync(path.resolve(__dirname, '../assets/images/404.jpg'))
-
-const { moleculer: { port }, global: { archivesMountPath, imageCacheTTL } } = require('../application.config')
+const { moleculer: { port }, global: { archivesMountPath } } = require('../application.config')
 
 const options = {
   definition: {
@@ -71,38 +66,7 @@ module.exports = {
           res.setHeader('Content-Type', 'application/json; charset=utf-8')
           res.end(JSON.stringify({ called: true, params: req.$params }))
         },
-        async 'GET images/:urn' (req, res) {
-          try {
-            const { urn } = req.$params
-            const { filepath, name, type } = await req.$ctx.broker.call('PagesDomain.getByUrn', { urn })
-            const basename = snakeCase(path.basename(name, path.extname(name)))
-            const extname = path.extname(filepath)
-            // const { stdout } = await sh(`7z e -so "${filepath}" "${name}"`, true)
-            let cmd = false
-            if (type === 'zip') {
-              // write tmp file
-              cmd = `unzip -p "${filepath}" "${name}" > /tmp/${basename}${extname}`
-            }
-            if (type === 'rar') {
-              // write tmp file
-              cmd = `unrar p -idq "${filepath}" "${name}" > /tmp/${basename}${extname}`
-            }
-            await sh(cmd, true)
-            // read file
-            const buffer = readFileSync(`/tmp/${basename}${extname}`)
-            unlinkSync(`/tmp/${basename}${extname}`)
-            // send buffer as image
-            res.setHeader('Content-Type', 'image')
-            res.setHeader('Cache-Control', `public, max-age=${imageCacheTTL}`)
-            res.end(buffer)
-          } catch (e) {
-            console.log(e);
-            // send buffer as image
-            res.setHeader('Content-Type', 'image')
-            res.setHeader('Cache-Control', 'no-cache')
-            res.end(Error404)
-          }
-        }
+        'GET images/:urn': 'ArchivesDomain.getByUrn'
       }
     }]
   }
