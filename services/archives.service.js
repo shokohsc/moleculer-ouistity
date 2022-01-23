@@ -46,21 +46,11 @@ module.exports = {
           const { urn } = ctx.params
           const { filepath, name, type } = await ctx.broker.call('PagesDomain.getByUrn', { urn })
           const basename = snakeCase(path.basename(name, path.extname(name)))
-          const extname = path.extname(filepath)
-          // const { stdout } = await sh(`7z e -so "${filepath}" "${name}"`, true)
-          let cmd = false
-          if (type === 'zip') {
-            // write tmp file
-            cmd = `unzip -p "${filepath}" "${name}" > /tmp/${basename}${extname}`
-          }
-          if (type === 'rar') {
-            // write tmp file
-            cmd = `unrar p -idq "${filepath}" "${name}" > /tmp/${basename}${extname}`
-          }
-          await sh(cmd, true)
+          const extname = path.extname(name)
+          await sh(`7z e -o/tmp "${filepath}" "${name}"`, true)
           // read file
-          const buffer = readFileSync(`/tmp/${basename}${extname}`)
-          unlinkSync(`/tmp/${basename}${extname}`)
+          const buffer = readFileSync(`/tmp/${name}`)
+          unlinkSync(`/tmp/${name}`)
           // send buffer as image
           ctx.meta.$responseType = 'image'
           ctx.meta.$responseHeaders = {

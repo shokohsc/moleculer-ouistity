@@ -44,3 +44,10 @@ spec:
             limits:
               cpu: 500m
               memory: 128M
+          volumeMounts:
+            - name: temp
+              mountPath: /tmp
+      volumes:
+        - name: temp
+          emptyDir:
+            medium: Memory
