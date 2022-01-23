@@ -17,6 +17,25 @@ spec:
           args:
             - --hot
             - services/api-gateway.service.js
+          volumeMounts:
+            - name: temp
+              mountPath: /tmp
+            - name: nfs-shared
+              mountPath: /usr/app/assets/data/archives/weekly
+            # - name: nfs-zarya
+            #   mountPath: /usr/app/assets/data/archives/comics
+      volumes:
+        - name: temp
+          emptyDir:
+            medium: Memory
+        - name: nfs-shared
+          nfs:
+            server: nfs-shared.nfs-shared.svc.cluster.local
+            path: /weekly
+        # - name: nfs-zarya
+        #   nfs:
+        #     server: nfs-wd-zarya.nfs-wd-zarya.svc.cluster.local
+        #     path: /comics
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
