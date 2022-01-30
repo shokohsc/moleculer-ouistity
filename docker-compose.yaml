@@ -4,7 +4,7 @@ services:
 
   thumbor:
     image: "minimalcompact/thumbor"
-    restart: "always"
+    restart: "unless-stopped"
     networks:
       - "public"
     ports:
@@ -12,7 +12,7 @@ services:
 
   rethinkdb:
     image: "rethinkdb:2.4.1"
-    restart: "always"
+    restart: "unless-stopped"
     volumes:
       - "rethinkdb_data:/data"
     networks:
@@ -21,9 +21,17 @@ services:
       - "8080:8080/tcp"
       - "28015:28015/tcp"
 
+  redis:
+    image: "redis:6.2.6"
+    restart: "unless-stopped"
+    networks:
+      - "public"
+    ports:
+      - "6379:6379/tcp"
+
   nats:
     image: "nats:2.2.0-alpine"
-    restart: "always"
+    restart: "unless-stopped"
     command:
       - "--debug"
       - "--cluster"
@@ -39,7 +47,7 @@ services:
 
   rabbitmq:
     image: "rabbitmq:3.7.17-management-alpine"
-    restart: "always"
+    restart: "unless-stopped"
     environment:
       RABBITMQ_ERLANG_COOKIE: "${APP_RABBITMQ_ERLANG_COOKIE}"
       RABBITMQ_DEFAULT_USER: "${APP_RABBITMQ_USERNAME}"

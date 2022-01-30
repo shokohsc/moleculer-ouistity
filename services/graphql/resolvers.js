@@ -50,7 +50,7 @@ module.exports = {
         const files = await sh(`ls -p ${archivesMountPath + '/' + targetDirectory} | egrep -v '/$' | sort -n`, true)
 
         let rows = initial(folders.stdout.split('\n'))
-          .map(function (item) { return {name: item, type: `folder`}; })
+          .map(function (item) { return {name: item.replace(archivesMountPath + '/', ''), type: `folder`}; })
           .concat(initial(files.stdout.split('\n'))
             .map(function (item) { return {name: item, type: `file`}; }))
 
@@ -59,41 +59,24 @@ module.exports = {
         const total = rows.length
         const totalPages = total / _pageSize
         rows = rows.slice(_page * _pageSize, _page * _pageSize + _pageSize);
+
         const foldersToKeep = rows.filter(row => 'folder' === row.type)
         const filesToSearch = rows.filter(row => 'file' === row.type).map(row => archivesMountPath + '/' + directory + row.name)
 
-        const cursor = await r.db('ouistity')
-          .table('books')
-          .filter(function(book){
-            return r
-              .expr(filesToSearch)
-              .contains(book('archive'))
-            }
-          )
-          .pluck('urn', 'basename', 'info')
-          .orderBy('archive')
-          .merge(function(book){
-            return {
-              cover: r.db('ouistity')
-              .table('pages')
-              .filter({ book: book('urn') })
-              .orderBy('name')
-              .pluck('image')
-              .limit(1)
-              .coerceTo('array')
-            }
-          })
-          .run($conn)
-        rows = await cursor.toArray()
+        const filesChecksums = []
+        await Promise.all(filesToSearch.map(async (fileToSearch) => {
+          filesChecksums.push(await $moleculer.call('ArchivesDomain.GenerateChecksum', { file: fileToSearch}))
+        }))
+        rows = 0 < filesToSearch.length ? await $moleculer.call('BooksDomain.getBooksAndCovers', {filesChecksums: filesChecksums}) : []
 
-        rows = foldersToKeep.concat(rows.map(row => {
-        return {
-          name: row.basename,
-          type: 'file',
-          cover: (row.cover.length > 0 && row.cover[0].image) ? row.cover[0].image : '',
-          urn: row.urn,
-          info: row.info
-        }
+        rows = foldersToKeep.concat(rows.flat().map(row => {
+          return {
+            name: row.basename,
+            type: 'file',
+            cover: (row.cover.length > 0 && row.cover[0].image) ? row.cover[0].image : '',
+            urn: row.urn,
+            info: row.info
+          }
         }))
 
         return {
@@ -114,7 +97,7 @@ module.exports = {
         const files = await sh(`find ${archivesMountPath} -iname "*${query}*" -type f |sort -n`, true)
 
         let rows = initial(folders.stdout.split('\n'))
-          .map(function (item) { return {name: item.replace(archivesMountPath, ''), type: `folder`}; })
+          .map(function (item) { return {name: item.replace(archivesMountPath + '/', '') + '/', type: `folder`}; })
           .concat(initial(files.stdout.split('\n'))
             .map(function (item) { return {name: item, type: `file`}; }))
 
@@ -123,41 +106,24 @@ module.exports = {
         const total = rows.length
         const totalPages = total / _pageSize
         rows = rows.slice(_page * _pageSize, _page * _pageSize + _pageSize);
+
         const foldersToKeep = rows.filter(row => 'folder' === row.type)
         const filesToSearch = rows.filter(row => 'file' === row.type).map(row => row.name)
 
-        const cursor = await r.db('ouistity')
-          .table('books')
-          .filter(function(book){
-            return r
-              .expr(filesToSearch)
-              .contains(book('archive'));
-            }
-          )
-          .pluck('urn', 'basename', 'info')
-          .orderBy('archive')
-          .merge(function(book){
-            return {
-              cover: r.db('ouistity')
-              .table('pages')
-              .filter({ book: book('urn') })
-              .orderBy('name')
-              .pluck('image')
-              .limit(1)
-              .coerceTo('array')
-            }
-          })
-          .run($conn)
-        rows = await cursor.toArray()
+        const filesChecksums = []
+        await Promise.all(filesToSearch.map(async (fileToSearch) => {
+          filesChecksums.push(await $moleculer.call('ArchivesDomain.GenerateChecksum', { file: fileToSearch}))
+        }))
+        rows = 0 < filesToSearch.length ? await $moleculer.call('BooksDomain.getBooksAndCovers', {filesChecksums: filesChecksums}) : []
 
-        rows = foldersToKeep.concat(rows.map(row => {
-        return {
-          name: row.basename,
-          type: 'file',
-          cover: (row.cover.length > 0 && row.cover[0].image) ? row.cover[0].image : '',
-          urn: row.urn,
-          info: row.info
-        }
+        rows = foldersToKeep.concat(rows.flat().map(row => {
+          return {
+            name: row.basename,
+            type: 'file',
+            cover: (row.cover.length > 0 && row.cover[0].image) ? row.cover[0].image : '',
+            urn: row.urn,
+            info: row.info
+          }
         }))
 
         return {

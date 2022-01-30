@@ -12,22 +12,43 @@ spec:
           env:
             - name: APP_GLOBAL_GATEWAY_URL
               value: https://api.ouistity.shokohsc.home
-            # - name: APP_NATS_HOSTNAME
-            #   value: nats.nats
+            - name: APP_IMAGE_CACHE_TTL
+              value: "30"
           args:
             - --hot
             - services/api-gateway.service.js
           volumeMounts:
+            - name: temp
+              mountPath: /tmp
             - name: nfs-shared
               mountPath: /usr/app/assets/data/archives/weekly
-            - name: nfs-wd2to
-              mountPath: /usr/app/assets/data/archives/comics
+            # - name: nfs-zarya
+            #   mountPath: /usr/app/assets/data/archives/comics
       volumes:
+        - name: temp
+          emptyDir:
+            medium: Memory
         - name: nfs-shared
           nfs:
-            server: nfs-shared.nfs-shared
+            server: nfs-shared.nfs-shared.svc.cluster.local
             path: /weekly
-        - name: nfs-wd2to
-          nfs:
-            server: nfs-wd2to.nfs-wd2to
-            path: /comics
+        # - name: nfs-zarya
+        #   nfs:
+        #     server: nfs-wd-zarya.nfs-wd-zarya.svc.cluster.local
+        #     path: /comics
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - api
+                  - archives
+                  - books
+                  - graphql
+                  - pages
+              topologyKey: kubernetes.io/hostname

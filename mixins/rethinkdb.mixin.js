@@ -13,6 +13,7 @@ module.exports = {
   actions: {
     count: {
       async handler (ctx) {
+        this.logger.info(ctx.action.name, ctx.params)
         const { query = {} } = ctx.params
         const cursor = await r.db(this.settings.rethinkdb.database)
           .table(this.settings.rethinkdb.table)
@@ -23,6 +24,7 @@ module.exports = {
     },
     getByUrn: {
       async handler (ctx) {
+        this.logger.info(ctx.action.name, ctx.params)
         const { urn } = ctx.params
         const cursor = await r.db(this.settings.rethinkdb.database)
           .table(this.settings.rethinkdb.table)
@@ -45,6 +47,7 @@ module.exports = {
     },
     get: {
       async handler (ctx) {
+        this.logger.info(ctx.action.name, ctx.params)
         const { id } = ctx.params
         const cursor = await r.db(this.settings.rethinkdb.database)
           .table(this.settings.rethinkdb.table)
@@ -86,8 +89,56 @@ module.exports = {
         }
       }
     },
+    getBooksAndCovers: {
+      async handler (ctx) {
+        this.logger.info(ctx.action.name, ctx.params)
+        const { filesChecksums } = ctx.params
+
+        // const result = []
+        // await Promise.all(filesChecksums.map(async (fileChecksum) => {
+        //   const cursor = await r.db('ouistity')
+        //     .table('books')
+        //     .getAll(fileChecksum, {index: "checksum"})
+        //     .pluck('urn', 'basename', 'info')
+        //     .orderBy('archive')
+        //     .merge(function(book){
+        //       return {
+        //         cover: r.db('ouistity')
+        //         .table('pages')
+        //         .getAll(book('urn'), {index: "book"})
+        //         .orderBy('name')
+        //         .pluck('image')
+        //         .limit(1)
+        //       }
+        //     })
+        //     .run(this.conn)
+        //   result.push(await cursor.toArray())
+        // }))
+
+        const cursor = await r.db('ouistity')
+          .table('books')
+          .getAll(...filesChecksums, {index: "checksum"})
+          .pluck('urn', 'basename', 'info')
+          .orderBy('archive')
+          .merge(function(book){
+            return {
+              cover: r.db('ouistity')
+              .table('pages')
+              .getAll(book('urn'), {index: "book"})
+              .orderBy('name')
+              .pluck('image')
+              .limit(1)
+            }
+          })
+          .run(this.conn)
+        const result = await cursor.toArray()
+
+        return result
+      }
+    },
     delete: {
       async handler (ctx) {
+        this.logger.info(ctx.action.name, ctx.params)
         const { query = {} } = ctx.params
         await r.db(this.settings.rethinkdb.database)
           .table(this.settings.rethinkdb.table)
@@ -99,6 +150,7 @@ module.exports = {
     },
     insert: {
       async handler (ctx) {
+        this.logger.info(ctx.action.name, ctx.params)
         const { data } = ctx.params
         await r.db(this.settings.rethinkdb.database)
           .table(this.settings.rethinkdb.table)
@@ -109,6 +161,7 @@ module.exports = {
     },
     update: {
       async handler (ctx) {
+        this.logger.info(ctx.action.name, ctx.params)
         const { id, data } = ctx.params
         await r.db(this.settings.rethinkdb.database)
           .table(this.settings.rethinkdb.table)
@@ -129,13 +182,18 @@ module.exports = {
       })
       this.conn.on('error', (err) => {
         this.logger.error('RethinkDB disconnected', err)
-        setTimeout(() => this.conn.reconnect(), 100)
+        setTimeout(() => this.conn.reconnect(), 1000)
       })
       this.logger.info('RethinkDB adapter has connected successfully.')
       await r.dbCreate(this.settings.rethinkdb.database).run(this.conn).catch(() => { })
       const tables = await r.db(this.settings.rethinkdb.database).tableList().run(this.conn)
       if (!tables.includes(this.settings.rethinkdb.table)) {
         await r.db(this.settings.rethinkdb.database).tableCreate(this.settings.rethinkdb.table).run(this.conn)
+        const indexes = await r.table(this.settings.rethinkdb.table).indexList().run(this.conn)
+        if (false === indexes.includes(this.settings.rethinkdb.secondaryIndex)) {
+          await r.table(this.settings.rethinkdb.table).indexCreate(this.settings.rethinkdb.secondaryIndex).run(this.conn)
+          await r.table(this.settings.rethinkdb.table).indexWait(this.settings.rethinkdb.secondaryIndex).run(this.conn)
+        }
       }
       return true
     } catch (e) {

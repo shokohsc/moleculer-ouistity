@@ -2,40 +2,6 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: thumbor
-spec:
-  selector:
-    matchLabels:
-      app: thumbor
-  template:
-    metadata:
-      labels:
-        app: thumbor
-    spec:
-      securityContext:
-        fsGroup: 1000
-      containers:
-        - name: thumbor
-          image: minimalcompact/thumbor
-          env:
-            - name: THUMBOR_PORT
-              value: "80"
-          ports:
-            - name: http
-              containerPort: 80
-              protocol: TCP
-          # livenessProbe:
-          #   httpGet:
-          #     port: http
-          #     path: /
-          # readinessProbe:
-          #   httpGet:
-          #     port: http
-          #     path: /
----
-kind: Deployment
-apiVersion: apps/v1
-metadata:
   name: rethinkdb
 spec:
   selector:
@@ -66,6 +32,13 @@ spec:
             httpGet:
               port: http
               path: /
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256M
+            limits:
+              cpu: 1000m
+              memory: 1024M
           volumeMounts:
             - name: data
               mountPath: /data
@@ -88,6 +61,40 @@ spec:
 kind: Deployment
 apiVersion: apps/v1
 metadata:
+  name: redis
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:6.2.6
+          ports:
+            - name: redis
+              containerPort: 6379
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256M
+            limits:
+              cpu: 1000m
+              memory: 1024M
+          livenessProbe:
+            tcpSocket:
+              port: redis
+          readinessProbe:
+            tcpSocket:
+              port: redis
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
   name: nats
 spec:
   selector:
@@ -102,15 +109,10 @@ spec:
         fsGroup: 1000
       containers:
         - name: nats
-          image: nats:2.2.0-alpine
+          image: nats:2.6.5-alpine
           args:
-            - "--debug"
-            - "--cluster"
-            - "nats://0.0.0.0:6222"
-            - "--http_port"
-            - "8222"
-            - "--port"
-            - "4222"
+            - -c
+            - /server.conf
           ports:
             - name: nats
               containerPort: 4222
@@ -126,6 +128,21 @@ spec:
             httpGet:
               port: http
               path: /
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256M
+            limits:
+              cpu: 1000m
+              memory: 1024M
+          volumeMounts:
+            - name: config
+              mountPath: /server.conf
+              subPath: server.conf
+      volumes:
+        - name: config
+          configMap:
+            name: config
 ---
 kind: Deployment
 apiVersion: apps/v1
@@ -144,7 +161,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: rabbitmq
-          image: rabbitmq:3.7.17-management-alpine
+          image: rabbitmq:3.9.11-management-alpine
           env:
             - name: RABBITMQ_ERLANG_COOKIE
               value: ""
@@ -167,9 +184,16 @@ spec:
             httpGet:
               port: http
               path: /
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256M
+            limits:
+              cpu: 1000m
+              memory: 1024M
           volumeMounts:
             - name: data
-              mountPath: /var/lib/rabbitmq
+              mountPath: /var/lib/rabbitmq/mnesia
       volumes:
         - name: data
           persistentVolumeClaim:

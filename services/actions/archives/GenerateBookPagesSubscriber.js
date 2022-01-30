@@ -3,7 +3,7 @@ const path = require('path')
 const { snakeCase, filter } = require('lodash')
 
 const parse = function (data) {
-  const entries = { files: [], type: false }
+  const entries = { files: [], type: false, count: 0 }
   // split lines
   const content = data.toString().split('\n')
   const lines = filter(content, function (o) { return o !== '' })
@@ -20,18 +20,17 @@ const parse = function (data) {
       entries.type = words[0].split(' = ')[1].toLowerCase()
     }
     // files content
-    if (words.length === 4) {
-      switch (true) {
-        case (words[3].search(/files/) !== -1):
-          entries.count = parseInt(words[3].split(' ')[0])
-          break
-        case !isNaN(parseInt(words[2])):
-          entries.files.push({
-            name: words[3],
-            size: parseInt(words[1]),
-            compressed: parseInt(words[2]),
-            datetime: `${words[0].split(' ')[0]} ${words[0].split(' ')[1]}`
-          })
+    if (line.search(/^\d+-\d+-\d+\s+\d+:\d+:\d+\s+[\.AR]+\s+\d+\s+\d+\s+.+\.[JPEGjpegPNpn]+$/) !== -1) {
+      const regex = /^(?<datetime>\d+-\d+-\d+\s+\d+:\d+:\d+)\s+[\.AR]+\s+(?<size>\d+)\s+(?<compressed>\d+)\s+(?<file>.+\.[JPEGjpegPNpn]+)$/
+      const [, datetime, size, compressed, file] = regex.exec(line) || [];
+      if (undefined !== file && undefined !== size && undefined !== compressed && undefined !== datetime) {
+        entries.count++
+        entries.files.push({
+          name: file,
+          size: size,
+          compressed: compressed,
+          datetime: datetime
+        })
       }
     }
     return true
@@ -47,9 +46,11 @@ const handler = async function (ctx) {
     const { stdout } = await sh(`7z l "${book.archive}"`, true)
     const entries = parse(stdout)
     const entities = []
+    await ctx.broker.call('PagesDomain.delete', { query: { book: book.urn } })
     do {
       const entry = entries.files.shift()
       const urn = `${book.urn}:pages:${snakeCase(path.basename(entry.name, path.extname(entry.name)))}`
+      // remove old entries with this book urn
       if (entry.name.match(/\.(jp(e)?g)|(png)$/)) { // Let's insert only images for now
         entities.push({
           urn,
@@ -67,7 +68,7 @@ const handler = async function (ctx) {
     return { success: true }
   } catch (e) {
     /* istanbul ignore next */
-    this.logger.error(ctx.action.name, e.message)
+    this.logger.error(ctx.action.name, `Archive: ${ctx.params.book.archive} Message: ${e.message}`)
     /* istanbul ignore next */
     return Promise.reject(e)
   }

@@ -11,10 +11,6 @@ spec:
     metadata:
       labels:
         app: books
-      # annotations:
-      #   prometheus.io/scrape: "true"
-      #   prometheus.io/path: /api/v1/books/metrics
-      #   prometheus.io/port: "5050"
     spec:
       securityContext:
         fsGroup: 1000
@@ -37,20 +33,14 @@ spec:
               value: rabbitmq
             - name: APP_RABBITMQ_PASSWORD
               value: changeme
+            - name: APP_REDIS_HOSTNAME
+              value: redis
           args:
             - services/books.service.js
-          # ports:
-          #   - name: http
-          #     containerPort: 5000
-          #     protocol: TCP
-          #   - name: metrics
-          #     containerPort: 5050
-          #     protocol: TCP
-          # livenessProbe:
-          #   httpGet:
-          #     port: http
-          #     path: /
-          # readinessProbe:
-          #   httpGet:
-          #     port: http
-          #     path: /
+          resources:
+            requests:
+              cpu: 10m
+              memory: 128M
+            limits:
+              cpu: 500m
+              memory: 128M

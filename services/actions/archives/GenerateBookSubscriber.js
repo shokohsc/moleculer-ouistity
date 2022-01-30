@@ -2,15 +2,14 @@ const sh = require('exec-sh').promise
 const path = require('path')
 const { snakeCase } = require('lodash')
 const parseString = require('xml2js').parseString
-const md5File = require('md5-file')
 
 const handler = async function (ctx) {
   try {
     this.logger.info(ctx.action.name, ctx.params)
     const { archive, pages } = ctx.params
     // upsert books
-    const hash = md5File.sync(archive)
-    const urn = `urn:ouistity:books:${snakeCase(path.basename(archive, path.extname(archive)))}:${hash}`
+    const checksum = await ctx.broker.call('ArchivesDomain.GenerateChecksum', { file: archive })
+    const urn = `urn:ouistity:books:${snakeCase(path.basename(archive, path.extname(archive)))}:${checksum}`
     const [book] = await ctx.broker.call('BooksDomain.filter', {
       query: {
         urn
@@ -18,6 +17,7 @@ const handler = async function (ctx) {
     })
     const data = {
       urn,
+      checksum,
       url: `/api/v1/books/${urn}`,
       archive,
       basename: path.basename(archive)
@@ -46,8 +46,6 @@ const handler = async function (ctx) {
     }
     // upsert pages for this book
     if (pages === true) {
-      // remove old entries with this book urn
-      await ctx.broker.call('PagesDomain.delete', { query: { book: urn } })
       await ctx.broker.$rabbitmq.publishExchange('amq.topic', 'moleculer.archives-domain-generate-book-pages-catalog.key', { book: data })
     }
     return { success: true }

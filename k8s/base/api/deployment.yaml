@@ -31,6 +31,8 @@ spec:
               value: graphql
             - name: APP_NATS_HOSTNAME
               value: nats
+            - name: APP_REDIS_HOSTNAME
+              value: redis
           args:
             - services/api-gateway.service.js
           ports:
@@ -51,3 +53,10 @@ spec:
             httpGet:
               port: http
               path: /status/readiness
+          resources:
+            requests:
+              cpu: 10m
+              memory: 128M
+            limits:
+              cpu: 100m
+              memory: 128M
