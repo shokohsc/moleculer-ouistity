@@ -1,8 +1,10 @@
 const r = require('rethinkdb')
 const { ApolloServer, gql } = require('apollo-server')
 const responseCachePlugin = require('apollo-server-plugin-response-cache')
+const { BaseRedisCache } = require('apollo-server-cache-redis');
+const Redis = require('ioredis');
 
-const { apollo } = require('../application.config')
+const { apollo, redis, graphqlCache } = require('../application.config')
 
 module.exports = {
   name: 'graphql',
@@ -21,41 +23,7 @@ module.exports = {
     }
   },
   methods: {
-    startApollo($moleculer, $conn) {
-      this.controller = new ApolloServer({
-        tracing: true,
-        typeDefs: gql`${this.settings.graphql.schemas}${this.settings.graphql.queries}`,
-        resolvers: this.settings.graphql.resolvers,
-        context: async () => ({
-          $moleculer,
-          $conn
-        }),
-        plugins: [responseCachePlugin()]
-      })
-    }
-  },
-  async created () {
-    const $conn = await r.connect({
-      host: this.settings.rethinkdb.hostname,
-      port: this.settings.rethinkdb.port,
-      db: 'ouistity',
-      silent: true
-    })
-    $conn.on('error', (err) => {
-      this.logger.error('RethinkDB disconnected', err)
-      setTimeout(() => $conn.reconnect(), 1000)
-    })
-    this.logger.info('RethinkDB adapter has connected successfully.')
-    // await r.dbCreate(this.settings.rethinkdb.database).run($conn).catch(() => { })
-    // create moleculer to pass to the context
-    const $moleculer = this.broker
-    // start apollo
-    this.startApollo($moleculer, $conn)
-    return true
-  },
-  async started () {
-    // TODO this.controller is sometimes undefined, why ?
-    if (!this.controller) {
+    async connectToRethinkDB() {
       const $conn = await r.connect({
         host: this.settings.rethinkdb.hostname,
         port: this.settings.rethinkdb.port,
@@ -67,14 +35,51 @@ module.exports = {
         setTimeout(() => $conn.reconnect(), 1000)
       })
       this.logger.info('RethinkDB adapter has connected successfully.')
-      const $moleculer = this.broker
-      this.startApollo($moleculer, $conn)
+      return $conn
+    },
+    async startApollo($moleculer, $conn) {
+      this.controller = new ApolloServer({
+        tracing: true,
+        csrfPrevention: true,
+        cache: new BaseRedisCache({
+          client: new Redis({
+            host: redis.hostname,
+          }),
+        }),
+        cacheControl: {
+          defaultMaxAge: graphqlCache.oneMinute
+        },
+        typeDefs: gql`${this.settings.graphql.schemas}${this.settings.graphql.queries}`,
+        resolvers: this.settings.graphql.resolvers,
+        context: async () => ({
+          $moleculer,
+          $conn
+        }),
+        plugins: [responseCachePlugin({
+          shouldReadFromCache: (requestContext) => (requestContext.request.http.headers.get('cache-control') !== 'no-cache'),
+          shouldWriteToCache: (requestContext) => (requestContext.request.http.headers.get('cache-control') !== 'no-cache')
+        })]
+      })
+      await this.controller.listen(apollo)
+      return true
+    },
+    async stopApollo() {
+      if (undefined !== this.controller)
+        this.controller.stop()
+      return true
     }
-    await this.controller.listen(apollo)
+  },
+  async created () {
+
+  },
+  async started () {
+    const $conn = await this.connectToRethinkDB()
+    const $moleculer = this.broker
+    await this.startApollo($moleculer, $conn)
     return true
   },
   async stopped () {
-    this.controller = false
+    this.stopApollo()
     return true
   }
 }

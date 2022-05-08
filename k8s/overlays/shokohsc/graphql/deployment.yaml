@@ -11,11 +11,11 @@ spec:
           image: shokohsc/moleculer-ouistity
           env:
             - name: APP_GRAPHQL_ONE_MINUTE_CACHE_TTL
-              value: "15"
+              value: "5"
             - name: APP_GRAPHQL_ONE_DAY_CACHE_TTL
-              value: "15"
+              value: "10"
             - name: APP_GRAPHQL_ONE_YEAR_CACHE_TTL
-              value: "15"
+              value: "20"
           args:
             - --hot
             - services/graphql-gateway.service.js

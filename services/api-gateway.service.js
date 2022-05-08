@@ -91,7 +91,7 @@ module.exports = {
             const buffer = readFileSync(`/tmp/${urn}`)
             unlinkSync(`/tmp/${urn}`)
             // send buffer as image
-            res.setHeader('Content-Type', 'image')
+            res.setHeader('Content-Type', 'image/jpg')
             res.setHeader('Cache-Control', `public, max-age=${imageCacheTTL}`)
             res.end(buffer)
           } catch (e) {

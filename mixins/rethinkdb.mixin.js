@@ -89,31 +89,39 @@ module.exports = {
         }
       }
     },
-    getBooksAndCovers: {
+    browseBooksAndCovers: {
+      async handler (ctx) {
+        this.logger.info(ctx.action.name, ctx.params)
+        const { filesChecksums, directory } = ctx.params
+
+        const cursor = await r.db('ouistity')
+          .table('books')
+          .getAll(...filesChecksums, {index: "checksum"})
+          .filter(
+            r.row("archive").match(`${directory}`)
+          )
+          .pluck('urn', 'basename', 'info')
+          .orderBy('archive')
+          .merge(function(book){
+            return {
+              cover: r.db('ouistity')
+              .table('pages')
+              .getAll(book('urn'), {index: "book"})
+              .orderBy('name')
+              .pluck('image')
+              .limit(1)
+            }
+          })
+          .run(this.conn)
+        const result = await cursor.toArray()
+
+        return result
+      }
+    },
+    searchBooksAndCovers: {
       async handler (ctx) {
         this.logger.info(ctx.action.name, ctx.params)
         const { filesChecksums } = ctx.params
-
-        // const result = []
-        // await Promise.all(filesChecksums.map(async (fileChecksum) => {
-        //   const cursor = await r.db('ouistity')
-        //     .table('books')
-        //     .getAll(fileChecksum, {index: "checksum"})
-        //     .pluck('urn', 'basename', 'info')
-        //     .orderBy('archive')
-        //     .merge(function(book){
-        //       return {
-        //         cover: r.db('ouistity')
-        //         .table('pages')
-        //         .getAll(book('urn'), {index: "book"})
-        //         .orderBy('name')
-        //         .pluck('image')
-        //         .limit(1)
-        //       }
-        //     })
-        //     .run(this.conn)
-        //   result.push(await cursor.toArray())
-        // }))
 
         const cursor = await r.db('ouistity')
           .table('books')

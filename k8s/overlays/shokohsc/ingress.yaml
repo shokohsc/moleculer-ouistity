@@ -7,7 +7,7 @@ metadata:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: ca-cluster-issuer
     flame.pawelmalak/name: ouistity-rethinkdb
-    flame.pawelmalak/url: rethinkdb.ouistity.shokohsc.home
+    flame.pawelmalak/url: https://rethinkdb.ouistity.shokohsc.home
     flame.pawelmalak/type: app
     flame.pawelmalak/icon: wrench
 spec:
@@ -35,7 +35,7 @@ metadata:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: ca-cluster-issuer
     flame.pawelmalak/name: ouistity-rabbitmq
-    flame.pawelmalak/url: rabbitmq.ouistity.shokohsc.home
+    flame.pawelmalak/url: https://rabbitmq.ouistity.shokohsc.home
     flame.pawelmalak/type: app
     flame.pawelmalak/icon: wrench
 spec:
@@ -54,3 +54,32 @@ spec:
   - hosts:
     - rabbitmq.ouistity.shokohsc.home
     secretName: rabbitmq-cert
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: redis-commander
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    cert-manager.io/cluster-issuer: ca-cluster-issuer
+    flame.pawelmalak/name: ouistity-redis
+    flame.pawelmalak/url: https://redis.ouistity.shokohsc.home
+    flame.pawelmalak/type: app
+    flame.pawelmalak/icon: wrench
+spec:
+  rules:
+  - host: redis.ouistity.shokohsc.home
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: redis-commander
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - redis.ouistity.shokohsc.home
+    secretName: redis-commander-cert
