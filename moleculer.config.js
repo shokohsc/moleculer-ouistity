@@ -44,27 +44,5 @@ module.exports = {
         }
       }
     ]
-  },
-  tracing: {
-		enabled: true,
-		// Available built-in exporters: "Console", "Datadog", "Event", "EventLegacy", "Jaeger", "Zipkin"
-		exporter: {
-			type: "Zipkin", // Console exporter is only for development!
-			options: {
-        // Base URL for Zipkin server.
-        baseURL: "http://zipkin.zipkin",
-        // Sending time interval in seconds.
-        interval: 5,
-        // Additional payload options.
-        payloadOptions: {
-            // Set `debug` property in payload.
-            debug: false,
-            // Set `shared` property in payload.
-            shared: false
-        },
-        // Default tags. They will be added into all span tags.
-        defaultTags: null
-			}
-		}
-	}
+  }
 }
