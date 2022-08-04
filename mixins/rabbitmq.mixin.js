@@ -10,7 +10,7 @@ module.exports = {
       username: '',
       password: '',
       vhost: '',
-      prefetchCount: 0,
+      prefetchCount: 1,
       aliases: {}
     }
   },

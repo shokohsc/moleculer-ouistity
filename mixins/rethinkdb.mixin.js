@@ -98,7 +98,7 @@ module.exports = {
           .table('books')
           .getAll(...filesChecksums, {index: "checksum"})
           .filter(
-            r.row("archive").match(`${directory}`)
+            r.row("archive").match(`${directory.replace(/\ /g, '\\ ').replace(/\+/g, '\\+').replace(/\(/g, '\\(').replace(/\)/g, '\\)')}`)
           )
           .pluck('urn', 'basename', 'info')
           .orderBy('archive')

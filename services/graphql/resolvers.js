@@ -45,9 +45,8 @@ module.exports = {
     },
     browse: async (_, { directory = '', page = 1, pageSize = 10 }, { $moleculer, $conn }, ___) => {
       try {
-        const targetDirectory = directory.replace(/\ /g, '\\ ')
-        const folders = await sh(`ls -p ${archivesMountPath + '/' + targetDirectory} | egrep '/$' | sort -n`, true)
-        const files = await sh(`ls -p ${archivesMountPath + '/' + targetDirectory} | egrep -v '/$' | sort -n`, true)
+        const folders = await sh(`ls -p '${archivesMountPath + '/' + directory}' | egrep '/$' | sort -n`, true)
+        const files = await sh(`ls -p '${archivesMountPath + '/' + directory}' | egrep -v '/$' | sort -n`, true)
 
         let rows = initial(folders.stdout.split('\n'))
           .map(function (item) { return {name: item.replace(archivesMountPath + '/', ''), type: `folder`}; })
@@ -67,6 +66,7 @@ module.exports = {
         await Promise.all(filesToSearch.map(async (fileToSearch) => {
           filesChecksums.push(await $moleculer.call('ArchivesDomain.GenerateChecksum', { file: fileToSearch}))
         }))
+
         rows = 0 < filesToSearch.length ? await $moleculer.call('BooksDomain.browseBooksAndCovers', {filesChecksums: filesChecksums, directory: directory}) : []
 
         rows = foldersToKeep.concat(rows.flat().map(row => {
