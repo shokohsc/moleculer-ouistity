@@ -6,10 +6,9 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: ca-cluster-issuer
-    flame.pawelmalak/name: ouistity-rethinkdb
-    flame.pawelmalak/url: https://rethinkdb.ouistity.shokohsc.home
-    flame.pawelmalak/type: app
-    flame.pawelmalak/icon: wrench
+    dashboard.shokohsc.home/name: ouistity-rethinkdb
+    dashboard.shokohsc.home/url: https://rethinkdb.ouistity.shokohsc.home
+    dashboard.shokohsc.home/icon: wrench
 spec:
   rules:
   - host: rethinkdb.ouistity.shokohsc.home
@@ -34,10 +33,9 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: ca-cluster-issuer
-    flame.pawelmalak/name: ouistity-rabbitmq
-    flame.pawelmalak/url: https://rabbitmq.ouistity.shokohsc.home
-    flame.pawelmalak/type: app
-    flame.pawelmalak/icon: wrench
+    dashboard.shokohsc.home/name: ouistity-rabbitmq
+    dashboard.shokohsc.home/url: https://rabbitmq.ouistity.shokohsc.home
+    dashboard.shokohsc.home/icon: wrench
 spec:
   rules:
   - host: rabbitmq.ouistity.shokohsc.home
@@ -63,10 +61,9 @@ metadata:
     kubernetes.io/ingress.class: nginx
     traefik.ingress.kubernetes.io/router.tls: "true"
     cert-manager.io/cluster-issuer: ca-cluster-issuer
-    flame.pawelmalak/name: ouistity-redis
-    flame.pawelmalak/url: https://redis.ouistity.shokohsc.home
-    flame.pawelmalak/type: app
-    flame.pawelmalak/icon: wrench
+    dashboard.shokohsc.home/name: ouistity-redis
+    dashboard.shokohsc.home/url: https://redis.ouistity.shokohsc.home
+    dashboard.shokohsc.home/icon: wrench
 spec:
   rules:
   - host: redis.ouistity.shokohsc.home

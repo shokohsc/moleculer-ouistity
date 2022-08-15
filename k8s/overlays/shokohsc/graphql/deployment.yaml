@@ -22,17 +22,19 @@ spec:
           volumeMounts:
             - name: nfs-shared
               mountPath: /usr/app/assets/data/archives/weekly
-            # - name: nfs-zarya
-            #   mountPath: /usr/app/assets/data/archives/comics
+            - name: nfs-zarya
+              mountPath: /usr/app/assets/data/archives/comics
       volumes:
         - name: nfs-shared
           nfs:
             server: nfs-shared.nfs-shared.svc.cluster.local
             path: /weekly
-        # - name: nfs-zarya
-        #   nfs:
-        #     server: nfs-wd-zarya.nfs-wd-zarya.svc.cluster.local
-        #     path: /comics
+            readOnly: true
+        - name: nfs-zarya
+          nfs:
+            server: nfs-wd-zarya.nfs-wd-zarya.svc.cluster.local
+            path: /comics
+            readOnly: true
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

@@ -57,7 +57,7 @@ module.exports = {
         const _pageSize = (parseInt(pageSize)) >= 0 ? parseInt(pageSize) : 1
         const total = rows.length
         const totalPages = total / _pageSize
-        rows = rows.slice(_page * _pageSize, _page * _pageSize + _pageSize);
+        rows = rows.slice(_page * _pageSize, _page * _pageSize + _pageSize)
 
         const foldersToKeep = rows.filter(row => 'folder' === row.type)
         const filesToSearch = rows.filter(row => 'file' === row.type).map(row => archivesMountPath + '/' + directory + row.name)
@@ -78,6 +78,15 @@ module.exports = {
             info: row.info
           }
         }))
+        .sort(function (rowA, rowB) {
+          if (rowA.name.toLowerCase() > rowB.name.toLowerCase()) {
+            return 1;
+          }
+          if (rowA.name.toLowerCase() < rowB.name.toLowerCase()) {
+            return -1;
+          }
+          return 0;
+        })
 
         return {
           rows,
@@ -125,6 +134,15 @@ module.exports = {
             info: row.info
           }
         }))
+        .sort(function (rowA, rowB) {
+          if (rowA.name.toLowerCase() > rowB.name.toLowerCase()) {
+            return 1;
+          }
+          if (rowA.name.toLowerCase() < rowB.name.toLowerCase()) {
+            return -1;
+          }
+          return 0;
+        })
 
         return {
           rows,
