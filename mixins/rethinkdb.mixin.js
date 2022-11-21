@@ -181,6 +181,8 @@ module.exports = {
     }
   },
   async created () {
+  },
+  async started () {
     try {
       this.conn = await r.connect({
         host: this.settings.rethinkdb.hostname,
@@ -208,8 +210,6 @@ module.exports = {
       this.logger.error('RethinkDB error.', e)
       throw e
     }
-  },
-  async started () {
     return true
   },
   async stopped () {
