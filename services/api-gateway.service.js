@@ -71,6 +71,12 @@ module.exports = {
           res.setHeader('Content-Type', 'application/json; charset=utf-8')
           res.end(JSON.stringify({ called: true, params: req.$params }))
         },
+        'POST clean/catalog' (req, res) {
+          // Emit a moleculer event to accelerate the callback.
+          req.$ctx.broker.emit('ArchivesDomain.CleanCatalogInitialized')
+          res.setHeader('Content-Type', 'application/json; charset=utf-8')
+          res.end(JSON.stringify({ called: true, params: req.$params }))
+        },
         async 'GET images/:urn' (req, res) {
           try {
             const { urn } = req.$params

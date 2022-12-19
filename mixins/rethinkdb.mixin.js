@@ -118,6 +118,19 @@ module.exports = {
         return result
       }
     },
+    getBooksArchiveUrn: {
+      async handler (ctx) {
+        this.logger.info(ctx.action.name)
+
+        const cursor = await r.db('ouistity')
+          .table('books')
+          .pluck("id", "urn", "archive")
+          .run(this.conn)
+        const result = await cursor.toArray()
+
+        return result
+      }
+    },
     searchBooksAndCovers: {
       async handler (ctx) {
         this.logger.info(ctx.action.name, ctx.params)
