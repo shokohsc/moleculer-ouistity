@@ -12,6 +12,7 @@ resources:
   - books/
   - graphql/
   - pages/
+  # - marvel/
 
 configMapGenerator:
 - name: config

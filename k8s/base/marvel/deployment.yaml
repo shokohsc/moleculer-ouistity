@@ -2,60 +2,50 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: api
+  name: marvel
 spec:
   selector:
     matchLabels:
-      app: api
+      app: marvel
   template:
     metadata:
       labels:
-        app: api
+        app: marvel
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/path: /metrics
         prometheus.io/port: "5050"
     spec:
-      securityContext:
-        fsGroup: 1000
       containers:
-        - name: api
+        - name: marvel
           image: shokohsc/moleculer-ouistity
-          securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
           env:
             - name: APP_GLOBAL_GATEWAY_URL
               value: http://api.svc.cluster.local
-            - name: APP_MOLECULER_APOLLO_HOSTNAME
-              value: graphql
             - name: APP_NATS_HOSTNAME
               value: nats
             - name: APP_REDIS_HOSTNAME
               value: redis
           args:
-            - services/api-gateway.service.js
+            - services/marvel/*.service.js
           ports:
-            - name: http
-              containerPort: 5000
-              protocol: TCP
             - name: metrics
               containerPort: 5050
               protocol: TCP
           startupProbe:
             tcpSocket:
-              port: http
+              port: metrics
           livenessProbe:
             tcpSocket:
-              port: http
+              port: metrics
           readinessProbe:
             httpGet:
-              port: http
-              path: /status/readiness
+              port: metrics
+              path: /metrics
           resources:
             requests:
               cpu: 10m
               memory: 64M
             limits:
-              cpu: 1000m
+              cpu: 100m
               memory: 64M

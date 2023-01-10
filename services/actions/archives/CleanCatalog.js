@@ -1,3 +1,5 @@
+const { global: { archivesMountPath } } = require('../../../application.config')
+
 /**
  * @swagger
  * /clean/catalog:
@@ -6,6 +8,11 @@
  *      tags: [Catalog]
  *      produces:
  *        - application/json
+ *      parameters:
+ *        - name: source
+ *          description: Pattern glob to scan books
+ *          in: formData
+ *          type: string
  *      responses:
  *        200:
  *          description: success or error
@@ -14,7 +21,8 @@ const handler = async function (ctx) {
   try {
     this.logger.info(ctx.action.name)
 
-    const books = await ctx.broker.call('BooksDomain.getBooksArchiveUrn')
+    const { source } = ctx.params
+    const books = await ctx.broker.call('BooksDomain.getBooksArchiveUrn', { source })
 
     const keys = Object.keys(books)
     do {
@@ -33,5 +41,8 @@ const handler = async function (ctx) {
 }
 
 module.exports = {
+  params: {
+    source: { type: 'string', default: `${archivesMountPath}/weekly/` }
+  },
   handler
 }

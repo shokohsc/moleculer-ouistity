@@ -31,7 +31,7 @@ module.exports = {
     },
     'ArchivesDomain.CleanCatalogInitialized': {
       async handler (ctx) {
-        await ctx.broker.call('ArchivesDomain.CleanCatalog')
+        await ctx.broker.call('ArchivesDomain.CleanCatalog', ctx.params)
       }
     }
   },

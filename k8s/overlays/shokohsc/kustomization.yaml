@@ -4,6 +4,8 @@ namespace: moleculer-ouistity
 bases:
   - ../../base
   - keda.yaml
+  # - marvel/secret.yaml
+
 patchesStrategicMerge:
   - ingress.yaml
 
@@ -14,3 +16,4 @@ patchesStrategicMerge:
   - graphql/deployment.yaml
   - graphql/ingress.yaml
   - pages/deployment.yaml
+  # - marvel/deployment.yaml

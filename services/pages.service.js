@@ -9,7 +9,7 @@ module.exports = {
     rethinkdb: {
       database: 'ouistity',
       table: 'pages',
-      secondaryIndex: 'book',
+      secondaryIndexes: ['book'],
       ...rethinkdb
     }
   }

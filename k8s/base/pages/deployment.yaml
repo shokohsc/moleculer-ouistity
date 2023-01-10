@@ -11,6 +11,10 @@ spec:
     metadata:
       labels:
         app: pages
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /metrics
+        prometheus.io/port: "5050"
     spec:
       securityContext:
         fsGroup: 1000
@@ -37,6 +41,20 @@ spec:
               value: redis
           args:
             - services/pages.service.js
+          ports:
+            - name: metrics
+              containerPort: 5050
+              protocol: TCP
+          startupProbe:
+            tcpSocket:
+              port: metrics
+          livenessProbe:
+            tcpSocket:
+              port: metrics
+          readinessProbe:
+            httpGet:
+              port: metrics
+              path: /metrics
           resources:
             requests:
               cpu: 10m

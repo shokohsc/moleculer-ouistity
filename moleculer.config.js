@@ -47,6 +47,8 @@ module.exports = {
   },
   tracing: {
 		enabled: true,
+    stackTrace: true,
+    events: true,
 		// Available built-in exporters: "Console", "Datadog", "Event", "EventLegacy", "Jaeger", "Zipkin"
 		exporter: {
 			type: "Zipkin", // Console exporter is only for development!
