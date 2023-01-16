@@ -201,8 +201,6 @@ module.exports = {
     }
   },
   async created () {
-  },
-  async started () {
     try {
       this.conn = await r.connect({
         host: this.settings.rethinkdb.hostname,
@@ -216,6 +214,15 @@ module.exports = {
       })
       this.logger.info('RethinkDB adapter has connected successfully.')
 
+      return true
+    } catch (e) {
+      this.logger.error('RethinkDB error.', e)
+      throw e
+    }
+    return true
+  },
+  async started () {
+    try {
       const databases = await r.dbList().run(this.conn)
       if (!databases.includes(this.settings.rethinkdb.database)) {
         await r.dbCreate(this.settings.rethinkdb.database).run(this.conn)
