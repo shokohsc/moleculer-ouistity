@@ -1,5 +1,5 @@
 const MarvelAPI = require('marvel-ts').MarvelAPI
-const moment = require('moment')
+const dayjs = require('dayjs')
 
 const { marvel: { publicKey, privateKey } } = require('../../application.config')
 
@@ -47,8 +47,8 @@ module.exports = {
 			async handler(ctx) {
 				this.logger.info(ctx.action.name, ctx.params)
 				try {
-					const endDate = moment(undefined !== ctx.params.date ? ctx.params.date : Date.now().toString())
-					const startDate = moment(ctx.params.date).subtract(6, 'days')
+					const endDate = dayjs('' !== ctx.params.date ? ctx.params.date : dayjs().format('YYYY-MM-DD'))
+					const startDate = dayjs('' !== ctx.params.date ? ctx.params.date : dayjs().format('YYYY-MM-DD')).subtract(6, 'days')
 
 					const response = await this.marvel.getComics({
 						dateRange: [startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')],
@@ -71,7 +71,7 @@ module.exports = {
 				}
 			},
 			params: {
-				date: { type: 'string', optional: true, default: Date.now().toString() }
+				date: { type: 'string', optional: true, default: dayjs().format('YYYY-MM-DD') }
 			},
 			cache: {
 				enabled: ctx => 'no-cache' !== ctx.meta.cacheControl,

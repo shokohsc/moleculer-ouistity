@@ -1,5 +1,4 @@
 const MarvelAPI = require('marvel-ts').MarvelAPI
-const moment = require('moment')
 
 const { marvel: { publicKey, privateKey } } = require('../../application.config')
 
