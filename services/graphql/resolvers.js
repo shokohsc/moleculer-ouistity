@@ -131,7 +131,8 @@ module.exports = {
             type: 'file',
             cover: (row.cover.length > 0 && row.cover[0].image) ? row.cover[0].image : '',
             urn: row.urn,
-            info: row.info
+            info: row.info,
+            path: row.archive.replace(archivesMountPath + '/', '').replace(row.basename, '')
           }
         }))
         .sort(function (rowA, rowB) {

@@ -48,6 +48,7 @@ module.exports = `
     cover: String
     urn: String
     info: ComicInfo
+    path: String
   }
   """
   This type describes a ComicInfo, optional metadata fields. Cached for a year

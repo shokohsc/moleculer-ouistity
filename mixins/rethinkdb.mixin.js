@@ -146,7 +146,7 @@ module.exports = {
         const cursor = await r.db('ouistity')
           .table('books')
           .getAll(...filesChecksums, {index: "checksum"})
-          .pluck('urn', 'basename', 'info')
+          .pluck('urn', 'basename', 'info', 'archive')
           .orderBy('archive')
           .merge(function(book){
             return {

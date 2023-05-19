@@ -11,6 +11,10 @@ spec:
     metadata:
       labels:
         app: graphql
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /metrics
+        prometheus.io/port: "5050"
     spec:
       securityContext:
         fsGroup: 1000
@@ -32,6 +36,9 @@ spec:
           ports:
             - name: http
               containerPort: 7000
+              protocol: TCP
+            - name: metrics
+              containerPort: 5050
               protocol: TCP
           startupProbe:
             tcpSocket:
