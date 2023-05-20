@@ -102,7 +102,7 @@ module.exports = {
           .filter(
             r.row("archive").match(`${directory.replace(/\ /g, '\\ ').replace(/\+/g, '\\+').replace(/\(/g, '\\(').replace(/\)/g, '\\)')}`)
           )
-          .pluck('urn', 'basename', 'info')
+          .pluck('urn', 'basename', 'info', 'archive')
           .orderBy('archive')
           .merge(function(book){
             return {

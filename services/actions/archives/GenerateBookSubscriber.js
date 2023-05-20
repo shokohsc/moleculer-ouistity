@@ -12,9 +12,15 @@ const handler = async function (ctx) {
     const urn = `urn:ouistity:books:${snakeCase(path.basename(archive, path.extname(archive)))}:${checksum}`
     const [book] = await ctx.broker.call('BooksDomain.filter', {
       query: {
-        urn
+        urn,
+        archive
       }
     })
+
+    if (book && book.archive === archive) {
+      return { success: true }
+    }
+
     const data = {
       urn,
       checksum,
