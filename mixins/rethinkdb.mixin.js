@@ -123,12 +123,12 @@ module.exports = {
     getBooksArchiveUrn: {
       async handler (ctx) {
         this.logger.info(ctx.action.name, ctx.params)
-        const { source } = ctx.params
+        const { directory } = ctx.params
 
         const cursor = await r.db('ouistity')
           .table('books')
           .filter(
-            r.row("archive").match(`^${source}`)
+            r.row("archive").match(`^${directory.replace(/\ /g, '\\ ').replace(/\+/g, '\\+').replace(/\(/g, '\\(').replace(/\)/g, '\\)')}`)
           )
           .pluck("id", "urn", "archive")
           .orderBy("archive")

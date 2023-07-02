@@ -10,14 +10,9 @@ const handler = async function (ctx) {
     // upsert books
     const checksum = await ctx.broker.call('ArchivesDomain.GenerateChecksum', { file: archive })
     const urn = `urn:ouistity:books:${snakeCase(path.basename(archive, path.extname(archive)))}:${checksum}`
-    const [book] = await ctx.broker.call('BooksDomain.filter', {
-      query: {
-        urn,
-        archive
-      }
-    })
+    const [book] = await ctx.broker.call('BooksDomain.searchBooksAndCovers', {filesChecksums: [checksum]})
 
-    if (book && book.archive === archive) {
+    if (book && book.archive === archive && book.cover.length > 0) {
       return { success: true }
     }
 

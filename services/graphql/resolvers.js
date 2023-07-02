@@ -67,7 +67,7 @@ module.exports = {
           filesChecksums.push(await $moleculer.call('ArchivesDomain.GenerateChecksum', { file: fileToSearch}))
         }))
 
-        rows = 0 < filesToSearch.length ? await $moleculer.call('BooksDomain.browseBooksAndCovers', {filesChecksums: filesChecksums, directory: directory}) : []
+        rows = 0 < filesToSearch.length ? await $moleculer.call('BooksDomain.browseBooksAndCovers', {filesChecksums, directory}) : []
 
         rows = foldersToKeep.concat(rows.flat().map(row => {
           return {
@@ -124,7 +124,7 @@ module.exports = {
         await Promise.all(filesToSearch.map(async (fileToSearch) => {
           filesChecksums.push(await $moleculer.call('ArchivesDomain.GenerateChecksum', { file: fileToSearch}))
         }))
-        rows = 0 < filesToSearch.length ? await $moleculer.call('BooksDomain.searchBooksAndCovers', {filesChecksums: filesChecksums}) : []
+        rows = 0 < filesToSearch.length ? await $moleculer.call('BooksDomain.searchBooksAndCovers', {filesChecksums}) : []
 
         rows = foldersToKeep.concat(rows.flat().map(row => {
           return {

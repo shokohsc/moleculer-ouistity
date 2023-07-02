@@ -22,7 +22,9 @@ const handler = async function (ctx) {
     this.logger.info(ctx.action.name)
 
     const { source } = ctx.params
-    const books = await ctx.broker.call('BooksDomain.getBooksArchiveUrn', { source })
+    const regex = new RegExp(archivesMountPath, 'i')
+    const directory = -1 === source.search(regex) ? `${archivesMountPath}/${source}` : source
+    const books = await ctx.broker.call('BooksDomain.getBooksArchiveUrn', { directory })
 
     const keys = Object.keys(books)
     do {

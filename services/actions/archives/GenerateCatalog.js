@@ -1,5 +1,7 @@
 const glob = require('glob-promise')
 
+const { global: { archivesMountPath } } = require('../../../application.config')
+
 /**
  * @swagger
  * /generate/catalog:
@@ -26,7 +28,9 @@ const handler = async function (ctx) {
     this.logger.info(ctx.action.name, ctx.params)
     // find all files
     const { source, pages } = ctx.params
-    const files = glob.sync(source)
+    const regex = new RegExp(archivesMountPath, 'i')
+    const directory = -1 === source.search(regex) ? `${archivesMountPath}/${source}` : source
+    const files = glob.sync(directory)
     if (files.length === 0) { throw new Error('No files in source pattern!')}
     const archives = {}
     files.map(file => {
