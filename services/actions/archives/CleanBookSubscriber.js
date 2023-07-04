@@ -17,7 +17,7 @@ const handler = async function (ctx) {
     if (!await exists(archive)) {
       this.logger.info(ctx.action.name, `Deleting ${urn} with id: ${id}`)
       await ctx.broker.call('PagesDomain.delete', { query: { book: urn } })
-      await ctx.broker.call('BooksDomain.delete', { query: { id: id } })
+      await ctx.broker.call('BooksDomain.delete', { query: { id } })
     }
     return { success: true }
   } catch (e) {

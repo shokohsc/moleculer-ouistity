@@ -1,0 +1,54 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: generate-catalog
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
+spec:
+  description: >-
+    Generate books catalog on specified paths.
+  params:
+  - name: SOURCE
+    default: '/usr/app/assets/data/archives/**/*.cb*'
+  - name: PAGES
+    default: 'true'
+  steps:
+  - name: generate
+    image: curlimages/curl:8.1.2
+    command:
+    - curl
+    args:
+    - -sLX
+    - POST
+    - -H
+    - 'Content-Type: application/json'
+    - -d
+    - '{ "pages": $(params.PAGES), "source": "$(params.SOURCE)"}'
+    - http://api.moleculer-ouistity:5000/generate/catalog
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: clean-catalog
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
+spec:
+  description: >-
+    Clean books catalog.
+  params:
+  - name: SOURCE
+    default: '/usr/app/assets/data/archives/weekly'
+  steps:
+  - name: clean
+    image: curlimages/curl:8.1.2
+    command:
+    - curl
+    args:
+    - -sLX
+    - POST
+    - -H
+    - 'Content-Type: application/json'
+    - -d
+    - '{ "source": "$(params.SOURCE)"}'
+    - http://api.moleculer-ouistity:5000/clean/catalog

@@ -11,10 +11,10 @@ const parse = function (data) {
   lines.map(line => {
     const tmp = line.split('  ') // hack
     const words = filter(tmp, function (o) { return o !== '' })
-    // path
-    if (words[0].search(/Path/) !== -1) {
-      entries.filepath = words[0].split(' = ')[1]
-    }
+    // // path
+    // if (words[0].search(/Path/) !== -1) {
+    //   entries.filepath = words[0].split(' = ')[1]
+    // }
     // type
     if (words[0].search(/Type/) !== -1) {
       entries.type = words[0].split(' = ')[1].toLowerCase()
@@ -57,7 +57,7 @@ const handler = async function (ctx) {
           book: book.urn,
           url: `/api/v1/pages/${urn}`,
           image: `/images/${urn}`,
-          filepath: entries.filepath,
+          // filepath: entries.filepath,
           type: entries.type,
           ...entry
         })

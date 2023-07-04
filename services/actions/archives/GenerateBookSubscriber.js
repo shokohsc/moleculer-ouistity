@@ -45,6 +45,7 @@ const handler = async function (ctx) {
     } else {
       await ctx.broker.call('BooksDomain.insert', { data: { ...data, createdAt: Date.now() } })
     }
+
     // upsert pages for this book
     if (pages === true) {
       await ctx.broker.$rabbitmq.publishExchange('amq.topic', 'moleculer.archives-domain-generate-book-pages-catalog.key', { book: data })
