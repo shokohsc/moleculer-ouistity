@@ -16,6 +16,8 @@ spec:
               value: "10"
             - name: APP_GRAPHQL_ONE_YEAR_CACHE_TTL
               value: "20"
+            # - name: APP_RETHINKDB_HOSTNAME
+            #   value: rethinkdb.rethinkdb
           args:
             - --hot
             - services/graphql-gateway.service.js

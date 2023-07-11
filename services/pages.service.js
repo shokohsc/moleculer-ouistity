@@ -31,7 +31,8 @@ module.exports = {
             function (page, book) {
               return page("book").eq(book("urn"))
             }
-          ).zip()
+          )
+          .zip()
           .run(this.conn)
         const result = await cursor.toArray()
 

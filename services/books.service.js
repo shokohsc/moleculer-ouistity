@@ -18,14 +18,15 @@ module.exports = {
     browseBooksAndCovers: {
       async handler (ctx) {
         this.logger.info(ctx.action.name, ctx.params)
-        const { filesChecksums, directory } = ctx.params
+        // const { filesChecksums, directory } = ctx.params
+        const { filesChecksums } = ctx.params
 
         const cursor = await r.db('ouistity')
           .table(this.settings.rethinkdb.table)
           .getAll(...filesChecksums, {index: "checksum"})
-          .filter(
-            r.row("archive").match(`${directory.replace(/\ /g, '\\ ').replace(/\+/g, '\\+').replace(/\(/g, '\\(').replace(/\)/g, '\\)')}`)
-          )
+          // .filter(
+          //   r.row("archive").match(`${directory.replace(/\ /g, '\\ ').replace(/\+/g, '\\+').replace(/\(/g, '\\(').replace(/\)/g, '\\)')}`)
+          // )
           .pluck('urn', 'basename', 'info', 'archive')
           .orderBy('archive')
           .merge(function(book){

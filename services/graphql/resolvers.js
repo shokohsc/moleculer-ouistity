@@ -67,7 +67,8 @@ module.exports = {
           filesChecksums.push(await $moleculer.call('ArchivesDomain.GenerateChecksum', { file: fileToSearch}))
         }))
 
-        rows = 0 < filesToSearch.length ? await $moleculer.call('BooksDomain.browseBooksAndCovers', {filesChecksums, directory}) : []
+        // rows = 0 < filesToSearch.length ? await $moleculer.call('BooksDomain.browseBooksAndCovers', {filesChecksums, directory}) : []
+        rows = 0 < filesToSearch.length ? await $moleculer.call('BooksDomain.browseBooksAndCovers', {filesChecksums}) : []
 
         rows = foldersToKeep.concat(rows.flat().map(row => {
           return {
