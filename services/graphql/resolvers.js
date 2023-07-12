@@ -2,6 +2,7 @@ const r = require('rethinkdb')
 const sh = require('exec-sh').promise
 const path = require('path')
 const { initial } = require('lodash')
+const { uniqBy } = require('lodash')
 
 const { global: { archivesMountPath } } = require('../../application.config')
 
@@ -119,7 +120,7 @@ module.exports = {
         rows = rows.slice(_page * _pageSize, _page * _pageSize + _pageSize);
 
         const foldersToKeep = rows.filter(row => 'folder' === row.type)
-        const filesToSearch = rows.filter(row => 'file' === row.type).map(row => row.name)
+        const filesToSearch = uniqBy(rows.filter(row => 'file' === row.type).map(row => row.name), path.basename)
 
         const filesChecksums = []
         await Promise.all(filesToSearch.map(async (fileToSearch) => {
