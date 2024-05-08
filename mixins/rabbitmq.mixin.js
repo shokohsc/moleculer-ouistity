@@ -10,7 +10,7 @@ module.exports = {
       username: '',
       password: '',
       vhost: '',
-      prefetchCount: 0,
+      prefetchCount: 1,
       aliases: {}
     }
   },
@@ -42,6 +42,13 @@ module.exports = {
         this.broker.$rabbitmq.bindToExchange(binding.target, binding.exchange, binding.key)
         return true
       })
+    },
+    async unsetQueues() {
+      this.metadata.$bindings.map(binding => {
+        this.broker.$rabbitmq.destroyQueue(binding.target)
+        this.broker.$rabbitmq.unbindFromExchange(binding.target, binding.exchange, binding.key)
+        return true
+      })
     }
   },
   created () {
@@ -59,7 +66,9 @@ module.exports = {
     })
     this.broker.$rabbitmq.on('disconnected', (err) => {
       this.logger.error('Rabbitmq disconnected', err)
-      setTimeout(() => r.reconnect(), 1000)
+      if (err) {
+        setTimeout(() => this.broker.$rabbitmq.reconnect(), 1000)
+      }
     })
     this.broker.$rabbitmq.on('log', (component, level, ...args) => {
       this.logger.info(...args)
@@ -76,5 +85,10 @@ module.exports = {
       return true
     })
     await this.setQueues()
-  }
+  },
+	async stopped() {
+    this.logger.info('rabbitmq mixin stopped')
+    await this.unsetQueues()
+    await this.broker.$rabbitmq.close()
+	}
 }

@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: books
+  name: marvel
   labels:
-    app: books
+    app: marvel
 spec:
   type: ClusterIP
   ports:
@@ -13,4 +13,4 @@ spec:
       protocol: TCP
       name: metrics
   selector:
-    app: books
+    app: marvel

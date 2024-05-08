@@ -11,6 +11,10 @@ spec:
     metadata:
       labels:
         app: graphql
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /metrics
+        prometheus.io/port: "5050"
     spec:
       securityContext:
         fsGroup: 1000
@@ -33,18 +37,23 @@ spec:
             - name: http
               containerPort: 7000
               protocol: TCP
-          # livenessProbe:
-          #   httpGet:
-          #     port: http
-          #     path: /
-          # readinessProbe:
-          #   httpGet:
-          #     port: http
-          #     path: /
+            - name: metrics
+              containerPort: 5050
+              protocol: TCP
+          startupProbe:
+            tcpSocket:
+              port: http
+          livenessProbe:
+            tcpSocket:
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /.well-known/apollo/server-health
+              port: http
           resources:
             requests:
               cpu: 10m
-              memory: 128M
+              memory: 64M
             limits:
-              cpu: 500m
-              memory: 128M
+              cpu: 1000m
+              memory: 64M

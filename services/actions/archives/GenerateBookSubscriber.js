@@ -10,11 +10,12 @@ const handler = async function (ctx) {
     // upsert books
     const checksum = await ctx.broker.call('ArchivesDomain.GenerateChecksum', { file: archive })
     const urn = `urn:ouistity:books:${snakeCase(path.basename(archive, path.extname(archive)))}:${checksum}`
-    const [book] = await ctx.broker.call('BooksDomain.filter', {
-      query: {
-        urn
-      }
-    })
+    const [book] = await ctx.broker.call('BooksDomain.searchBooksAndCovers', {filesChecksums: [checksum]})
+
+    if (book && book.archive === archive && book.cover.length > 0) {
+      return { success: true }
+    }
+
     const data = {
       urn,
       checksum,
@@ -44,6 +45,7 @@ const handler = async function (ctx) {
     } else {
       await ctx.broker.call('BooksDomain.insert', { data: { ...data, createdAt: Date.now() } })
     }
+
     // upsert pages for this book
     if (pages === true) {
       await ctx.broker.$rabbitmq.publishExchange('amq.topic', 'moleculer.archives-domain-generate-book-pages-catalog.key', { book: data })

@@ -23,6 +23,9 @@ metadata:
 spec:
   scaleTargetRef:
     name: archives
+  pollingInterval: 5
+  cooldownPeriod:  10
+  minReplicaCount: 1
   maxReplicaCount: 2
   triggers:
   - type: rabbitmq
@@ -30,7 +33,7 @@ spec:
       protocol: amqp
       queueName: moleculer.archives-domain-generate-book.queue
       mode: QueueLength
-      value: "20"
+      value: "200"
     authenticationRef:
       name: rabbitmq-conn
 ---
@@ -41,14 +44,17 @@ metadata:
 spec:
   scaleTargetRef:
     name: books
-  maxReplicaCount: 2
+  pollingInterval: 5
+  cooldownPeriod:  10
+  minReplicaCount: 1
+  maxReplicaCount: 3
   triggers:
   - type: rabbitmq
     metadata:
       protocol: amqp
       queueName: moleculer.archives-domain-generate-book.queue
       mode: QueueLength
-      value: "20"
+      value: "200"
     authenticationRef:
       name: rabbitmq-conn
 ---
@@ -59,13 +65,16 @@ metadata:
 spec:
   scaleTargetRef:
     name: pages
-  maxReplicaCount: 2
+  pollingInterval: 5
+  cooldownPeriod:  10
+  minReplicaCount: 1
+  maxReplicaCount: 3
   triggers:
   - type: rabbitmq
     metadata:
       protocol: amqp
       queueName: moleculer.archives-domain-generate-book-pages-catalog.queue
       mode: QueueLength
-      value: "20"
+      value: "5"
     authenticationRef:
       name: rabbitmq-conn

@@ -6,12 +6,14 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingress.yaml
+  - tekton.yaml
 
   - api/
   - archives/
   - books/
   - graphql/
   - pages/
+  # - marvel/
 
 configMapGenerator:
 - name: config

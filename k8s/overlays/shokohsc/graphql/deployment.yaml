@@ -11,28 +11,32 @@ spec:
           image: shokohsc/moleculer-ouistity
           env:
             - name: APP_GRAPHQL_ONE_MINUTE_CACHE_TTL
-              value: "15"
+              value: "5"
             - name: APP_GRAPHQL_ONE_DAY_CACHE_TTL
-              value: "15"
+              value: "10"
             - name: APP_GRAPHQL_ONE_YEAR_CACHE_TTL
-              value: "15"
+              value: "20"
+            # - name: APP_RETHINKDB_HOSTNAME
+            #   value: rethinkdb.rethinkdb
           args:
             - --hot
             - services/graphql-gateway.service.js
           volumeMounts:
             - name: nfs-shared
               mountPath: /usr/app/assets/data/archives/weekly
-            # - name: nfs-zarya
-            #   mountPath: /usr/app/assets/data/archives/comics
+            - name: nfs-zarya
+              mountPath: /usr/app/assets/data/archives/comics
       volumes:
         - name: nfs-shared
           nfs:
             server: nfs-shared.nfs-shared.svc.cluster.local
             path: /weekly
-        # - name: nfs-zarya
-        #   nfs:
-        #     server: nfs-wd-zarya.nfs-wd-zarya.svc.cluster.local
-        #     path: /comics
+            readOnly: true
+        - name: nfs-zarya
+          nfs:
+            server: nfs-wd-zarya.nfs-wd-zarya.svc.cluster.local
+            path: /comics
+            readOnly: true
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

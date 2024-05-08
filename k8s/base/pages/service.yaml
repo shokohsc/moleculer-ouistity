@@ -8,9 +8,9 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: 5000
-      targetPort: http
+    - port: 5050
+      targetPort: metrics
       protocol: TCP
-      name: http
+      name: metrics
   selector:
     app: pages

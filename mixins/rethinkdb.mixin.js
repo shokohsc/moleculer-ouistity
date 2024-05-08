@@ -1,5 +1,7 @@
 const r = require('rethinkdb')
 
+const { global: { archivesMountPath } } = require('../application.config')
+
 module.exports = {
   name: 'rethinkdb',
   settings: {
@@ -42,6 +44,7 @@ module.exports = {
             break
           default:
         }
+
         return entity
       }
     },
@@ -87,53 +90,6 @@ module.exports = {
           const result = await cursor.toArray()
           return result
         }
-      }
-    },
-    getBooksAndCovers: {
-      async handler (ctx) {
-        this.logger.info(ctx.action.name, ctx.params)
-        const { filesChecksums } = ctx.params
-
-        // const result = []
-        // await Promise.all(filesChecksums.map(async (fileChecksum) => {
-        //   const cursor = await r.db('ouistity')
-        //     .table('books')
-        //     .getAll(fileChecksum, {index: "checksum"})
-        //     .pluck('urn', 'basename', 'info')
-        //     .orderBy('archive')
-        //     .merge(function(book){
-        //       return {
-        //         cover: r.db('ouistity')
-        //         .table('pages')
-        //         .getAll(book('urn'), {index: "book"})
-        //         .orderBy('name')
-        //         .pluck('image')
-        //         .limit(1)
-        //       }
-        //     })
-        //     .run(this.conn)
-        //   result.push(await cursor.toArray())
-        // }))
-
-        const cursor = await r.db('ouistity')
-          .table('books')
-          .getAll(...filesChecksums, {index: "checksum"})
-          .pluck('urn', 'basename', 'info')
-          .orderBy('archive')
-          .merge(function(book){
-            return {
-              cover: r.db('ouistity')
-              .table('pages')
-              .getAll(book('urn'), {index: "book"})
-              .orderBy('name')
-              .pluck('image')
-              .limit(1)
-            }
-          })
-          .run(this.conn)
-        const result = await cursor.toArray()
-
-        return result
       }
     },
     delete: {
@@ -185,23 +141,38 @@ module.exports = {
         setTimeout(() => this.conn.reconnect(), 1000)
       })
       this.logger.info('RethinkDB adapter has connected successfully.')
-      await r.dbCreate(this.settings.rethinkdb.database).run(this.conn).catch(() => { })
-      const tables = await r.db(this.settings.rethinkdb.database).tableList().run(this.conn)
-      if (!tables.includes(this.settings.rethinkdb.table)) {
-        await r.db(this.settings.rethinkdb.database).tableCreate(this.settings.rethinkdb.table).run(this.conn)
-        const indexes = await r.table(this.settings.rethinkdb.table).indexList().run(this.conn)
-        if (false === indexes.includes(this.settings.rethinkdb.secondaryIndex)) {
-          await r.table(this.settings.rethinkdb.table).indexCreate(this.settings.rethinkdb.secondaryIndex).run(this.conn)
-          await r.table(this.settings.rethinkdb.table).indexWait(this.settings.rethinkdb.secondaryIndex).run(this.conn)
-        }
-      }
+
       return true
     } catch (e) {
       this.logger.error('RethinkDB error.', e)
       throw e
     }
+    return true
   },
   async started () {
+    try {
+      const databases = await r.dbList().run(this.conn)
+      if (!databases.includes(this.settings.rethinkdb.database)) {
+        await r.dbCreate(this.settings.rethinkdb.database).run(this.conn)
+      }
+
+      const tables = await r.db(this.settings.rethinkdb.database).tableList().run(this.conn)
+      if (!tables.includes(this.settings.rethinkdb.table)) {
+        await r.db(this.settings.rethinkdb.database).tableCreate(this.settings.rethinkdb.table).run(this.conn)
+      }
+
+      this.settings.rethinkdb.secondaryIndexes.forEach(async (index, i) => {
+        r.table(this.settings.rethinkdb.table).indexStatus(index).run(this.conn).catch(async (err) => {
+          await r.table(this.settings.rethinkdb.table).indexCreate(index).run(this.conn)
+          await r.table(this.settings.rethinkdb.table).indexWait(index).run(this.conn)
+        })
+      })
+
+      return true
+    } catch (e) {
+      this.logger.error('RethinkDB error.', e)
+      throw e
+    }
     return true
   },
   async stopped () {

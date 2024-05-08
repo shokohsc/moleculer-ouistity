@@ -32,7 +32,7 @@ module.exports = {
       // Configures the Access-Control-Allow-Methods CORS header.
       methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'DELETE'],
       // Configures the Access-Control-Allow-Headers CORS header.
-      allowedHeaders: [],
+      allowedHeaders: ['Cache-Control', 'X-Requested-With'],
       // Configures the Access-Control-Expose-Headers CORS header.
       exposedHeaders: [],
       // Configures the Access-Control-Allow-Credentials CORS header.
@@ -41,12 +41,11 @@ module.exports = {
       maxAge: 3600
     },
     routes: [{
+      onBeforeCall(ctx, route, req, res) {
+        ctx.meta.cacheControl = req.headers["cache-control"] || 'no-cache';
+      },
       mappingPolicy: 'restrict',
       aliases: {
-        'GET status/liveness' (req, res) {
-          res.setHeader('Content-Type', 'application/json; charset=utf-8')
-          res.end(JSON.stringify({ alive: true }))
-        },
         'GET status/readiness' (req, res) {
           res.setHeader('Content-Type', 'application/json; charset=utf-8')
           res.end(JSON.stringify({ ready: true }))
@@ -60,6 +59,31 @@ module.exports = {
         'GET api/v1/books/:urn': 'BooksDomain.getByUrn',
         'GET api/v1/pages': 'PagesDomain.filter',
         'GET api/v1/pages/:urn': 'PagesDomain.getByUrn',
+
+        'GET api/v1/marvel/characters/:id/comics': 'MarvelCharacters.getComics',
+        'GET api/v1/marvel/characters/:id': 'MarvelCharacters.getCharacter',
+        'GET api/v1/marvel/characters': 'MarvelCharacters.searchCharacters',
+
+        'GET api/v1/marvel/comics/week': 'MarvelComics.getComicsWeek',
+        'GET api/v1/marvel/comics/:id': 'MarvelComics.getComic',
+        'GET api/v1/marvel/comics': 'MarvelComics.searchComics',
+
+        'GET api/v1/marvel/creators/:id/comics': 'MarvelCreators.getComics',
+        'GET api/v1/marvel/creators/:id': 'MarvelCreators.getCreator',
+        'GET api/v1/marvel/creators': 'MarvelCreators.searchCreators',
+
+        'GET api/v1/marvel/events/:id/comics': 'MarvelEvents.getComics',
+        'GET api/v1/marvel/events/:id': 'MarvelEvents.getEvent',
+        'GET api/v1/marvel/events': 'MarvelEvents.searchEvents',
+
+        'GET api/v1/marvel/series/:id/comics': 'MarvelSeries.getComics',
+        'GET api/v1/marvel/series/:id': 'MarvelSeries.getSerie',
+        'GET api/v1/marvel/series': 'MarvelSeries.searchSeries',
+
+        'GET api/v1/marvel/stories/:id/comics': 'MarvelStories.getComics',
+        'GET api/v1/marvel/stories/:id': 'MarvelStories.getStory',
+        'GET api/v1/marvel/stories': 'MarvelStories.searchStories',
+
         'POST generate/catalog' (req, res) {
           // Emit a moleculer event to accelerate the callback.
           const params = {
@@ -71,27 +95,38 @@ module.exports = {
           res.setHeader('Content-Type', 'application/json; charset=utf-8')
           res.end(JSON.stringify({ called: true, params: req.$params }))
         },
+        'POST clean/catalog' (req, res) {
+          // Emit a moleculer event to accelerate the callback.
+          const params = {
+            source: path.resolve(__dirname, `${archivesMountPath}/weekly/`),
+            ...req.$params
+          }
+          req.$ctx.broker.emit('ArchivesDomain.CleanCatalogInitialized', params)
+          res.setHeader('Content-Type', 'application/json; charset=utf-8')
+          res.end(JSON.stringify({ called: true, params: req.$params }))
+        },
         async 'GET images/:urn' (req, res) {
           try {
             const { urn } = req.$params
-            const { filepath, name, type } = await req.$ctx.broker.call('PagesDomain.getByUrn', { urn })
+            const [page] = await req.$ctx.broker.call('PagesDomain.getPageAndArchive', { urn })
+            const { archive, name, type } = page
             const basename = snakeCase(path.basename(name, path.extname(name)))
-            // await sh(`7z e -o/tmp "${filepath}" "${name}"`, true)
+            // await sh(`7z e -o/tmp "${archive}" "${name}"`, true)
             let cmd = false
             if (type === 'zip') {
               // write tmp file
-              cmd = `unzip -p "${filepath}" "${name}" > /tmp/${urn}`
+              cmd = `unzip -p "${archive}" "${name}" > /tmp/${urn}`
             }
             if (type === 'rar') {
               // write tmp file
-              cmd = `unrar p -idq "${filepath}" "${name}" > /tmp/${urn}`
+              cmd = `unrar p -idq "${archive}" "${name}" > /tmp/${urn}`
             }
             await sh(cmd, true)
             // read file
             const buffer = readFileSync(`/tmp/${urn}`)
             unlinkSync(`/tmp/${urn}`)
             // send buffer as image
-            res.setHeader('Content-Type', 'image')
+            res.setHeader('Content-Type', 'image/jpg')
             res.setHeader('Cache-Control', `public, max-age=${imageCacheTTL}`)
             res.end(buffer)
           } catch (e) {

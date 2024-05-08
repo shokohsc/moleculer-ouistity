@@ -12,6 +12,8 @@ spec:
           env:
             - name: APP_GLOBAL_GATEWAY_URL
               value: https://api.ouistity.shokohsc.home
+            # - name: APP_RETHINKDB_HOSTNAME
+            #   value: rethinkdb.rethinkdb
           args:
             - --hot
             - services/pages.service.js

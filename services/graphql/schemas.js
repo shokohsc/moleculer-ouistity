@@ -12,17 +12,17 @@ module.exports = `
     totalPages: Int!
   }
   """
-  This type describes a book entity. Cached for a minute
+  This type describes a book entity. Cached for a day
   """
-  type Book @cacheControl(maxAge: ${graphqlCache.oneMinute}) {
+  type Book @cacheControl(maxAge: ${graphqlCache.oneDay}) {
     id: String!
     url: String!
     pages: [Page]
   }
   """
-  This type describes a page entity. Cached for a minute
+  This type describes a page entity. Cached for a day
   """
-  type Page @cacheControl(maxAge: ${graphqlCache.oneMinute}) {
+  type Page @cacheControl(maxAge: ${graphqlCache.oneDay}) {
     id: String!
     book: String!
     url: String!
@@ -30,9 +30,9 @@ module.exports = `
     archive: String!
   }
   """
-  This type describes files as a result of browsing a directory or a query search. Cached for a day
+  This type describes files as a result of browsing a directory or a query search. Cached for a minute
   """
-  type FilesResult @cacheControl(maxAge: ${graphqlCache.oneDay}) {
+  type FilesResult @cacheControl(maxAge: ${graphqlCache.oneMinute}) {
     rows: [File]
     total: Int
     page: Int
@@ -40,14 +40,15 @@ module.exports = `
     totalPages: Int
   }
   """
-  This type describes a File, either folder or file. Cached for a day
+  This type describes a File, either folder or file. Cached for a minute
   """
-  type File @cacheControl(maxAge: ${graphqlCache.oneDay}) {
+  type File @cacheControl(maxAge: ${graphqlCache.oneMinute}) {
     name: String!
     type: String!
     cover: String
     urn: String
     info: ComicInfo
+    path: String
   }
   """
   This type describes a ComicInfo, optional metadata fields. Cached for a year
@@ -68,7 +69,7 @@ module.exports = `
     total: Int!
   }
   """
-  This type describes a File, either folder or file. Cached for a year
+  This type describes a page. Cached for a year
   """
   type BookPage @cacheControl(maxAge: ${graphqlCache.oneYear}) {
     image: String!

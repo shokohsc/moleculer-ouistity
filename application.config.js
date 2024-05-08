@@ -51,6 +51,9 @@ const APP_RABBITMQ_PASSWORD = nconf.get('APP_RABBITMQ_PASSWORD') || 'password'
 
 const APP_ARCHIVES_MOUNT_PATH = nconf.get('APP_ARCHIVES_MOUNT_PATH') || '/usr/app/assets/data/archives'
 
+const APP_MARVEL_PUBLIC_KEY = nconf.get('APP_MARVEL_PUBLIC_KEY') || 'public_key'
+const APP_MARVEL_PRIVATE_KEY = nconf.get('APP_MARVEL_PRIVATE_KEY') || 'private_key'
+
 module.exports = {
   global: {
     gatewayUrl: APP_GLOBAL_GATEWAY_URL,
@@ -92,5 +95,9 @@ module.exports = {
     oneMinute: APP_GRAPHQL_ONE_MINUTE_CACHE_TTL,
     oneDay: APP_GRAPHQL_ONE_DAY_CACHE_TTL,
     oneYear: APP_GRAPHQL_ONE_YEAR_CACHE_TTL
+  },
+  marvel:{
+    publicKey: APP_MARVEL_PUBLIC_KEY,
+    privateKey: APP_MARVEL_PRIVATE_KEY
   }
 }
