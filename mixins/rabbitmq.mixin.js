@@ -75,6 +75,26 @@ module.exports = {
       this.metadata.$bindings.push({ exchange: `amq.${type}`, target: `moleculer.${name}.queue`, key: `moleculer.${name}.key` })
       return true
     })
-    await this.setQueues()
+    // Step 2: From bindings to rabbitmq queue
+    this.metadata.$bindings.map(binding => {
+      const base = { durable: true, autoDelete: false }
+      const options = { ...base }
+      // TODO Need to create queues when connection is up, or wait for it
+      this.broker.$rabbitmq.createQueue(binding.target, options, async (msg, ack) => {
+        const routingKey = msg.fields.routingKey
+        const refName = routingKey.split('.')[1]
+        const item = aliases[refName]
+        try {
+          await this.broker.call(item.subscriber, JSON.parse(msg.content.toString()))
+          ack()
+          return true
+        } catch (e) {
+          ack(e.message)
+          return false
+        }
+      })
+      this.broker.$rabbitmq.bindToExchange(binding.target, binding.exchange, binding.key)
+      return true
+    })
   }
 }

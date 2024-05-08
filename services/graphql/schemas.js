@@ -52,7 +52,7 @@ module.exports = `
   """
   This type describes a ComicInfo, optional metadata fields. Cached for a year
   """
-  type ComicInfo @cacheControl(maxAge: ${graphqlCache.oneYear}) {
+  type ComicInfo @cacheControl(maxAge: ${graphqlCache.books}) {
     series: String
     number: String
     summary: String

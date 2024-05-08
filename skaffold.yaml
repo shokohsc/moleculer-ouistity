@@ -1,4 +1,4 @@
-apiVersion: skaffold/v2beta26
+apiVersion: skaffold/v2beta22
 kind: Config
 metadata:
   name: ouistity
