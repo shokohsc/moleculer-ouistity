@@ -9,6 +9,10 @@ metadata:
     dashboard.shokohsc.home/name: ouistity-api
     dashboard.shokohsc.home/url: https://api.ouistity.shokohsc.home
     dashboard.shokohsc.home/icon: wrench
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
 spec:
   rules:
   - host: api.ouistity.shokohsc.home
