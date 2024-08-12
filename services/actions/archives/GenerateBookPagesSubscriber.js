@@ -20,8 +20,8 @@ const parse = function (data) {
       entries.type = words[0].split(' = ')[1].toLowerCase()
     }
     // files content
-    if (line.search(/^\d+-\d+-\d+\s+\d+:\d+:\d+\s+[\.AR]+\s+\d+\s+\d+\s+.+\.[JPEGjpegPNpn]+$/) !== -1) {
-      const regex = /^(?<datetime>\d+-\d+-\d+\s+\d+:\d+:\d+)\s+[\.AR]+\s+(?<size>\d+)\s+(?<compressed>\d+)\s+(?<file>.+\.[JPEGjpegPNpn]+)$/
+    if (line.search(/^\d+-\d+-\d+\s+\d+:\d+:\d+\s+[\.AR]+\s+\d+\s+\d+\s+.+\.[JPEGjpegPNpnAVIFavif]+$/) !== -1) {
+      const regex = /^(?<datetime>\d+-\d+-\d+\s+\d+:\d+:\d+)\s+[\.AR]+\s+(?<size>\d+)\s+(?<compressed>\d+)\s+(?<file>.+\.[JPEGjpegPNpnAVIFavif]+)$/
       const [, datetime, size, compressed, file] = regex.exec(line) || [];
       if (undefined !== file && undefined !== size && undefined !== compressed && undefined !== datetime) {
         entries.count++
@@ -51,7 +51,7 @@ const handler = async function (ctx) {
       const entry = entries.files.shift()
       const urn = `${book.urn}:pages:${snakeCase(path.basename(entry.name, path.extname(entry.name)))}`
       // remove old entries with this book urn
-      if (entry.name.match(/\.(jp(e)?g)|(png)$/)) { // Let's insert only images for now
+      if (entry.name.match(/\.(jp(e)?g)|(png)|(avif)$/)) { // Let's insert only images for now
         entities.push({
           urn,
           book: book.urn,

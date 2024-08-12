@@ -110,7 +110,6 @@ module.exports = {
             const { urn } = req.$params
             const [page] = await req.$ctx.broker.call('PagesDomain.getPageAndArchive', { urn })
             const { archive, name, type } = page
-            const basename = snakeCase(path.basename(name, path.extname(name)))
             // await sh(`7z e -o/tmp "${archive}" "${name}"`, true)
             let cmd = false
             if (type === 'zip') {
@@ -126,7 +125,7 @@ module.exports = {
             const buffer = readFileSync(`/tmp/${urn}`)
             unlinkSync(`/tmp/${urn}`)
             // send buffer as image
-            res.setHeader('Content-Type', 'image/jpg')
+            res.setHeader('Content-Type', `image/${(path.extname(name)).replace('.', '')}`)
             res.setHeader('Cache-Control', `public, max-age=${imageCacheTTL}`)
             res.end(buffer)
           } catch (e) {
