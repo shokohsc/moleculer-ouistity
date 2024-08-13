@@ -107,19 +107,18 @@ module.exports = {
         },
         async 'GET images/:urn' (req, res) {
           try {
+            let cmd
             const { urn } = req.$params
             const [page] = await req.$ctx.broker.call('PagesDomain.getPageAndArchive', { urn })
             const { archive, name, type } = page
             // await sh(`7z e -o/tmp "${archive}" "${name}"`, true)
-            let cmd = false
-            if (type === 'zip') {
-              // write tmp file
+            if (path.extname(archive) === '.cbz') {
               cmd = `unzip -p "${archive}" "${name}" > /tmp/${urn}`
             }
-            if (type === 'rar') {
-              // write tmp file
+            if (path.extname(archive) === '.cbr') {
               cmd = `unrar p -idq "${archive}" "${name}" > /tmp/${urn}`
             }
+            this.logger.info(cmd)
             await sh(cmd, true)
             // read file
             const buffer = readFileSync(`/tmp/${urn}`)

@@ -11,7 +11,21 @@ const { moleculer: { metrics }, nats, redis } = require('./application.config')
 
 module.exports = {
   nodeID: `node-${name}-${version}-${uuidv4()}`,
-  logger: true,
+  logger: {
+		type: "Console",
+		options: {
+			// Using colors on the output
+			colors: true,
+			// Print module names with different colors (like docker-compose for containers)
+			moduleColors: false,
+			// Line formatter. It can be "json", "short", "simple", "full", a `Function` or a template string like "{timestamp} {level} {nodeID}/{mod}: {msg}"
+			formatter: "full",
+			// Custom object printer. If not defined, it uses the `util.inspect` method.
+			objectPrinter: null,
+			// Auto-padding the module name in order to messages begin at the same column.
+			autoPadding: false
+		}
+	},
   cacher: {
     type: "Redis",
     options: {
