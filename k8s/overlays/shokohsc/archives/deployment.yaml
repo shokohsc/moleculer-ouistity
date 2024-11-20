@@ -29,10 +29,13 @@ spec:
             path: /weekly
             readOnly: true
         # - name: nfs-zarya
-        #   nfs:
-        #     server: nfs-wd-zarya.nfs-wd-zarya.svc.cluster.local
-        #     path: /comics
-        #     readOnly: true
+        # #   nfs:
+        # #     server: nfs-wd-zarya.nfs-wd-zarya.svc.cluster.local
+        # #     path: /comics
+        # #     readOnly: true
+        #   hostPath:
+        #     path: /mnt/wd2to/comics
+        #     type: Directory
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -49,3 +52,5 @@ spec:
                   - graphql
                   - pages
               topologyKey: kubernetes.io/hostname
+      # nodeSelector:
+      #   node.overwatch.io/character: zarya

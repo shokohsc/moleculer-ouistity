@@ -73,5 +73,6 @@ module.exports = `
   """
   type BookPage @cacheControl(maxAge: ${graphqlCache.oneYear}) {
     image: String!
+    name: String!
   }
 `
