@@ -70,7 +70,7 @@ module.exports = {
       try {
         const files = await getArchiveList(archivesMountPath + '/' + book)
         const rows = files
-          .map(function (file) { return {name: file.name, image: `/images?archive=${encodeURIComponent(book)}&file=${file.name}`}; })
+          .map(function (file) { return {name: file.name, image: `/images?archive=${encodeURIComponent(book)}&file=${encodeURIComponent(file.name)}`}; })
         const re = /\D/g
         rows.forEach(r => {
           r.name = r.name.padStart(9, '0')
@@ -112,7 +112,7 @@ module.exports = {
           rows[i] = {
             name: path.basename(rows[i].name),
             type: 'file',
-            cover: `/images?archive=${encodeURIComponent(rows[i].name)}&file=${cover}`, // Returns the first file from the archive sorted alphabetically
+            cover: `/images?archive=${encodeURIComponent(rows[i].name)}&file=${encodeURIComponent(cover)}`, // Returns the first file from the archive sorted alphabetically
             info: await getComicInfo(rows[i].name), // Returns the ComicInfo.xml file content from the archive if it exists
             path: archivesMountPath + '/' + rows[i].name
           };
@@ -169,7 +169,7 @@ module.exports = {
           rows[i] = {
             name: path.basename(rows[i].name),
             type: 'file',
-            cover: `/images?archive=${encodeURIComponent(rows[i].name)}&file=${cover}`, // Returns the first file from the archive sorted alphabetically
+            cover: `/images?archive=${encodeURIComponent(rows[i].name)}&file=${encodeURIComponent(cover)}`, // Returns the first file from the archive sorted alphabetically
             info: await getComicInfo(rows[i].name), // Returns the ComicInfo.xml file content from the archive if it exists
             path: rows[i].name
           };
