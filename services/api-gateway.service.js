@@ -1,7 +1,6 @@
 const sh = require('exec-sh').promise
 const path = require('path')
 const { readFileSync, unlinkSync } = require('fs')
-const { snakeCase } = require('lodash')
 
 const Error404 = readFileSync(path.resolve(__dirname, '../assets/images/404.jpg'))
 const WebMixin = require('moleculer-web')
@@ -55,10 +54,6 @@ module.exports = {
           res.setHeader('Content-Type', 'application/json; charset=utf-8')
           res.end(JSON.stringify(openapiSpecification))
         },
-        'GET api/v1/books': 'BooksDomain.filter',
-        'GET api/v1/books/:urn': 'BooksDomain.getByUrn',
-        'GET api/v1/pages': 'PagesDomain.filter',
-        'GET api/v1/pages/:urn': 'PagesDomain.getByUrn',
 
         'GET api/v1/marvel/characters/:id/comics': 'MarvelCharacters.getComics',
         'GET api/v1/marvel/characters/:id': 'MarvelCharacters.getCharacter',
@@ -84,47 +79,18 @@ module.exports = {
         'GET api/v1/marvel/stories/:id': 'MarvelStories.getStory',
         'GET api/v1/marvel/stories': 'MarvelStories.searchStories',
 
-        'POST generate/catalog' (req, res) {
-          // Emit a moleculer event to accelerate the callback.
-          const params = {
-            source: path.resolve(__dirname, `${archivesMountPath}/**/*.cb*`),
-            pages: false,
-            ...req.$params
-          }
-          req.$ctx.broker.emit('ArchivesDomain.GenerateCatalogInitialized', params)
-          res.setHeader('Content-Type', 'application/json; charset=utf-8')
-          res.end(JSON.stringify({ called: true, params: req.$params }))
-        },
-        'POST clean/catalog' (req, res) {
-          // Emit a moleculer event to accelerate the callback.
-          const params = {
-            source: path.resolve(__dirname, `${archivesMountPath}/weekly/`),
-            ...req.$params
-          }
-          req.$ctx.broker.emit('ArchivesDomain.CleanCatalogInitialized', params)
-          res.setHeader('Content-Type', 'application/json; charset=utf-8')
-          res.end(JSON.stringify({ called: true, params: req.$params }))
-        },
-        async 'GET images/:urn' (req, res) {
+        async 'GET images' (req, res) {
           try {
             let cmd
-            const { urn } = req.$params
-            const [page] = await req.$ctx.broker.call('PagesDomain.getPageAndArchive', { urn })
-            const { archive, name, type } = page
-            // await sh(`7z e -o/tmp "${archive}" "${name}"`, true)
-            if (path.extname(archive) === '.cbz') {
-              cmd = `unzip -p "${archive}" "${name}" > /tmp/${urn}`
-            }
-            if (path.extname(archive) === '.cbr') {
-              cmd = `unrar p -idq "${archive}" "${name}" > /tmp/${urn}`
-            }
-            this.logger.info(cmd)
+            const { archive, file } = req.$params
+            const tmpName = path.basename(archivesMountPath + archive)+'#'+file
+            cmd = `7z e -o/tmp "${archivesMountPath + '/' + archive}" "${file}" -so > "/tmp/${tmpName}"`
             await sh(cmd, true)
             // read file
-            const buffer = readFileSync(`/tmp/${urn}`)
-            unlinkSync(`/tmp/${urn}`)
+            const buffer = readFileSync(`/tmp/${tmpName}`)
+            unlinkSync(`/tmp/${tmpName}`)
             // send buffer as image
-            res.setHeader('Content-Type', `image/${(path.extname(name)).replace('.', '')}`)
+            res.setHeader('Content-Type', `image/${(path.extname(archivesMountPath + archive)).replace('.', '')}`)
             res.setHeader('Cache-Control', `public, max-age=${imageCacheTTL}`)
             res.end(buffer)
           } catch (e) {

@@ -3,7 +3,6 @@ kind: Kustomization
 namespace: moleculer-ouistity
 bases:
   - ../../base
-  - keda.yaml
   # - marvel/secret.yaml
 
 patchesStrategicMerge:
@@ -11,9 +10,6 @@ patchesStrategicMerge:
 
   - api/deployment.yaml
   - api/ingress.yaml
-  - archives/deployment.yaml
-  - books/deployment.yaml
   - graphql/deployment.yaml
   - graphql/ingress.yaml
-  - pages/deployment.yaml
   # - marvel/deployment.yaml

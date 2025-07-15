@@ -1,4 +1,4 @@
-FROM library/node:14.16-alpine
+FROM library/node:alpine
 LABEL maintainer=Gilles\ Perreymond\ <gilles.perreymond@metronlab.com>
 
 # Automatic arguments pass from circleCI
@@ -7,14 +7,11 @@ ARG GITLAB_SHA1
 # Declare some hardcode environment vars for the image
 ENV APP_LAST_COMMIT=${GITLAB_SHA1}
 
-RUN apk add --update bash p7zip unzip unrar
+RUN apk add --update bash p7zip unzip
 
 # Prepare the destination
 RUN mkdir -p /usr/app
 WORKDIR /usr/app
-
-# Root user used in docker:dind during CI, cf https://docs.npmjs.com/misc/config
-RUN npm config set unsafe-perm true
 
 COPY --chown=node:node package* /usr/app/
 

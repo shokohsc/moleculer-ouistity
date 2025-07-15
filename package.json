@@ -10,10 +10,9 @@
     "start:dev": "moleculer-runner --repl --hot --config moleculer.config.js services"
   },
   "dependencies": {
-    "apollo-server": "2.25.3",
+    "apollo-server": "2.26.2",
     "apollo-server-cache-redis": "3.3.1",
     "apollo-server-plugin-response-cache": "0.8.0",
-    "checksum": "1.0.0",
     "dayjs": "1.11.7",
     "dotenv": "9.0.2",
     "exec-sh": "0.4.0",
@@ -25,23 +24,19 @@
     "lodash": "4.17.21",
     "marvel-ts": "1.0.0",
     "moleculer": "0.14.13",
-    "moleculer-db": "0.8.16",
-    "moleculer-db-adapter-mongoose": "0.8.9",
     "moleculer-repl": "0.7.0",
-    "moleculer-web": "0.10.0-beta2",
+    "moleculer-web": "0.10.8",
     "nats": "1.4.12",
-    "nconf": "0.11.2",
-    "rabbit-queue": "5.2.0",
-    "rethinkdb": "2.4.2",
+    "nconf": "0.11.4",
     "slugify": "1.6.5",
     "swagger-jsdoc": "6.1.0",
     "uuid": "8.3.2",
-    "xml2js": "0.4.23",
+    "xml2js": "0.6.2",
     "yamljs": "0.3.0"
   },
   "devDependencies": {
     "axios": "0.21.4",
-    "jest": "26.6.3",
+    "jest": "30.0.4",
     "standard": "16.0.4"
   },
   "standard": {

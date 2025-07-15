@@ -27,10 +27,8 @@ spec:
           env:
             - name: APP_NATS_HOSTNAME
               value: nats
-            - name: APP_RETHINKDB_HOSTNAME
-              value: rethinkdb
             - name: APP_REDIS_HOSTNAME
-              value: redis
+              value: valkey
           args:
             - services/graphql-gateway.service.js
           ports:

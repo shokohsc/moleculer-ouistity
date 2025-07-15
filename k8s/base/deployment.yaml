@@ -2,80 +2,21 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: rethinkdb
+  name: valkey
 spec:
   selector:
     matchLabels:
-      app: rethinkdb
+      app: valkey
   template:
     metadata:
       labels:
-        app: rethinkdb
-    spec:
-      securityContext:
-        fsGroup: 1000
-      containers:
-        - name: rethinkdb
-          image: rethinkdb:2.4.1
-          ports:
-            - name: http
-              containerPort: 8080
-              protocol: TCP
-            - name: rethinkdb
-              containerPort: 28015
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              port: http
-              path: /
-          readinessProbe:
-            httpGet:
-              port: http
-              path: /
-          resources:
-            requests:
-              cpu: 100m
-              memory: 256M
-            limits:
-              cpu: 1000m
-              memory: 1024M
-          volumeMounts:
-            - name: data
-              mountPath: /data
-      volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: rethinkdb
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: rethinkdb
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 2Gi
----
-kind: Deployment
-apiVersion: apps/v1
-metadata:
-  name: redis
-spec:
-  selector:
-    matchLabels:
-      app: redis
-  template:
-    metadata:
-      labels:
-        app: redis
+        app: valkey
     spec:
       containers:
-        - name: redis
-          image: redis:6.2.6
+        - name: valkey
+          image: valkey/valkey:8.1.3-alpine
           ports:
-            - name: redis
+            - name: valkey
               containerPort: 6379
               protocol: TCP
           resources:
@@ -87,10 +28,10 @@ spec:
               memory: 1024M
           livenessProbe:
             tcpSocket:
-              port: redis
+              port: valkey
           readinessProbe:
             tcpSocket:
-              port: redis
+              port: valkey
 ---
 kind: Deployment
 apiVersion: apps/v1
@@ -143,72 +84,6 @@ spec:
         - name: config
           configMap:
             name: config
----
-kind: Deployment
-apiVersion: apps/v1
-metadata:
-  name: rabbitmq
-spec:
-  selector:
-    matchLabels:
-      app: rabbitmq
-  template:
-    metadata:
-      labels:
-        app: rabbitmq
-    spec:
-      securityContext:
-        fsGroup: 1000
-      containers:
-        - name: rabbitmq
-          image: rabbitmq:3.9.11-management-alpine
-          env:
-            - name: RABBITMQ_ERLANG_COOKIE
-              value: ""
-            - name: RABBITMQ_DEFAULT_USER
-              value: rabbitmq
-            - name: RABBITMQ_DEFAULT_PASS
-              value: changeme
-          ports:
-            - name: amqp
-              containerPort: 5672
-              protocol: TCP
-            - name: http
-              containerPort: 15672
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              port: http
-              path: /
-          readinessProbe:
-            httpGet:
-              port: http
-              path: /
-          resources:
-            requests:
-              cpu: 100m
-              memory: 256M
-            limits:
-              cpu: 1000m
-              memory: 1024M
-          volumeMounts:
-            - name: data
-              mountPath: /var/lib/rabbitmq/mnesia
-      volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: rabbitmq
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: rabbitmq
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 2Gi
 ---
 apiVersion: apps/v1
 kind: Deployment

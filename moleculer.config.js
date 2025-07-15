@@ -80,7 +80,7 @@ module.exports = {
     ]
   },
   tracing: {
-		enabled: true,
+		enabled: false,
     stackTrace: true,
     events: true,
 		// Available built-in exporters: "Console", "Datadog", "Event", "EventLegacy", "Jaeger", "Zipkin"

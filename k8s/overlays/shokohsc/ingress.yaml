@@ -2,60 +2,6 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: rethinkdb
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: ca-cluster-issuer
-    dashboard.shokohsc.home/name: ouistity-rethinkdb
-    dashboard.shokohsc.home/url: https://rethinkdb.ouistity.shokohsc.home
-    dashboard.shokohsc.home/icon: wrench
-spec:
-  rules:
-  - host: rethinkdb.ouistity.shokohsc.home
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: rethinkdb
-            port:
-              number: 8080
-  tls:
-  - hosts:
-    - rethinkdb.ouistity.shokohsc.home
-    secretName: rethinkdb-cert
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: rabbitmq
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: ca-cluster-issuer
-    dashboard.shokohsc.home/name: ouistity-rabbitmq
-    dashboard.shokohsc.home/url: https://rabbitmq.ouistity.shokohsc.home
-    dashboard.shokohsc.home/icon: wrench
-spec:
-  rules:
-  - host: rabbitmq.ouistity.shokohsc.home
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: rabbitmq
-            port:
-              number: 15672
-  tls:
-  - hosts:
-    - rabbitmq.ouistity.shokohsc.home
-    secretName: rabbitmq-cert
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
   name: redis-commander
   annotations:
     kubernetes.io/ingress.class: nginx

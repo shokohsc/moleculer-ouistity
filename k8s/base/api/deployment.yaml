@@ -32,7 +32,7 @@ spec:
             - name: APP_NATS_HOSTNAME
               value: nats
             - name: APP_REDIS_HOSTNAME
-              value: redis
+              value: valkey
           args:
             - services/api-gateway.service.js
           ports:
@@ -57,5 +57,5 @@ spec:
               cpu: 10m
               memory: 64M
             limits:
-              cpu: 1000m
-              memory: 64M
+              cpu: 2000m
+              memory: 1024M

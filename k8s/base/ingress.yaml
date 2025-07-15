@@ -2,40 +2,6 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: rethinkdb
-spec:
-  rules:
-  - host: rethinkdb.svc.cluster.local
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: rethinkdb
-            port:
-              number: 8080
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: rabbitmq
-spec:
-  rules:
-  - host: rabbitmq.svc.cluster.local
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: rabbitmq
-            port:
-              number: 15672
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
   name: redis-commander
 spec:
   rules:

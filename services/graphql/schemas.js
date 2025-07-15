@@ -2,16 +2,6 @@ const { graphqlCache } = require('../../application.config')
 
 module.exports = `
   """
-  This type describes a result of paginate books listing. Cached for a minute
-  """
-  type BooksResult @cacheControl(maxAge: ${graphqlCache.oneMinute}) {
-    rows: [Book]
-    total: Int!
-    page: Int!
-    pageSize: Int!
-    totalPages: Int!
-  }
-  """
   This type describes a book entity. Cached for a day
   """
   type Book @cacheControl(maxAge: ${graphqlCache.oneDay}) {
@@ -46,7 +36,6 @@ module.exports = `
     name: String!
     type: String!
     cover: String
-    urn: String
     info: ComicInfo
     path: String
   }

@@ -1,50 +1,76 @@
-const r = require('rethinkdb')
 const sh = require('exec-sh').promise
 const path = require('path')
-const { initial } = require('lodash')
-const { uniqBy } = require('lodash')
+const { filter, initial, uniqBy } = require('lodash')
 
 const { global: { archivesMountPath } } = require('../../application.config')
 
+const parse = async (data) => {
+  const entries = { files: [], type: false, count: 0 }
+  // split lines
+  const content = data.toString().split('\n')
+  const lines = await filter(content, function (o) { return o !== '' })
+  // file or not file
+  lines.map(async line => {
+    const tmp = line.split('  ') // hack
+    const words = await filter(tmp, function (o) { return o !== '' })
+    // type
+    if (words[0].search(/Type/) !== -1) {
+      entries.type = words[0].split(' = ')[1].toLowerCase()
+    }
+    // files content
+    if (line.search(/^\d+-\d+-\d+\s+\d+:\d+:\d+\s+[\.AR]+\s+\d+\s+\d+\s+.+\.[JPEGjpegPNpnAVIFavif]+$/) !== -1) {
+      const regex = /^(?<datetime>\d+-\d+-\d+\s+\d+:\d+:\d+)\s+[\.AR]+\s+(?<size>\d+)\s+(?<compressed>\d+)\s+(?<file>.+\.[JPEGjpegPNpnAVIFavif]+)$/
+      const [, datetime, size, compressed, file] = regex.exec(line) || [];
+      if (undefined !== file && undefined !== size && undefined !== compressed && undefined !== datetime) {
+        entries.count++
+        entries.files.push({
+          name: file,
+          size: size,
+          compressed: compressed,
+          datetime: datetime
+        })
+      }
+    }
+    return true
+  })
+  return entries
+}
+const getArchiveList = async (archive) => {
+  const { stdout } = await sh(`7z l "${archive}"`, true)
+  const entries = await parse(stdout)
+  entries.files.sort((rowA, rowB) => {
+    if (rowA.name.toLowerCase() > rowB.name.toLowerCase()) {
+      return 1;
+    }
+    if (rowA.name.toLowerCase() < rowB.name.toLowerCase()) {
+      return -1;
+    }
+    return 0;
+  })
+
+  return entries.files
+}
+const getCover = async (archive) => {
+  const list = await getArchiveList(archivesMountPath + '/' + archive)
+  
+  return list[0].name
+}
+const getComicInfo = async (archive) => {
+  const list = await getArchiveList(archivesMountPath + '/' + archive)
+  if (list.some(item => { item.name === "ComicInfo.xml"}))
+    return list[list.indexOf("ComicInfo.xml")]
+  return undefined
+}
+
+
 module.exports = {
   Query: {
-    books: async (_, { page = 1, pageSize = 10 }, { $moleculer, $conn }, ___) => {
+    read: async (_, { book }, { $moleculer }, ___) => {
+      $moleculer.logger.info('Query - read', book)
       try {
-        const _page = parseInt(page)
-        const _pageSize = parseInt(pageSize)
-        const total = await r.db('ouistity').table('books').count().run($conn)
-        const totalPages = total / _pageSize
-        const cursor = await r.db('ouistity')
-          .table('books')
-          .skip((_page - 1) * _pageSize)
-          .limit(_pageSize)
-          .merge(function (book) {
-            return { pages: r.db('ouistity').table('pages').filter({ book: book('urn') }).coerceTo('array') }
-          })
-          .run($conn)
-        const rows = await cursor.toArray()
-        return {
-          rows,
-          total,
-          page,
-          pageSize,
-          totalPages: Number.isInteger(totalPages) ? totalPages : Math.floor(totalPages) + 1
-        }
-      } catch (e) {
-        console.log(e);
-        return {}
-      }
-    },
-    read: async (_, { book }, { $moleculer, $conn }, ___) => {
-      try {
-        const cursor = await r.db('ouistity')
-          .table('pages')
-          .filter({ book: book })
-          // .orderBy('name')
-          .pluck('image', 'name')
-          .coerceTo('array')
-          .run($conn)
-        const rows = await cursor.toArray()
+        const files = await getArchiveList(archivesMountPath + '/' + book)
+        const rows = files
+          .map(function (file) { return {name: file.name, image: `/images?archive=${encodeURIComponent(book)}&file=${file.name}`}; })
         const re = /\D/g
         rows.forEach(r => {
           r.name = r.name.padStart(9, '0')
@@ -59,10 +85,11 @@ module.exports = {
         return {}
       }
     },
-    browse: async (_, { directory = '', page = 1, pageSize = 10 }, { $moleculer, $conn }, ___) => {
+    browse: async (_, { directory = '', page = 1, pageSize = 10 }, { $moleculer }, ___) => {
+      $moleculer.logger.info('Query - browse', directory, page, pageSize)
       try {
-        const folders = await sh(`ls -p '${archivesMountPath + '/' + directory}' | egrep '/$' | sort -n`, true)
-        const files = await sh(`ls -p '${archivesMountPath + '/' + directory}' | egrep -v '/$' | sort -n`, true)
+        const folders = await sh(`ls -p '${archivesMountPath + '/' + directory}' | grep -v ".pdf" | egrep '/$' | sort -n`, true)
+        const files = await sh(`ls -p '${archivesMountPath + '/' + directory}' | grep -v ".pdf" | egrep -v '/$' | sort -n`, true)
 
         let rows = initial(folders.stdout.split('\n'))
           .map(function (item) { return {name: item.replace(archivesMountPath + '/', ''), type: `folder`}; })
@@ -76,27 +103,24 @@ module.exports = {
         rows = rows.slice(_page * _pageSize, _page * _pageSize + _pageSize)
 
         const foldersToKeep = rows.filter(row => 'folder' === row.type)
-        const filesToSearch = rows.filter(row => 'file' === row.type).map(row => archivesMountPath + '/' + directory + row.name)
+        const filesToSearch = rows.filter(row => 'file' === row.type).map(row => directory + row.name)
 
-        const filesChecksums = []
-        await Promise.all(filesToSearch.map(async (fileToSearch) => {
-          filesChecksums.push(await $moleculer.call('ArchivesDomain.GenerateChecksum', { file: fileToSearch}))
-        }))
+        rows = 0 < filesToSearch.length ? filesToSearch.map(file => { return {name: file, type: `file`}; }) : []
 
-        // rows = 0 < filesToSearch.length ? await $moleculer.call('BooksDomain.browseBooksAndCovers', {filesChecksums, directory}) : []
-        rows = 0 < filesToSearch.length ? await $moleculer.call('BooksDomain.browseBooksAndCovers', {filesChecksums}) : []
-
-        rows = foldersToKeep.concat(rows.flat().map(row => {
-          return {
-            name: row.basename,
+        for (let i = 0; i < rows.length; i++) {
+          const cover = await getCover(rows[i].name)
+          rows[i] = {
+            name: path.basename(rows[i].name),
             type: 'file',
-            cover: (row.cover.length > 0 && row.cover[0].image) ? row.cover[0].image : '',
-            urn: row.urn,
-            info: row.info,
-            path: row.archive.replace(archivesMountPath + '/', '').replace(row.basename, '')
-          }
-        }))
-        .sort(function (rowA, rowB) {
+            cover: `/images?archive=${encodeURIComponent(rows[i].name)}&file=${cover}`, // Returns the first file from the archive sorted alphabetically
+            info: await getComicInfo(rows[i].name), // Returns the ComicInfo.xml file content from the archive if it exists
+            path: archivesMountPath + '/' + rows[i].name
+          };
+        }
+
+        rows = foldersToKeep.concat(rows)
+
+        rows.sort((rowA, rowB) => {
           if (rowA.name.toLowerCase() > rowB.name.toLowerCase()) {
             return 1;
           }
@@ -118,7 +142,8 @@ module.exports = {
         return {}
       }
     },
-    search: async (_, { query = '', page = 1, pageSize = 10 }, { $moleculer, $conn }, ___) => {
+    search: async (_, { query = '', page = 1, pageSize = 10 }, { $moleculer }, ___) => {
+      $moleculer.logger.info('Query - search', query, page, pageSize)
       try {
         const folders = await sh(`find ${archivesMountPath} -iname "*${query}*" -type d |sort -n`, true)
         const files = await sh(`find ${archivesMountPath} -iname "*${query}*" -type f |sort -n`, true)
@@ -126,7 +151,7 @@ module.exports = {
         let rows = initial(folders.stdout.split('\n'))
           .map(function (item) { return {name: item.replace(archivesMountPath + '/', '') + '/', type: `folder`}; })
           .concat(initial(files.stdout.split('\n'))
-            .map(function (item) { return {name: item, type: `file`}; }))
+            .map(function (item) { return {name: item.replace(archivesMountPath + '/', ''), type: `file`}; }))
 
         const _page = (parseInt(page) - 1) >= 0 ? parseInt(page) - 1 : 0
         const _pageSize = (parseInt(pageSize)) >= 0 ? parseInt(pageSize) : 1
@@ -137,23 +162,22 @@ module.exports = {
         const foldersToKeep = rows.filter(row => 'folder' === row.type)
         const filesToSearch = uniqBy(rows.filter(row => 'file' === row.type).map(row => row.name), path.basename)
 
-        const filesChecksums = []
-        await Promise.all(filesToSearch.map(async (fileToSearch) => {
-          filesChecksums.push(await $moleculer.call('ArchivesDomain.GenerateChecksum', { file: fileToSearch}))
-        }))
-        rows = 0 < filesToSearch.length ? await $moleculer.call('BooksDomain.searchBooksAndCovers', {filesChecksums}) : []
+        rows = 0 < filesToSearch.length ? filesToSearch.map(file => { return {name: file, type: `file`}; }) : []
 
-        rows = foldersToKeep.concat(rows.flat().map(row => {
-          return {
-            name: row.basename,
+        for (let i = 0; i < rows.length; i++) {
+          const cover = await getCover(rows[i].name)
+          rows[i] = {
+            name: path.basename(rows[i].name),
             type: 'file',
-            cover: (row.cover.length > 0 && row.cover[0].image) ? row.cover[0].image : '',
-            urn: row.urn,
-            info: row.info,
-            path: row.archive.replace(archivesMountPath + '/', '').replace(row.basename, '')
-          }
-        }))
-        .sort(function (rowA, rowB) {
+            cover: `/images?archive=${encodeURIComponent(rows[i].name)}&file=${cover}`, // Returns the first file from the archive sorted alphabetically
+            info: await getComicInfo(rows[i].name), // Returns the ComicInfo.xml file content from the archive if it exists
+            path: rows[i].name
+          };
+        }
+
+        rows = foldersToKeep.concat(rows)
+
+        rows.sort(function (rowA, rowB) {
           if (rowA.name.toLowerCase() > rowB.name.toLowerCase()) {
             return 1;
           }
