@@ -165,12 +165,12 @@ module.exports = {
       $moleculer.logger.info('Query - search', query, page, pageSize)
       try {
         const folders = await sh(`find ${archivesMountPath} -iname "*${query}*" -type d |sort -n`, true)
-        const files = await sh(`find ${archivesMountPath} -iname "*${query}*" -type f |sort -n`, true)
+        // const files = await sh(`find ${archivesMountPath} -iname "*${query}*" -type f |sort -n`, true)
 
         let rows = initial(folders.stdout.split('\n'))
           .map(function (item) { return {name: item.replace(archivesMountPath + '/', '') + '/', type: `folder`}; })
-          .concat(initial(files.stdout.split('\n'))
-            .map(function (item) { return {name: item.replace(archivesMountPath + '/', ''), type: `file`}; }))
+          // .concat(initial(files.stdout.split('\n'))
+          //   .map(function (item) { return {name: item.replace(archivesMountPath + '/', ''), type: `file`}; }))
 
         const _page = (parseInt(page) - 1) >= 0 ? parseInt(page) - 1 : 0
         const _pageSize = (parseInt(pageSize)) >= 0 ? parseInt(pageSize) : 1
@@ -179,9 +179,11 @@ module.exports = {
         rows = rows.slice(_page * _pageSize, _page * _pageSize + _pageSize);
 
         const foldersToKeep = rows.filter(row => 'folder' === row.type)
-        const filesToSearch = uniqBy(rows.filter(row => 'file' === row.type).map(row => row.name), path.basename)
+        // const filesToSearch = uniqBy(rows.filter(row => 'file' === row.type).map(row => row.name), path.basename)
 
-        rows = 0 < filesToSearch.length ? filesToSearch.map(file => { return {name: file, type: `file`}; }) : []
+        // rows = 0 < filesToSearch.length ? filesToSearch.map(file => { return {name: file, type: `file`}; }) : []
+        const results = await $moleculer.call('ArchivesDomain.searchHits', { query, page: _page, pageSize: _pageSize })
+        rows = 0 < results.hits.length ? results.hits : []
 
         for (let i = 0; i < rows.length; i++) {
           const cover = await getCover(rows[i].name)

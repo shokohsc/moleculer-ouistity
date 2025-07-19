@@ -1,7 +1,7 @@
 const { ApolloServer, gql } = require('apollo-server')
 const responseCachePlugin = require('apollo-server-plugin-response-cache')
-const { BaseRedisCache } = require('apollo-server-cache-redis');
-const Redis = require('ioredis');
+const { BaseRedisCache } = require('apollo-server-cache-redis')
+const Redis = require('ioredis')
 
 const { apollo, redis, graphqlCache } = require('../application.config')
 

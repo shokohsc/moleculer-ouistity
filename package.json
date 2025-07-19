@@ -23,6 +23,7 @@
     "ioredis": "4.28.2",
     "lodash": "4.17.21",
     "marvel-ts": "1.0.0",
+    "meilisearch": "0.51.0",
     "moleculer": "0.14.13",
     "moleculer-repl": "0.7.0",
     "moleculer-web": "0.10.8",

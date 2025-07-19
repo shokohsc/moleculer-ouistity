@@ -126,3 +126,51 @@ spec:
             limits:
               cpu: 100m
               memory: 64M
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meilisearch
+  labels:
+    app: meilisearch
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: meilisearch
+  template:
+    metadata:
+      labels:
+        app: meilisearch
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: meilisearch
+          image: getmeili/meilisearch:v1.15.2
+          env:
+            - name: MEILI_NO_ANALYTICS
+              value: "true"
+            - name: MEILI_MASTER_KEY
+              value: "DyHdsuSJdrdTxNcdgIWoafs+jtiM/BAapEI2OZyfTLc="
+          ports:
+            - name: http
+              protocol: TCP
+              containerPort: 7700
+          startupProbe:
+            tcpSocket:
+              port: http
+          livenessProbe:
+            tcpSocket:
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64M
+            limits:
+              cpu: 1000m
+              memory: 2048M
