@@ -154,7 +154,7 @@ module.exports = {
           total,
           page,
           pageSize,
-          totalPages: Number.isInteger(totalPages) ? totalPages : Math.floor(totalPages) + 1
+          totalPages: Number.isInteger(totalPages) ? totalPages : Math.ceil(totalPages)
         }
       } catch (e) {
         console.log(e);
@@ -164,56 +164,40 @@ module.exports = {
     search: async (_, { query = '', page = 1, pageSize = 10 }, { $moleculer }, ___) => {
       $moleculer.logger.info('Query - search', query, page, pageSize)
       try {
-        const folders = await sh(`find ${archivesMountPath} -iname "*${query}*" -type d |sort -n`, true)
-        // const files = await sh(`find ${archivesMountPath} -iname "*${query}*" -type f |sort -n`, true)
-
-        let rows = initial(folders.stdout.split('\n'))
-          .map(function (item) { return {name: item.replace(archivesMountPath + '/', '') + '/', type: `folder`}; })
-          // .concat(initial(files.stdout.split('\n'))
-          //   .map(function (item) { return {name: item.replace(archivesMountPath + '/', ''), type: `file`}; }))
-
         const _page = (parseInt(page) - 1) >= 0 ? parseInt(page) - 1 : 0
         const _pageSize = (parseInt(pageSize)) >= 0 ? parseInt(pageSize) : 1
-        const total = rows.length
-        const totalPages = total / _pageSize
-        rows = rows.slice(_page * _pageSize, _page * _pageSize + _pageSize);
 
-        const foldersToKeep = rows.filter(row => 'folder' === row.type)
-        // const filesToSearch = uniqBy(rows.filter(row => 'file' === row.type).map(row => row.name), path.basename)
+        const findResults = await sh(`find ${archivesMountPath} -iname "*${query}*" -type d |sort -n`, true)
+        const folders = initial(findResults.stdout.split('\n'))
+          .map(folder => { return { name: folder.replace(archivesMountPath + '/', '') + '/', type: `folder`}; })
+          .slice(_page * _pageSize, _page * _pageSize + _pageSize)
+          
 
-        // rows = 0 < filesToSearch.length ? filesToSearch.map(file => { return {name: file, type: `file`}; }) : []
-        const results = await $moleculer.call('ArchivesDomain.searchHits', { query, page: _page, pageSize: _pageSize })
-        rows = 0 < results.hits.length ? results.hits : []
+        const meilisearchResults = await $moleculer.call('ArchivesDomain.GetComicHits', { query, offset: _page * _pageSize, limit: _pageSize })
+        const files = uniqBy(meilisearchResults.hits, file => path.basename(file.archive))
+          .map(file => { return { name: file.archive.replace(archivesMountPath + '/', ''), type: `file` }; })
 
-        for (let i = 0; i < rows.length; i++) {
-          const cover = await getCover(rows[i].name)
-          rows[i] = {
-            name: path.basename(rows[i].name),
+        for (let i = 0; i < files.length; i++) {
+          const cover = await getCover(files[i].name)
+          files[i] = {
+            name: path.basename(files[i].name),
             type: 'file',
-            cover: `/images?archive=${encodeURIComponent(rows[i].name)}&file=${encodeURIComponent(cover)}`, // Returns the first file from the archive sorted alphabetically
-            info: await getComicInfo(rows[i].name), // Returns the ComicInfo.xml file content from the archive if it exists
-            path: rows[i].name
+            cover: `/images?archive=${encodeURIComponent(files[i].name)}&file=${encodeURIComponent(cover)}`, // Returns the first file from the archive sorted alphabetically
+            info: await getComicInfo(files[i].name), // Returns the ComicInfo.xml file content from the archive if it exists
+            path: files[i].name
           };
         }
 
-        rows = foldersToKeep.concat(rows)
-
-        rows.sort(function (rowA, rowB) {
-          if (rowA.name.toLowerCase() > rowB.name.toLowerCase()) {
-            return 1;
-          }
-          if (rowA.name.toLowerCase() < rowB.name.toLowerCase()) {
-            return -1;
-          }
-          return 0;
-        })
+        const rows = folders.concat(files)
+        const total = initial(findResults.stdout.split('\n')).length + meilisearchResults.estimatedTotalHits
+        const totalPages = total / _pageSize
 
         return {
           rows,
           total,
           page,
           pageSize,
-          totalPages: Number.isInteger(totalPages) ? totalPages : Math.floor(totalPages) + 1
+          totalPages: Number.isInteger(totalPages) ? totalPages : Math.ceil(totalPages)
         }
       } catch (e) {
         console.log(e);

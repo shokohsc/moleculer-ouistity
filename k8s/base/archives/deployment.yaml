@@ -30,11 +30,19 @@ spec:
             - name: APP_NATS_HOSTNAME
               value: nats
             - name: APP_REDIS_HOSTNAME
-              value: redis
+              value: valkey
             - name: APP_MEILISEARCH_HOSTNAME
               value: meilisearch
             - name: APP_MEILISEARCH_APIKEY
               value: "DyHdsuSJdrdTxNcdgIWoafs+jtiM/BAapEI2OZyfTLc="
+            - name: APP_POSTGRES_HOSTNAME
+              value: postgres
+            - name: APP_POSTGRES_USERNAME
+              value: comics
+            - name: APP_POSTGRES_PASSWORD
+              value: comics
+            - name: APP_POSTGRES_DATABASE
+              value: comics
           args:
             - services/archives.service.js
           ports:
@@ -57,4 +65,4 @@ spec:
               memory: 64M
             limits:
               cpu: 1000m
-              memory: 128M
+              memory: 1024M

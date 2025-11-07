@@ -1,9 +1,8 @@
-const { Rabbit } = require('rabbit-queue')
 const { Meilisearch } = require('meilisearch')
 
 module.exports = {
   // Must overwrite it
-  name: '',
+  name: 'meilisearch',
   settings: {
     meilisearch: {
       hostname: '',
@@ -27,11 +26,9 @@ module.exports = {
     this.logger.info('meilisearch mixin created')
   },
   async started () {
-    this.broker.$meilisearch.index(this.settings.meilisearch.index)
     this.logger.info('meilisearch mixin started')
   },
 	async stopped() {
-    // this.broker.$meilisearch.deleteIndex(this.settings.meilisearch.index)
     this.logger.info('meilisearch mixin stopped')
 	}
 }

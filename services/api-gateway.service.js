@@ -79,6 +79,27 @@ module.exports = {
         'GET api/v1/marvel/stories/:id': 'MarvelStories.getStory',
         'GET api/v1/marvel/stories': 'MarvelStories.searchStories',
 
+        'POST generate/catalog' (req, res) {
+          // Emit a moleculer event to accelerate the callback.
+          const params = {
+            source: path.resolve(__dirname, `${archivesMountPath}/**/*.cb*`),
+            ...req.$params
+          }
+          req.$ctx.broker.emit('ArchivesDomain.GenerateCatalogInitialized', params)
+          res.setHeader('Content-Type', 'application/json; charset=utf-8')
+          res.end(JSON.stringify({ called: true, params: req.$params }))
+        },
+        'POST clean/catalog' (req, res) {
+          // Emit a moleculer event to accelerate the callback.
+          const params = {
+            source: path.resolve(__dirname, `${archivesMountPath}/weekly/`),
+            ...req.$params
+          }
+          req.$ctx.broker.emit('ArchivesDomain.CleanCatalogInitialized', params)
+          res.setHeader('Content-Type', 'application/json; charset=utf-8')
+          res.end(JSON.stringify({ called: true, params: req.$params }))
+        },
+
         async 'GET images' (req, res) {
           try {
             let cmd

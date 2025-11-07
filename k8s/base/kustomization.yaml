@@ -8,6 +8,7 @@ resources:
   - ingress.yaml
 
   - api/
+  - archives/
   - graphql/
   # - marvel/
 

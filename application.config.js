@@ -14,6 +14,7 @@ let APP_MOLECULER_APOLLO_PORT = 7000
 let APP_NATS_PORT = 4222
 let APP_REDIS_PORT = 6379
 let APP_MEILISEARCH_PORT = 7700
+let APP_POSTGRES_PORT = 5432
 let APP_GRAPHQL_ONE_MINUTE_CACHE_TTL = 60
 let APP_GRAPHQL_ONE_DAY_CACHE_TTL = 86400
 let APP_GRAPHQL_ONE_YEAR_CACHE_TTL = 31557600
@@ -26,6 +27,7 @@ if (nconf.get('APP_MOLECULER_METRICS_PORT')) { APP_MOLECULER_METRICS_PORT = pars
 if (nconf.get('APP_MOLECULER_APOLLO_PORT')) { APP_MOLECULER_APOLLO_PORT = parseInt(nconf.get('APP_MOLECULER_APOLLO_PORT')) }
 if (nconf.get('APP_NATS_PORT')) { APP_NATS_PORT = parseInt(nconf.get('APP_NATS_PORT')) }
 if (nconf.get('APP_REDIS_PORT')) { APP_REDIS_PORT = parseInt(nconf.get('APP_REDIS_PORT')) }
+if (nconf.get('APP_POSTGRES_PORT')) { APP_POSTGRES_PORT = parseInt(nconf.get('APP_POSTGRES_PORT')) }
 if (nconf.get('APP_MEILISEARCH_PORT')) { APP_MEILISEARCH_PORT = parseInt(nconf.get('APP_MEILISEARCH_PORT')) }
 if (nconf.get('APP_GRAPHQL_ONE_MINUTE_CACHE_TTL')) { APP_GRAPHQL_ONE_MINUTE_CACHE_TTL = parseInt(nconf.get('APP_GRAPHQL_ONE_MINUTE_CACHE_TTL')) }
 if (nconf.get('APP_GRAPHQL_ONE_DAY_CACHE_TTL')) { APP_GRAPHQL_ONE_DAY_CACHE_TTL = parseInt(nconf.get('APP_GRAPHQL_ONE_DAY_CACHE_TTL')) }
@@ -41,6 +43,11 @@ const APP_NATS_HOSTNAME = nconf.get('APP_NATS_HOSTNAME') || 'localhost'
 const APP_REDIS_HOSTNAME = nconf.get('APP_REDIS_HOSTNAME') || 'localhost'
 const APP_MEILISEARCH_HOSTNAME = nconf.get('APP_MEILISEARCH_HOSTNAME') || 'localhost'
 const APP_MEILISEARCH_APIKEY = nconf.get('APP_MEILISEARCH_APIKEY') || 'api_key'
+const APP_POSTGRES_HOSTNAME = nconf.get('APP_POSTGRES_HOSTNAME') || 'localhost'
+const APP_POSTGRES_DATABASE = nconf.get('APP_POSTGRES_DATABASE') || 'comics'
+const APP_POSTGRES_USERNAME = nconf.get('APP_POSTGRES_USERNAME') || 'comics'
+const APP_POSTGRES_PASSWORD = nconf.get('APP_POSTGRES_PASSWORD') || 'comics'
+const APP_PGPUBSUB_CHANNEL = nconf.get('APP_PGPUBSUB_CHANNEL') || 'comics'
 
 const APP_ARCHIVES_MOUNT_PATH = nconf.get('APP_ARCHIVES_MOUNT_PATH') || '/usr/app/assets/data/archives'
 
@@ -78,6 +85,14 @@ module.exports = {
     port: APP_MEILISEARCH_PORT,
     apiKey: APP_MEILISEARCH_APIKEY
   },
+  postgres: {
+    hostname: APP_POSTGRES_HOSTNAME,
+    port: APP_POSTGRES_PORT,
+    database: APP_POSTGRES_DATABASE,
+    username: APP_POSTGRES_USERNAME,
+    password: APP_POSTGRES_PASSWORD
+  },
+  channel: APP_PGPUBSUB_CHANNEL,
   graphqlCache: {
     oneMinute: APP_GRAPHQL_ONE_MINUTE_CACHE_TTL,
     oneDay: APP_GRAPHQL_ONE_DAY_CACHE_TTL,

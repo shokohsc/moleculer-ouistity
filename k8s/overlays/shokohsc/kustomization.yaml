@@ -9,6 +9,7 @@ patchesStrategicMerge:
   - ingress.yaml
 
   - api/deployment.yaml
+  - archives/deployment.yaml
   - api/ingress.yaml
   - graphql/deployment.yaml
   - graphql/ingress.yaml

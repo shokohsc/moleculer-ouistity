@@ -2,24 +2,6 @@ const { graphqlCache } = require('../../application.config')
 
 module.exports = `
   """
-  This type describes a book entity. Cached for a day
-  """
-  type Book @cacheControl(maxAge: ${graphqlCache.oneDay}) {
-    id: String!
-    url: String!
-    pages: [Page]
-  }
-  """
-  This type describes a page entity. Cached for a day
-  """
-  type Page @cacheControl(maxAge: ${graphqlCache.oneDay}) {
-    id: String!
-    book: String!
-    url: String!
-    image: String!
-    archive: String!
-  }
-  """
   This type describes files as a result of browsing a directory or a query search. Cached for a minute
   """
   type FilesResult @cacheControl(maxAge: ${graphqlCache.oneMinute}) {

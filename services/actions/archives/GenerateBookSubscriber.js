@@ -6,20 +6,11 @@ const parseString = require('xml2js').parseString
 const handler = async function (ctx) {
   try {
     this.logger.info(ctx.action.name, ctx.params)
-    const { archive, pages } = ctx.params
-    // upsert books
-    const checksum = await ctx.broker.call('ArchivesDomain.GenerateChecksum', { file: archive })
-    const urn = `urn:ouistity:books:${snakeCase(path.basename(archive, path.extname(archive)))}:${checksum}`
-    const [book] = await ctx.broker.call('BooksDomain.searchBooksAndCovers', {filesChecksums: [checksum]})
-
-    if (book && book.archive === archive && book.cover.length > 0) {
-      return { success: true }
-    }
+    const { archive } = ctx.params
+    const urn = (`${snakeCase(path.basename(archive, path.extname(archive)))}`).replaceAll('_', '-')
 
     const data = {
       urn,
-      checksum,
-      url: `/api/v1/books/${urn}`,
       archive,
       basename: path.basename(archive)
     }
@@ -39,19 +30,8 @@ const handler = async function (ctx) {
       })
     }
 
-    if (book) {
-      await ctx.broker.call('BooksDomain.update', { id: book.id, data: { ...data, updatedAt: Date.now() } })
-    } else {
-      await ctx.broker.call('BooksDomain.insert', { data: { ...data, createdAt: Date.now() } })
-    }
+    await ctx.broker.$index.addDocuments([{id: urn, ...data}])
 
-    const index = ctx.broker.$meilisearch.index('comics')
-    await index.addDocuments([{id: checksum, ...data}])
-
-    // upsert pages for this book
-    if (pages === true) {
-      await ctx.broker.$rabbitmq.publishExchange('amq.topic', 'moleculer.archives-domain-generate-book-pages-catalog.key', { book: data })
-    }
     return { success: true }
   } catch (e) {
     /* istanbul ignore next */
@@ -63,8 +43,7 @@ const handler = async function (ctx) {
 
 module.exports = {
   params: {
-    archive: { type: 'string'},
-    pages: { type: 'boolean'}
+    archive: { type: 'string'}
   },
   handler
 }
