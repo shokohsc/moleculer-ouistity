@@ -9,7 +9,7 @@ resources:
 
   - api/
   - graphql/
-  # - marvel/
+  - marvel/
 
 configMapGenerator:
 - name: config

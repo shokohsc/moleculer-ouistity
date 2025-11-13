@@ -44,8 +44,8 @@ const APP_MEILISEARCH_APIKEY = nconf.get('APP_MEILISEARCH_APIKEY') || 'api_key'
 
 const APP_ARCHIVES_MOUNT_PATH = nconf.get('APP_ARCHIVES_MOUNT_PATH') || '/usr/app/assets/data/archives'
 
-const APP_MARVEL_PUBLIC_KEY = nconf.get('APP_MARVEL_PUBLIC_KEY') || 'public_key'
-const APP_MARVEL_PRIVATE_KEY = nconf.get('APP_MARVEL_PRIVATE_KEY') || 'private_key'
+const APP_MARVEL_PUBLIC_URL = nconf.get('APP_MARVEL_PUBLIC_URL') || 'https://bifrost.marvel.com'
+const APP_MARVEL_PUBLIC_URI = nconf.get('APP_MARVEL_PUBLIC_URL') || '/v1/catalog'
 
 module.exports = {
   global: {
@@ -84,7 +84,7 @@ module.exports = {
     oneYear: APP_GRAPHQL_ONE_YEAR_CACHE_TTL
   },
   marvel:{
-    publicKey: APP_MARVEL_PUBLIC_KEY,
-    privateKey: APP_MARVEL_PRIVATE_KEY
+    publicUrl: APP_MARVEL_PUBLIC_URL,
+    publicUri: APP_MARVEL_PUBLIC_URI
   }
 }

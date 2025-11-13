@@ -12,16 +12,6 @@ spec:
           env:
             - name: APP_GLOBAL_GATEWAY_URL
               value: https://api.ouistity.shokohsc.home
-            - name: APP_MARVEL_PUBLIC_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: marvel
-                  key: public-key
-            - name: APP_MARVEL_PRIVATE_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: marvel
-                  key: private-key
           args:
             - --hot
             - services/marvel/*.service.js

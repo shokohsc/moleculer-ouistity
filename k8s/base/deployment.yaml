@@ -106,7 +106,7 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
             - name: REDIS_HOSTS
-              value: redis
+              value: valkey
           ports:
             - name: http
               containerPort: 8081
