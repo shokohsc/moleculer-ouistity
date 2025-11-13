@@ -1,7 +1,3 @@
-const MarvelAPI = require('marvel-ts').MarvelAPI
-
-const { marvel: { publicKey, privateKey } } = require('../application.config')
-
 module.exports = {
   name: 'marvel',
   settings: {
