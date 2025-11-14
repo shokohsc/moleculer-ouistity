@@ -40,13 +40,7 @@ const getArchiveList = async (archive) => {
   const { stdout } = await sh(`7z l "${archive}"`, true)
   const entries = await parse(stdout)
   entries.files.sort((rowA, rowB) => {
-    if (rowA.name.toLowerCase() > rowB.name.toLowerCase()) {
-      return 1;
-    }
-    if (rowA.name.toLowerCase() < rowB.name.toLowerCase()) {
-      return -1;
-    }
-    return 0;
+    return rowA.name.toLowerCase().localeCompare(rowB.name.toLowerCase(), undefined, { numeric: true })
   })
 
   return entries.files
@@ -90,11 +84,7 @@ module.exports = {
         const rows = files
           .filter(file => path.extname(file.name).toLowerCase() !== '.xml')
           .map(function (file) { return {name: file.name, image: `/images?archive=${encodeURIComponent(book)}&file=${encodeURIComponent(file.name)}`}; })
-        const re = /\D/g
-        rows.forEach(r => {
-          r.name = r.name.padStart(9, '0')
-        })
-        rows.sort((a, b) => parseInt(a.name.replace(re, ''), 10) - parseInt(b.name.replace(re, ''), 10))
+        rows.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
         return {
           rows,
           total: rows.length

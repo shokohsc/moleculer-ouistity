@@ -55,29 +55,9 @@ module.exports = {
           res.end(JSON.stringify(openapiSpecification))
         },
 
-        'GET api/v1/marvel/characters/:id/comics': 'MarvelCharacters.getComics',
-        'GET api/v1/marvel/characters/:id': 'MarvelCharacters.getCharacter',
-        'GET api/v1/marvel/characters': 'MarvelCharacters.searchCharacters',
-
         'GET api/v1/marvel/comics/week': 'MarvelComics.getComicsWeek',
-        'GET api/v1/marvel/comics/:id': 'MarvelComics.getComic',
-        'GET api/v1/marvel/comics': 'MarvelComics.searchComics',
-
         'GET api/v1/marvel/creators/:id/comics': 'MarvelCreators.getComics',
-        'GET api/v1/marvel/creators/:id': 'MarvelCreators.getCreator',
-        'GET api/v1/marvel/creators': 'MarvelCreators.searchCreators',
-
-        'GET api/v1/marvel/events/:id/comics': 'MarvelEvents.getComics',
-        'GET api/v1/marvel/events/:id': 'MarvelEvents.getEvent',
-        'GET api/v1/marvel/events': 'MarvelEvents.searchEvents',
-
         'GET api/v1/marvel/series/:id/comics': 'MarvelSeries.getComics',
-        'GET api/v1/marvel/series/:id': 'MarvelSeries.getSerie',
-        'GET api/v1/marvel/series': 'MarvelSeries.searchSeries',
-
-        'GET api/v1/marvel/stories/:id/comics': 'MarvelStories.getComics',
-        'GET api/v1/marvel/stories/:id': 'MarvelStories.getStory',
-        'GET api/v1/marvel/stories': 'MarvelStories.searchStories',
 
         async 'GET images' (req, res) {
           try {
